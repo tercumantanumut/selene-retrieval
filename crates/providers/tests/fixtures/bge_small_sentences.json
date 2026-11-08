@@ -1,0 +1,22 @@
+[
+"The quick brown fox jumps over the lazy dog.",
+"Represent this sentence for searching relevant passages: how do I rebuild the vector index?",
+"SQLite's query planner chooses an index based on table statistics gathered by ANALYZE.",
+"fn main() { println!(\"hello, world\"); }",
+"The TLS handshake failed because the certificate chain was incomplete.",
+"Kneading the sourdough for ten minutes develops the gluten network.",
+"Exoplanet transits are detected as tiny periodic dips in a star's brightness.",
+"Windows Defender may briefly lock a file right after it is written.",
+"Café crème brûlée naïve façade — Unicode accents should tokenize fine.",
+"数据库索引可以显著提高查询速度。",
+"Path traversal attacks use sequences like ../../etc/passwd to escape a sandbox.",
+"Cosine similarity of two L2-normalised vectors equals their dot product.",
+"",
+"a",
+"Reference code TKN01234 appears in the changelog for release 2.3.1.",
+"The settings page has an Advanced section that most users never open.",
+"Retry with exponential backoff after a DNS lookup timeout.",
+"C:\\Users\\me\\Documents\\notes\\2026-10-17 meeting.md",
+"In 1969, Apollo 11 landed on the Moon; Neil Armstrong was the first to step onto the surface, followed by Buzz Aldrin, while Michael Collins orbited above in the command module Columbia, and the mission returned safely to Earth on July 24 after splashing down in the Pacific Ocean, completing one of the most ambitious engineering projects ever undertaken by humanity, involving hundreds of thousands of people across industry, government and universities, and costing billions of dollars over the course of the decade-long programme that began with President Kennedy's challenge in 1961.",
+"Embedding models map text to dense vectors so that similar meanings land close together."
+]

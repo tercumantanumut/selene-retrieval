@@ -1,0 +1,43 @@
+# sr-msi-ca: the MSI's small custom-action DLL (M5-I, installer/wix/). Built only by
+# `cargo xtask package --msi`; never installed (it lives in the MSI's Binary table). Its own nested
+# workspace like sr-setup (M5-I owns installer/, not the root Cargo.toml). No dependency besides
+# windows-sys (already in the root lockfile at this version).
+# Static VC runtime (hybrid CRT, Amendment 4.1).
+[package]
+name = "sr-msi-ca"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.95"
+license = "Apache-2.0"
+publish = false
+
+[lib]
+name = "sr_msi_ca"
+path = "src/lib.rs"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+windows-sys = { version = "0.61.2", features = [
+  "Win32_Foundation", "Win32_System_ApplicationInstallationAndServicing", "Win32_System_Registry",
+] }
+
+[workspace]
+
+[workspace.lints.rust]
+unsafe_code = "deny"           # reviewed module only: src/lib.rs `ffi` (msi.dll + registry calls)
+[workspace.lints.clippy]
+unwrap_used = "deny"
+expect_used = "warn"
+dbg_macro = "deny"
+
+[lints]
+workspace = true
+
+# A panic must never unwind into msiexec (extern "system" aborts anyway; this keeps it small).
+[profile.release]
+lto = "thin"
+codegen-units = 1
+panic = "abort"
+debug = "line-tables-only"
+[profile.dev]
+panic = "abort"

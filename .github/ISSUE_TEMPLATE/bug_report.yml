@@ -1,0 +1,84 @@
+name: Bug report
+description: Something doesn't work as it should.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a problem. Please check the existing issues first.
+        Security problems must not be reported here: see [SECURITY.md](https://github.com/tercumantanumut/selene-retrieval/blob/main/SECURITY.md).
+
+  - type: checkboxes
+    id: not-security
+    attributes:
+      label: This is not a security issue
+      options:
+        - label: I confirm this is not a security vulnerability. Vulnerabilities go through [SECURITY.md](https://github.com/tercumantanumut/selene-retrieval/blob/main/SECURITY.md), never public issues.
+          required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Describe the problem. Copy any message the app showed, word for word.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: What did you do, step by step?
+      placeholder: |
+        1. Open Selene Retrieval
+        2. Go to ...
+        3. Press ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Selene Retrieval version
+      description: In the app, open Settings. The Help section shows "Selene Retrieval" and the version number.
+      placeholder: "0.1.0"
+    validations:
+      required: true
+
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version
+      description: Press Windows+R, type winver and press Enter.
+      placeholder: "Windows 11 24H2"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: ai-app
+    attributes:
+      label: Which AI app?
+      description: The app you connected to Selene Retrieval, if any.
+      options:
+        - Claude Desktop
+        - Cursor
+        - VS Code
+        - Other
+    validations:
+      required: false
+
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostics
+      description: In the app, open Settings, go to Help and press "Copy diagnostics", then paste here. Diagnostics never include your files, searches, folder names or keys. Leave this empty if the app doesn't start.
+      render: json
+    validations:
+      required: false

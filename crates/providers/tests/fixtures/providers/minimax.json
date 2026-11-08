@@ -1,0 +1,106 @@
+{
+  "provider": "minimax",
+  "source": "Recorded shapes for contract tests (M3-P, 2026-10-19). Bodies follow each provider's public API reference; values are synthetic. No live capture: no real keys or network are used in tests.",
+  "chat_model": "MiniMax-M2.1",
+  "validate": {
+    "status": 200,
+    "body": {
+      "id": "chatcmpl-test",
+      "object": "chat.completion",
+      "created": 1760000000,
+      "model": "MiniMax-M2.1-lightning",
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "p"
+          },
+          "finish_reason": "stop"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 42,
+        "completion_tokens": 7,
+        "total_tokens": 49
+      }
+    }
+  },
+  "chat": {
+    "status": 200,
+    "body": {
+      "id": "chatcmpl-test",
+      "object": "chat.completion",
+      "created": 1760000000,
+      "model": "MiniMax-M2.1",
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "The answer is in notes.md."
+          },
+          "finish_reason": "stop"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 42,
+        "completion_tokens": 7,
+        "total_tokens": 49
+      }
+    }
+  },
+  "stream": [
+    "data: {\"id\":\"chatcmpl-test\",\"object\":\"chat.completion.chunk\",\"created\":1760000000,\"model\":\"MiniMax-M2.1\",\"choices\":[{\"index\":0,\"delta\":{\"role\":\"assistant\",\"content\":\"\"},\"finish_reason\":null}]}",
+    "data: {\"id\":\"chatcmpl-test\",\"object\":\"chat.completion.chunk\",\"created\":1760000000,\"model\":\"MiniMax-M2.1\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"The answer \"},\"finish_reason\":null}]}",
+    "data: {\"id\":\"chatcmpl-test\",\"object\":\"chat.completion.chunk\",\"created\":1760000000,\"model\":\"MiniMax-M2.1\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"is in notes.md.\"},\"finish_reason\":null}]}",
+    "data: {\"id\":\"chatcmpl-test\",\"object\":\"chat.completion.chunk\",\"created\":1760000000,\"model\":\"MiniMax-M2.1\",\"choices\":[{\"index\":0,\"delta\":{},\"finish_reason\":\"stop\"}]}",
+    "data: {\"id\":\"chatcmpl-test\",\"object\":\"chat.completion.chunk\",\"choices\":[],\"usage\":{\"prompt_tokens\":42,\"completion_tokens\":7,\"total_tokens\":49}}",
+    "data: [DONE]"
+  ],
+  "errors": {
+    "auth": {
+      "status": 401,
+      "body": {
+        "error": {
+          "message": "invalid api key",
+          "type": "authorized_error"
+        }
+      },
+      "expect": "ProviderAuth"
+    },
+    "quota": {
+      "status": 429,
+      "body": {
+        "error": {
+          "message": "insufficient balance",
+          "type": "insufficient_quota"
+        }
+      },
+      "expect": "ProviderQuota"
+    },
+    "rate": {
+      "status": 429,
+      "body": {
+        "error": {
+          "message": "rate limit exceeded(RPM)",
+          "type": "rate_limit_exceeded"
+        }
+      },
+      "expect": "RateLimited",
+      "headers": {
+        "retry-after": "4"
+      }
+    },
+    "unavailable": {
+      "status": 500,
+      "body": {
+        "error": {
+          "message": "unknown error",
+          "type": "server_error"
+        }
+      },
+      "expect": "ProviderUnavailable"
+    }
+  }
+}

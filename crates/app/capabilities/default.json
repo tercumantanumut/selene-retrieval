@@ -1,0 +1,12 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Main window, least privilege: listen to the app's pushed events, open the folder picker, and the save dialog for 'Save diagnostics as a file' (M4, OQ-30; the file is written by the app's own command, which accepts only a .txt path). App commands (typed via tauri-specta) need no plugin permission. No shell, fs, http, opener or window-management permissions.",
+  "windows": ["main"],
+  "permissions": [
+    "core:event:allow-listen",
+    "core:event:allow-unlisten",
+    "dialog:allow-open",
+    "dialog:allow-save"
+  ]
+}

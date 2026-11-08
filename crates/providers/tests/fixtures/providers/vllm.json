@@ -1,0 +1,142 @@
+{
+  "provider": "vllm",
+  "source": "Recorded shapes for contract tests (M3-P, 2026-10-19). Bodies follow each provider's public API reference; values are synthetic. No live capture: no real keys or network are used in tests.",
+  "chat_model": "Qwen/Qwen3-8B",
+  "validate": {
+    "status": 200,
+    "body": {
+      "object": "list",
+      "data": [
+        {
+          "id": "Qwen/Qwen3-8B",
+          "object": "model",
+          "created": 1760000000,
+          "owned_by": "test",
+          "root": "Qwen/Qwen3-8B",
+          "max_model_len": 32768
+        }
+      ]
+    }
+  },
+  "models": {
+    "status": 200,
+    "body": {
+      "object": "list",
+      "data": [
+        {
+          "id": "Qwen/Qwen3-8B",
+          "object": "model",
+          "created": 1760000000,
+          "owned_by": "test",
+          "max_model_len": 32768
+        },
+        {
+          "id": "BAAI/bge-m3",
+          "object": "model",
+          "created": 1760000000,
+          "owned_by": "test"
+        }
+      ]
+    },
+    "expect_ids": [
+      "Qwen/Qwen3-8B",
+      "BAAI/bge-m3"
+    ]
+  },
+  "chat": {
+    "status": 200,
+    "body": {
+      "id": "chatcmpl-test",
+      "object": "chat.completion",
+      "created": 1760000000,
+      "model": "Qwen/Qwen3-8B",
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "The answer is in notes.md."
+          },
+          "finish_reason": "stop"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 42,
+        "completion_tokens": 7,
+        "total_tokens": 49
+      }
+    }
+  },
+  "stream": [
+    "data: {\"id\":\"chatcmpl-test\",\"object\":\"chat.completion.chunk\",\"created\":1760000000,\"model\":\"Qwen/Qwen3-8B\",\"choices\":[{\"index\":0,\"delta\":{\"role\":\"assistant\",\"content\":\"\"},\"finish_reason\":null}]}",
+    "data: {\"id\":\"chatcmpl-test\",\"object\":\"chat.completion.chunk\",\"created\":1760000000,\"model\":\"Qwen/Qwen3-8B\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"The answer \"},\"finish_reason\":null}]}",
+    "data: {\"id\":\"chatcmpl-test\",\"object\":\"chat.completion.chunk\",\"created\":1760000000,\"model\":\"Qwen/Qwen3-8B\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"is in notes.md.\"},\"finish_reason\":null}]}",
+    "data: {\"id\":\"chatcmpl-test\",\"object\":\"chat.completion.chunk\",\"created\":1760000000,\"model\":\"Qwen/Qwen3-8B\",\"choices\":[{\"index\":0,\"delta\":{},\"finish_reason\":\"stop\"}]}",
+    "data: {\"id\":\"chatcmpl-test\",\"object\":\"chat.completion.chunk\",\"choices\":[],\"usage\":{\"prompt_tokens\":42,\"completion_tokens\":7,\"total_tokens\":49}}",
+    "data: [DONE]"
+  ],
+  "embeddings": {
+    "model": "BAAI/bge-m3",
+    "status": 200,
+    "body": {
+      "object": "list",
+      "model": "BAAI/bge-m3",
+      "data": [
+        {
+          "object": "embedding",
+          "index": 1,
+          "embedding": [
+            0.0,
+            3.0,
+            0.0,
+            4.0
+          ]
+        },
+        {
+          "object": "embedding",
+          "index": 0,
+          "embedding": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 8,
+        "total_tokens": 8
+      }
+    }
+  },
+  "errors": {
+    "auth": {
+      "status": 401,
+      "body": {
+        "error": "Unauthorized"
+      },
+      "expect": "ProviderAuth"
+    },
+    "too_long": {
+      "status": 400,
+      "body": {
+        "object": "error",
+        "message": "This model's maximum context length is 32768 tokens.",
+        "type": "BadRequestError",
+        "param": null,
+        "code": 400
+      },
+      "expect": "ProviderRequest"
+    },
+    "unavailable": {
+      "status": 503,
+      "body": {
+        "object": "error",
+        "message": "Service Unavailable",
+        "type": "ServiceUnavailableError",
+        "code": 503
+      },
+      "expect": "ProviderUnavailable"
+    }
+  }
+}

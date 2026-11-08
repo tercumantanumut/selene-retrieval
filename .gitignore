@@ -1,0 +1,25 @@
+/target/
+**/*.rs.bk
+/ui/node_modules/
+/ui/dist/
+/vendor-bin/
+# Cargo.lock is committed (binaries).
+
+# M0 spikes: build output, vendored toolchains, downloaded models, venvs (multi-GB, reproducible)
+/spikes/**/target/
+/spikes/**/vendor/
+/spikes/**/models/
+/spikes/**/ortdll/
+/spikes/**/.venv/
+*.onnx
+*.zip
+
+# Latest built installers (kept for local testing)
+/installers/
+
+# Tool logs (pip, cargo build captures) and Python caches
+*.log
+__pycache__/
+
+# Generated extract-sandbox fixtures (159 MB): `python spikes/extract-sandbox/gen_fixtures.py --extra`
+/spikes/extract-sandbox/fixtures/

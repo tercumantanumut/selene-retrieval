@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Selene Retrieval: per-user MSI (owner: M5-I). WiX Toolset v5 (MS-RL; xtask/src/fetch.rs WIX).
+
+  Same install as the NSIS setup: %LOCALAPPDATA%\Selene Retrieval\ with the same files, a Start
+  menu shortcut, no administrator prompt, and the same hidden helper (sr-setup.exe, the commands
+  crates/app/nsis/hooks.nsh runs). Built only by `cargo xtask package` with its MSI option, which passes:
+    SrVersion   x.y.z                    SrAppId     tauri.conf.json identifier
+    SrIcon      app icon (.ico)          SrCa        sr-msi-ca DLL (installer/msi-ca)
+    SrWebView2  Microsoft's WebView2 bootstrapper, or the standalone runtime (offline variant);
+                run only when WebView2 is missing (Amendment 7.4)
+    SrWebView2Offline  1, only in the offline variant (Finish-page wording)
+  and compiles this file with the generated files.wxs (component per folder, explicit file list)
+  and en-us.wxl.
+
+  Command line (msiexec):
+    msiexec /i SeleneRetrieval-<v>-x64.msi            full UI (Welcome, progress, Finish)
+    msiexec /i ... /qn                                 silent
+    msiexec /x ... [DELETEAPPDATA=1] [/qn]             uninstall; the search index is kept unless
+                                                       DELETEAPPDATA=1 (same rule as NSIS
+                                                       /DELETEAPPDATA)
+  Upgrades: every build has a new ProductCode and the same UpgradeCode; a newer (or equal, for
+  rebuilds) version replaces the old one in place (old product removed first, then the new one is
+  installed into the remembered folder). A downgrade is refused with a plain message.
+  Coexistence: the MSI refuses to install over the NSIS setup (and NSIS over the MSI), because both
+  use the same folder.
+-->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="Selene Retrieval"
+           Manufacturer="Selene"
+           Version="$(var.SrVersion)"
+           UpgradeCode="5952867F-2B9A-4B9F-9873-FC6F7567F682"
+           Scope="perUser"
+           Compressed="yes"
+           Language="1033"
+           InstallerVersion="500">
+    <SummaryInformation Description="Selene Retrieval $(var.SrVersion) Setup" Manufacturer="Selene" />
+
+    <MajorUpgrade Schedule="afterInstallInitialize"
+                  AllowSameVersionUpgrades="yes"
+                  DowngradeErrorMessage="A newer version of Selene Retrieval is already installed. Nothing was changed." />
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+
+    <Icon Id="SrIcon" SourceFile="$(var.SrIcon)" />
+    <Property Id="ARPPRODUCTICON" Value="SrIcon" />
+    <Property Id="ARPNOMODIFY" Value="1" />
+    <Property Id="ARPNOREPAIR" Value="1" />
+    <SetProperty Id="ARPINSTALLLOCATION" Value="[INSTALLFOLDER]" After="CostFinalize" Sequence="execute" />
+    <!-- We stop our own processes (sr-setup stop) before files are checked; Restart Manager must
+         never offer to close Claude, Cursor or VS Code because they hold an sr-bridge.exe. -->
+    <Property Id="MSIRESTARTMANAGERCONTROL" Value="Disable" />
+
+    <!-- The folder of an existing install (an upgrade goes to the same place). -->
+    <Property Id="INSTALLFOLDER" Secure="yes">
+      <RegistrySearch Id="SrInstallDirSearch" Root="HKCU" Key="Software\Selene\Selene Retrieval" Name="InstallDir" Type="raw" />
+    </Property>
+
+    <!-- The NSIS setup owns the same folder: never install over it. -->
+    <Property Id="SR_NSIS_INSTALLED">
+      <RegistrySearch Id="SrNsisSearch" Root="HKCU" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\SeleneRetrieval" Name="UninstallString" Type="raw" />
+    </Property>
+    <Launch Condition="Installed OR REMOVE OR NOT SR_NSIS_INSTALLED"
+            Message="Selene Retrieval is already installed with its standard setup. To use this package instead, first remove Selene Retrieval in Settings, Apps, Installed apps (your search index is kept), then run this package again." />
+
+    <!-- Offline package (standalone WebView2 runtime bundled): the Finish-page text for a failed
+         WebView2 setup must not blame the internet connection (sr-msi-ca SrWebView2Result). -->
+<?ifdef SrWebView2Offline ?>
+    <Property Id="SR_WV2_OFFLINE" Value="1" />
+<?endif ?>
+
+    <!-- Uninstall options. DELETEAPPDATA=1 also deletes the search index (default: kept). -->
+    <Property Id="DELETEAPPDATA" Secure="yes" Value="0" />
+    <SetProperty Id="SR_DELETE_ARG" Value="--delete-data" Before="CostFinalize" Sequence="execute" Condition="DELETEAPPDATA = 1" />
+    <SetProperty Id="SR_NOTICE_FILE" Value="[TempFolder]SeleneRetrieval-uninstall-notice.txt" Before="CostFinalize" Sequence="execute" />
+
+    <!-- Install layout: %LOCALAPPDATA%\Selene Retrieval (same as NSIS / Tauri currentUser). -->
+    <StandardDirectory Id="LocalAppDataFolder">
+      <Directory Id="INSTALLFOLDER" Name="Selene Retrieval" />
+    </StandardDirectory>
+
+    <!-- Per-user state: the remembered folder and the "installed by MSI" marker that makes the NSIS
+         setup step aside. Per-user components need a registry key path (ICE38). -->
+    <Component Id="SrState" Directory="INSTALLFOLDER" Guid="2B2F26C9-145F-4FEC-BBA3-AC59D0727D05">
+      <RegistryValue Root="HKCU" Key="Software\Selene\Selene Retrieval" Name="InstallDir" Type="string" Value="[INSTALLFOLDER]" KeyPath="yes" />
+      <RegistryValue Root="HKCU" Key="Software\Selene\Selene Retrieval" Name="InstalledBy" Type="string" Value="msi" />
+      <RemoveFile Id="SrOldCopies" Name="*.sr-old" On="both" />
+      <RemoveFolder Id="SrRemoveInstallFolder" On="uninstall" />
+      <RemoveRegistryKey Root="HKCU" Key="Software\Selene\Selene Retrieval" Action="removeOnUninstall" />
+    </Component>
+
+    <!-- Start menu shortcut "Selene Retrieval" (same name and place as NSIS). -->
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Component Id="SrShortcut" Guid="644C74A1-6DB2-45D4-B85D-96491A72F7D5">
+        <Shortcut Id="SrStartMenu" Name="Selene Retrieval" Description="Search your folders from Claude and other AI apps"
+                  Target="[#f_sr_app_exe]" WorkingDirectory="INSTALLFOLDER" />
+        <RegistryValue Root="HKCU" Key="Software\Selene\Selene Retrieval" Name="StartMenuShortcut" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </StandardDirectory>
+
+    <Feature Id="Main" Title="Selene Retrieval" AllowAbsent="no">
+      <ComponentGroupRef Id="SrFiles" />
+      <ComponentRef Id="SrState" />
+      <ComponentRef Id="SrShortcut" />
+    </Feature>
+
+    <!-- ===== Custom actions =====
+         sr-setup.exe does the same work as in hooks.nsh. Every step is idempotent and never fails
+         the install (Return="ignore"): the daemon self-heals the ACE and re-registers a missing
+         task. `"[INSTALLFOLDER]\"` passes the folder with a trailing backslash; the doubled
+         backslash keeps the closing quote (sr-setup drops the separator). -->
+    <Binary Id="SrCa" SourceFile="$(var.SrCa)" />
+    <Binary Id="SrWv2" SourceFile="$(var.SrWebView2)" />
+
+    <!-- Before files are checked (so nothing is "in use"): the installed helper drains the
+         background service. On an upgrade it moves an in-use sr-bridge.exe aside instead of
+         stopping the MCP client that runs it (Claude then says "Restart Claude to finish."). -->
+    <CustomAction Id="SrStopUpdate" Directory="INSTALLFOLDER" Execute="immediate" Impersonate="yes" Return="ignore"
+                  ExeCommand="&quot;[INSTALLFOLDER]sr-setup.exe&quot; stop --install-dir &quot;[INSTALLFOLDER]\&quot; --mode update" />
+    <CustomAction Id="SrStopUninstall" Directory="INSTALLFOLDER" Execute="immediate" Impersonate="yes" Return="ignore"
+                  ExeCommand="&quot;[INSTALLFOLDER]sr-setup.exe&quot; stop --install-dir &quot;[INSTALLFOLDER]\&quot; --mode uninstall" />
+    <!-- After files are written: sandbox reader access, data folder, per-user task. -->
+    <CustomAction Id="SrInstall" FileRef="f_sr_setup_exe" Execute="deferred" Impersonate="yes" Return="ignore"
+                  ExeCommand="install --install-dir &quot;[INSTALLFOLDER]\&quot;" />
+    <!-- Before files are removed: task (+ empty \SR folder), client entries, sandbox profile,
+         saved keys, autostart values, the app's WebView2 cache; the index only with DELETEAPPDATA=1.
+         A settings file we may not edit is named in the summary (R-UX43). -->
+    <CustomAction Id="SrUninstall" FileRef="f_sr_setup_exe" Execute="deferred" Impersonate="yes" Return="ignore"
+                  ExeCommand="uninstall --install-dir &quot;[INSTALLFOLDER]\&quot; --app-id $(var.SrAppId) --notice-file &quot;[SR_NOTICE_FILE]&quot; [SR_DELETE_ARG]" />
+    <CustomAction Id="SrShowNotice" BinaryRef="SrCa" DllEntry="SrShowNotice" Execute="immediate" Return="ignore" />
+
+    <!-- WebView2 (the app window's engine): installed for this user only when missing. Search
+         from Claude works without it, so a failure never fails the install (OQ-14). -->
+    <CustomAction Id="SrWv2Detect" BinaryRef="SrCa" DllEntry="SrWebView2Detect" Execute="immediate" Return="ignore" />
+    <CustomAction Id="SrWv2Install" BinaryRef="SrWv2" ExeCommand="/silent /install" Execute="deferred" Impersonate="yes" Return="ignore" />
+    <CustomAction Id="SrWv2Result" BinaryRef="SrCa" DllEntry="SrWebView2Result" Execute="immediate" Return="ignore" />
+
+    <!-- Finish page "Open Selene Retrieval". -->
+    <CustomAction Id="SrLaunchApp" FileRef="f_sr_app_exe" ExeCommand="" Execute="immediate" Impersonate="yes" Return="asyncNoWait" />
+
+    <InstallExecuteSequence>
+      <Custom Action="SrWv2Detect" After="CostFinalize" Condition="NOT REMOVE~=&quot;ALL&quot;" />
+      <Custom Action="SrStopUpdate" Before="InstallValidate" Condition="WIX_UPGRADE_DETECTED AND NOT REMOVE~=&quot;ALL&quot;" />
+      <Custom Action="SrStopUninstall" Before="InstallValidate" Condition="REMOVE~=&quot;ALL&quot; AND NOT UPGRADINGPRODUCTCODE" />
+      <Custom Action="SrUninstall" Before="RemoveFiles" Condition="REMOVE~=&quot;ALL&quot; AND NOT UPGRADINGPRODUCTCODE" />
+      <Custom Action="SrInstall" After="InstallFiles" Condition="NOT REMOVE~=&quot;ALL&quot;" />
+      <Custom Action="SrWv2Install" After="SrInstall" Condition="NOT REMOVE~=&quot;ALL&quot; AND NOT SR_WV2_VERSION" />
+      <Custom Action="SrShowNotice" After="InstallFinalize" Condition="REMOVE~=&quot;ALL&quot; AND NOT UPGRADINGPRODUCTCODE" />
+    </InstallExecuteSequence>
+
+    <!-- ===== UI: Welcome -> progress -> Finish (no licence page, no options) ===== -->
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Open Selene Retrieval" />
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
+    <UI Id="SrUI">
+      <TextStyle Id="WixUI_Font_Normal" FaceName="Segoe UI" Size="9" />
+      <TextStyle Id="WixUI_Font_Bigger" FaceName="Segoe UI" Size="12" />
+      <TextStyle Id="WixUI_Font_Title" FaceName="Segoe UI" Size="9" Bold="yes" />
+      <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
+
+      <DialogRef Id="ErrorDlg" />
+      <DialogRef Id="FatalError" />
+      <DialogRef Id="FilesInUse" />
+      <DialogRef Id="MsiRMFilesInUse" />
+      <DialogRef Id="PrepareDlg" />
+      <DialogRef Id="ProgressDlg" />
+      <DialogRef Id="ResumeDlg" />
+      <DialogRef Id="UserExit" />
+      <DialogRef Id="WelcomeDlg" />
+
+      <!-- First install: Welcome's Next starts the install (like WixUI_Minimal's Install button). -->
+      <Publish Dialog="WelcomeDlg" Control="Next" Event="EndDialog" Value="Return" Condition="NOT Installed" />
+      <Publish Dialog="ExitDialog" Control="Finish" Event="DoAction" Value="SrLaunchApp" Order="1"
+               Condition="WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 AND NOT Installed AND NOT REMOVE~=&quot;ALL&quot;" />
+      <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999" />
+
+      <!-- Running the package again: Remove (Change and Repair are not offered in Apps). -->
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" />
+      <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg" />
+      <Publish Dialog="MaintenanceTypeDlg" Control="RepairButton" Event="NewDialog" Value="VerifyReadyDlg" />
+      <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg" />
+      <Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg" />
+
+      <ProgressText Action="SrStopUpdate" Message="Stopping the background search service for the update..." />
+      <ProgressText Action="SrStopUninstall" Message="Stopping the background search service..." />
+      <ProgressText Action="SrInstall" Message="Setting up the background search service..." />
+      <ProgressText Action="SrUninstall" Message="Removing the background service and its settings..." />
+      <ProgressText Action="SrWv2Install" Message="Installing Microsoft Edge WebView2 (needed to show the app window)..." />
+
+      <InstallUISequence>
+        <!-- After the install ran: if WebView2 is still missing, the Finish page says what to do. -->
+        <Custom Action="SrWv2Result" After="ExecuteAction" Condition="NOT REMOVE~=&quot;ALL&quot;" />
+      </InstallUISequence>
+    </UI>
+    <UIRef Id="WixUI_Common" />
+  </Package>
+</Wix>

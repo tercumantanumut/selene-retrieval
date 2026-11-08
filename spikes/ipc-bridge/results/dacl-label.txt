@@ -1,0 +1,9 @@
+user SID: S-1-5-21-<machine>-1001
+daemon-side: "requested=D:P(A;;GA;;;S-1-5-21-<machine>-1001)S:(ML;;NWNR;;;ME) effective=O:S-1-5-21-<machine>-1001D:P(A;;FA;;;S-1-5-21-<machine>-1001)S:AI(ML;;NWNR;;;ME)"
+client-side GetSecurityInfo: O:S-1-5-21-<machine>-1001D:P(A;;FA;;;S-1-5-21-<machine>-1001)S:AI(ML;;NWNR;;;ME)
+  protected=true ace_count=2 only_user_sid_allow=false
+  [restricted token, user SID deny-only (other principal)] sr pipe: DENIED (ERROR_ACCESS_DENIED) | Everyone control pipe: OPENED
+  [restricted token, user SID intact (control)] sr pipe: OPENED | Everyone control pipe: OPENED
+  [same user, Low IL (S-1-16-4096)] sr pipe read+write: DENIED (5 ACCESS_DENIED) | read-only: DENIED (5 ACCESS_DENIED)
+  [same user, Medium IL (control)] sr pipe read+write: OPENED | read-only: OPENED
+  [SMB loopback \\localhost\pipe] sr pipe (reject-remote): DENIED (5 ACCESS_DENIED) | control pipe (no flag): OPENED

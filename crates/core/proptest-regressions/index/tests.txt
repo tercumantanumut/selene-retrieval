@@ -1,0 +1,7 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc a4577c9d0c9919ad16530d5c033d6d640dde599c3659f874bb7fff3962cd37f7 # shrinks to acts = [Purge { coll: 1, folder: 0 }, New { coll: 0, folder: 0, topic: 0 }, New { coll: 1, folder: 0, topic: 0 }, New { coll: 0, folder: 0, topic: 0 }]

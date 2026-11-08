@@ -1,0 +1,2 @@
+# Model files are never committed (66 MB+; sha256-pinned in sr-common::tier).
+/models/

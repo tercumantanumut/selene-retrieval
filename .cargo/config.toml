@@ -1,0 +1,16 @@
+# Workspace cargo config.
+#
+# C runtime (Amendment 3.1 / 3.16) is set PER PACKAGE, never here:
+#   * sr-bridge, sr-extract, sr-app (and sr-launch when it exists) link the VC++ runtime
+#     statically through their build.rs (`include!("../common/build/static_crt.rs")`), which emits
+#     `cargo:rustc-link-arg` only for that package. Result: no VCRUNTIME140*/MSVCP140* import;
+#     only KERNEL32, ntdll and the inbox UCRT apisets (verified with dumpbin; internal
+#     note, not published).
+#   * sr-daemon keeps the dynamic CRT (prebuilt ORT is /MD-only) and ships the four VC++ DLLs
+#     app-local.
+# A global `target.x86_64-pc-windows-msvc.rustflags = ["-C", "target-feature=+crt-static"]` would
+# hit sr-daemon and the M0 spikes too (cargo merges config by directory), so it must stay off.
+
+# `cargo xtask <cmd>` (M1-F; wave 2): check-bridge-deps, check-crt, check-delayload, schema, eval.
+[alias]
+xtask = "run -p xtask --"

@@ -1,0 +1,180 @@
+{"qid":"I001","kind":"identifier","query":"rrfFusion","rel":[["sym","rrfFusion",3],["sym","hybridSearchV2",2]],"refs":true}
+{"qid":"I002","kind":"identifier","query":"generateLexicalVector","rel":[["sym","generateLexicalVector",3],["sym","createDocumentRecord",2],["sym","searchLexical",2]],"refs":true}
+{"qid":"I003","kind":"identifier","query":"tokenizeForLex","rel":[["sym","tokenizeForLex",3],["sym","generateLexicalVector",1]],"refs":true}
+{"qid":"I004","kind":"identifier","query":"chunkByTokens","rel":[["sym","chunkByTokens",3],["sym","getChunksForIndexing",2]],"refs":true}
+{"qid":"I005","kind":"identifier","query":"scanTextFileLimits","rel":[["sym","scanTextFileLimits",3],["span","lib/vectordb/sync-file-processor.ts:143-185",2]],"refs":true}
+{"qid":"I006","kind":"identifier","query":"hybridSearchV2","rel":[["sym","hybridSearchV2",3],["sym","searchWithRouter",2]],"refs":true}
+{"qid":"I007","kind":"identifier","query":"searchWithRouter","rel":[["sym","searchWithRouter",3]],"refs":true}
+{"qid":"I008","kind":"identifier","query":"mmrDiversify","rel":[["sym","mmrDiversify",3]],"refs":true}
+{"qid":"I009","kind":"identifier","query":"sortByFusedScore","rel":[["sym","sortByFusedScore",3],["sym","hybridSearchV2",1]],"refs":true}
+{"qid":"I010","kind":"identifier","query":"expandQuery","rel":[["sym","lib/vectordb/v2/query-expansion.ts::expandQuery",3],["sym","getCodeExpansions",2]],"refs":true}
+{"qid":"I011","kind":"identifier","query":"getVectorSearchConfig","rel":[["sym","getVectorSearchConfig",3]],"refs":true}
+{"qid":"I012","kind":"identifier","query":"loadConfigFromEnv","rel":[["sym","loadConfigFromEnv",3],["sym","updateEnvFromSettings",2]],"refs":true}
+{"qid":"I013","kind":"identifier","query":"ensureAgentTable","rel":[["sym","ensureAgentTable",3]],"refs":true}
+{"qid":"I014","kind":"identifier","query":"compactAgentTable","rel":[["sym","compactAgentTable",3],["sym","compactAllAgentTables",2]],"refs":true}
+{"qid":"I015","kind":"identifier","query":"isDangerousPath","rel":[["sym","isDangerousPath",3]],"refs":true}
+{"qid":"I016","kind":"identifier","query":"createAggressiveIgnore","rel":[["sym","createAggressiveIgnore",3]],"refs":true}
+{"qid":"I017","kind":"identifier","query":"DEFAULT_IGNORE_PATTERNS","rel":[["sym","DEFAULT_IGNORE_PATTERNS",3]],"refs":true}
+{"qid":"I018","kind":"identifier","query":"recoverStuckSyncingFolders","rel":[["sym","recoverStuckSyncingFolders",3]],"refs":true}
+{"qid":"I019","kind":"identifier","query":"restartAllWatchers","rel":[["sym","restartAllWatchers",3]],"refs":true}
+{"qid":"I020","kind":"identifier","query":"processFileInBatch","rel":[["sym","processFileInBatch",3]],"refs":true}
+{"qid":"I021","kind":"identifier","query":"discoverFiles","rel":[["sym","discoverFiles",3]],"refs":true}
+{"qid":"I022","kind":"identifier","query":"shouldSmartReindex","rel":[["sym","shouldSmartReindex",3]],"refs":true}
+{"qid":"I023","kind":"identifier","query":"resolveFolderSyncBehavior","rel":[["sym","resolveFolderSyncBehavior",3]],"refs":true}
+{"qid":"I024","kind":"identifier","query":"resolveChunkingOverrides","rel":[["sym","resolveChunkingOverrides",3]],"refs":true}
+{"qid":"I025","kind":"identifier","query":"indexFileToVectorDB","rel":[["sym","indexFileToVectorDB",3]],"refs":true}
+{"qid":"I026","kind":"identifier","query":"removeFolderFromVectorDB","rel":[["sym","removeFolderFromVectorDB",3]],"refs":true}
+{"qid":"I027","kind":"identifier","query":"startWatching","rel":[["sym","lib/vectordb/file-watcher.ts::startWatching",3]],"refs":true}
+{"qid":"I028","kind":"identifier","query":"registerFolder","rel":[["sym","registerFolder",3]],"refs":true}
+{"qid":"I029","kind":"identifier","query":"readSyncedFile","rel":[["sym","readSyncedFile",3]],"refs":true}
+{"qid":"I030","kind":"identifier","query":"isPathAllowed","rel":[["sym","lib/ai/filesystem/path-utils.ts::isPathAllowed",3],["sym","lib/ai/vector-search/synthesizer.ts::isPathAllowed",2]],"refs":true}
+{"qid":"I031","kind":"identifier","query":"atomicWriteFile","rel":[["sym","atomicWriteFile",3]],"refs":true}
+{"qid":"I032","kind":"identifier","query":"searchWithRipgrep","rel":[["sym","searchWithRipgrep",3]],"refs":true}
+{"qid":"I033","kind":"identifier","query":"createLocalGrepTool","rel":[["sym","createLocalGrepTool",3]],"refs":true}
+{"qid":"I034","kind":"identifier","query":"createVectorSearchToolV2","rel":[["sym","createVectorSearchToolV2",3]],"refs":true}
+{"qid":"I035","kind":"identifier","query":"synthesizeSearchResults","rel":[["sym","synthesizeSearchResults",3]],"refs":true}
+{"qid":"I036","kind":"identifier","query":"rerankResults","rel":[["sym","rerankResults",3]],"refs":true}
+{"qid":"I037","kind":"identifier","query":"createLocalEmbeddingModel","rel":[["sym","createLocalEmbeddingModel",3]],"refs":true}
+{"qid":"I038","kind":"identifier","query":"DEFAULT_LOCAL_EMBEDDING_MODEL","rel":[["sym","DEFAULT_LOCAL_EMBEDDING_MODEL",3]],"refs":true}
+{"qid":"I039","kind":"identifier","query":"getEmbeddingModel","rel":[["sym","getEmbeddingModel",3],["sym","getEmbeddingModelId",1]],"refs":true}
+{"qid":"I040","kind":"identifier","query":"normalizeEmbedding","rel":[["sym","normalizeEmbedding",3],["sym","normalizeEmbeddings",2]],"refs":true}
+{"qid":"I041","kind":"identifier","query":"LOCAL_EMBEDDING_MODELS","rel":[["sym","LOCAL_EMBEDDING_MODELS",3]],"refs":true}
+{"qid":"I042","kind":"identifier","query":"validateModelConfiguration","rel":[["sym","validateModelConfiguration",3]],"refs":true}
+{"qid":"I043","kind":"identifier","query":"extractTextFromDocument","rel":[["sym","extractTextFromDocument",3]],"refs":true}
+{"qid":"I044","kind":"identifier","query":"chunkText","rel":[["sym","chunkText",3]],"refs":true}
+{"qid":"I045","kind":"identifier","query":"runDocling","rel":[["sym","runDocling",3]],"refs":true}
+{"qid":"I046","kind":"identifier","query":"loadSettings","rel":[["sym","loadSettings",3]],"refs":true}
+{"qid":"I047","kind":"identifier","query":"TaskQueue","rel":[["sym","TaskQueue",3]],"refs":true}
+{"qid":"I048","kind":"identifier","query":"executeCommand","rel":[["sym","lib/command-execution/executor.ts::executeCommand",3]],"refs":true}
+{"qid":"I049","kind":"identifier","query":"validateCommand","rel":[["sym","validateCommand",3]],"refs":true}
+{"qid":"I050","kind":"identifier","query":"truncateOutput","rel":[["sym","truncateOutput",3]],"refs":true}
+{"qid":"I051","kind":"identifier","query":"resilientFetch","rel":[["sym","resilientFetch",3]],"refs":true}
+{"qid":"I052","kind":"identifier","query":"getNextRunDate","rel":[["sym","getNextRunDate",3]],"refs":true}
+{"qid":"I053","kind":"identifier","query":"normalizeTimezone","rel":[["sym","normalizeTimezone",3]],"refs":true}
+{"qid":"I054","kind":"identifier","query":"dispatchHook","rel":[["sym","dispatchHook",3]],"refs":true}
+{"qid":"I055","kind":"identifier","query":"installPlugin","rel":[["sym","installPlugin",3]],"refs":true}
+{"qid":"I056","kind":"identifier","query":"claimChannelOutboxEntry","rel":[["sym","claimChannelOutboxEntry",3]],"refs":true}
+{"qid":"I057","kind":"identifier","query":"ContextWindowManager","rel":[["sym","ContextWindowManager",3]],"refs":true}
+{"qid":"I058","kind":"identifier","query":"CompactionService","rel":[["sym","CompactionService",3]],"refs":true}
+{"qid":"I059","kind":"identifier","query":"limitToolOutput","rel":[["sym","limitToolOutput",3]],"refs":true}
+{"qid":"I060","kind":"identifier","query":"guardToolResultForStreaming","rel":[["sym","guardToolResultForStreaming",3]],"refs":true}
+{"qid":"I061","kind":"identifier","query":"StdioClientTransport","rel":[["sym","StdioClientTransport",3]],"refs":true}
+{"qid":"I062","kind":"identifier","query":"sanitizeSchema","rel":[["sym","sanitizeSchema",3]],"refs":true}
+{"qid":"I063","kind":"identifier","query":"refreshAntigravityToken","rel":[["sym","refreshAntigravityToken",3]],"refs":true}
+{"qid":"I064","kind":"identifier","query":"truncateCodexInput","rel":[["sym","truncateCodexInput",3]],"refs":true}
+{"qid":"I065","kind":"identifier","query":"startH2Proxy","rel":[["sym","startH2Proxy",3]],"refs":true}
+{"qid":"I066","kind":"identifier","query":"ensureLocalCerts","rel":[["sym","ensureLocalCerts",3]],"refs":true}
+{"qid":"I067","kind":"identifier","query":"initializeVectorSync","rel":[["sym","initializeVectorSync",3]],"refs":true}
+{"qid":"I068","kind":"identifier","query":"LEX_DIM","rel":[["sym","LEX_DIM",3],["sym","generateLexicalVector",2]],"refs":true}
+{"qid":"I069","kind":"identifier","query":"MAX_FILE_INDEXING_TIMEOUT_MS","rel":[["sym","MAX_FILE_INDEXING_TIMEOUT_MS",3]],"refs":true}
+{"qid":"I070","kind":"identifier","query":"enableHybridSearch","rel":[["sym","lib/config/vector-search.ts::defaultConfig",3],["sym","hybridSearchV2",2],["sym","searchWithRouter",2]],"refs":true}
+{"qid":"N001","kind":"nl","query":"how are dense and keyword search results merged into one ranking","rel":[["sym","rrfFusion",3],["sym","hybridSearchV2",3],["sym","sortByFusedScore",2]]}
+{"qid":"N002","kind":"nl","query":"hashed bag of words vector used for keyword matching","rel":[["sym","generateLexicalVector",3],["sym","tokenizeForLex",2],["sym","LEX_DIM",1]]}
+{"qid":"N003","kind":"nl","query":"split camelCase and snake_case identifiers into search tokens","rel":[["sym","tokenizeForLex",3]]}
+{"qid":"N004","kind":"nl","query":"split a document into overlapping token windows with line numbers","rel":[["sym","chunkByTokens",3],["sym","chunkText",1],["sym","getChunksForIndexing",1]]}
+{"qid":"N005","kind":"nl","query":"character based chunking with overlap that avoids cutting sentences in half","rel":[["sym","chunkText",3]]}
+{"qid":"N006","kind":"nl","query":"skip files with too many lines or very long lines during folder sync","rel":[["sym","scanTextFileLimits",3],["span","lib/vectordb/sync-file-processor.ts:143-185",3],["sym","shouldApplyTextLineChecks",2]]}
+{"qid":"N007","kind":"nl","query":"default vector search settings such as RRF k and lexical weight","rel":[["sym","lib/config/vector-search.ts::defaultConfig",3],["span","lib/settings/settings-manager.ts:388-404",3],["sym","loadConfigFromEnv",1]]}
+{"qid":"N008","kind":"nl","query":"synonym table used to expand search queries","rel":[["sym","getCodeExpansions",3],["sym","lib/vectordb/v2/query-expansion.ts::expandQuery",3]]}
+{"qid":"N009","kind":"nl","query":"cross-encoder reranking of search results","rel":[["sym","rerankResults",3],["sym","RERANKER_MODELS",1],["sym","isValidRerankerModel",1]]}
+{"qid":"N010","kind":"nl","query":"maximal marginal relevance diversification of results","rel":[["sym","mmrDiversify",3]]}
+{"qid":"N011","kind":"nl","query":"convert LanceDB cosine distance into a similarity score and filter by minimum score","rel":[["sym","searchVectorDB",3],["sym","searchLexical",2]]}
+{"qid":"N012","kind":"nl","query":"which embedding model is used by default for local embeddings","rel":[["sym","DEFAULT_LOCAL_EMBEDDING_MODEL",3],["sym","LOCAL_EMBEDDING_MODELS",2],["sym","getEmbeddingModelId",2]]}
+{"qid":"N013","kind":"nl","query":"mean pooling and normalization when running transformers.js embeddings","rel":[["sym","createLocalEmbeddingModel",3],["sym","normalizeEmbedding",1]]}
+{"qid":"N014","kind":"nl","query":"instruction prefix added to text before embedding","rel":[["sym","applyQueryPrefix",3],["sym","resolveQueryPrefix",3],["sym","DEFAULT_QUERY_PREFIX",2]]}
+{"qid":"N015","kind":"nl","query":"L2 normalize an embedding vector to unit length","rel":[["sym","normalizeEmbedding",3],["sym","normalizeEmbeddings",3]]}
+{"qid":"N016","kind":"nl","query":"create the LanceDB table for an agent with the right vector dimensions","rel":[["sym","ensureAgentTable",3],["sym","getAgentTableName",2]]}
+{"qid":"N017","kind":"nl","query":"compact LanceDB tables and clean up old versions","rel":[["sym","compactAgentTable",3],["sym","compactAllAgentTables",2]]}
+{"qid":"N018","kind":"nl","query":"delete all indexed vectors belonging to a folder","rel":[["sym","removeFolderFromVectorDB",3],["sym","removeSyncFolder",2]]}
+{"qid":"N019","kind":"nl","query":"embed chunks in batches and store them in the vector table","rel":[["sym","embedAndStoreChunks",3],["sym","indexFileToVectorDB",2],["sym","resolveEmbeddingBatchSize",1]]}
+{"qid":"N020","kind":"nl","query":"recover folders stuck in syncing state after a crash","rel":[["sym","recoverStuckSyncingFolders",3],["sym","forceCleanupStuckFolders",2]]}
+{"qid":"N021","kind":"nl","query":"cancel a folder sync that is already running","rel":[["sym","cancelSyncByPath",3],["sym","cancelSyncById",3],["sym","removeSyncFolder",1]]}
+{"qid":"N022","kind":"nl","query":"watch a folder for file changes and reindex modified files","rel":[["sym","lib/vectordb/file-watcher.ts::startWatching",3],["sym","stopWatching",1]]}
+{"qid":"N023","kind":"nl","query":"share one file watcher between several folders that point at the same physical path","rel":[["sym","registerFolder",3],["sym","setWatcherOwner",2],["sym","resolveRegistryPathAsync",2],["sym","lib/vectordb/file-watcher.ts::startWatching",2]]}
+{"qid":"N024","kind":"nl","query":"limit how many open file descriptors the file watchers use","rel":[["sym","getWatcherFdBudget",3],["sym","getOpenFileDescriptorCount",2],["sym","isFileDescriptorLimitError",1]]}
+{"qid":"N025","kind":"nl","query":"refuse to sync system directories like the home folder or drive root","rel":[["sym","isDangerousPath",3],["sym","validateSyncFolderPath",2]]}
+{"qid":"N026","kind":"nl","query":"default ignore patterns like node_modules and .git","rel":[["sym","DEFAULT_IGNORE_PATTERNS",3],["sym","createAggressiveIgnore",2],["sym","createIgnoreMatcher",2]]}
+{"qid":"N027","kind":"nl","query":"recursively find the files to index in a folder with extension filters","rel":[["sym","discoverFiles",3],["sym","normalizeExtensions",1]]}
+{"qid":"N028","kind":"nl","query":"decide whether a folder needs a full reindex or only changed files","rel":[["sym","shouldSmartReindex",3],["sym","resolveFolderSyncBehavior",2]]}
+{"qid":"N029","kind":"nl","query":"map the chunk preset of a folder to chunk size and overlap overrides","rel":[["sym","resolveChunkingOverrides",3],["sym","normalizeChunkPreset",2]]}
+{"qid":"N030","kind":"nl","query":"start vector sync and file watchers when the app launches","rel":[["sym","initializeVectorSync",3],["sym","restartAllWatchers",2]]}
+{"qid":"N031","kind":"nl","query":"pause and resume syncing of a folder","rel":[["sym","pauseSyncFolder",3],["sym","resumeSyncFolder",3]]}
+{"qid":"N032","kind":"nl","query":"add a new synced folder for an agent","rel":[["sym","addSyncFolder",3]]}
+{"qid":"N033","kind":"nl","query":"mark one synced folder as the primary folder of a character","rel":[["sym","setPrimaryFolder",3],["sym","getPrimarySyncFolder",2]]}
+{"qid":"N034","kind":"nl","query":"check that a file path is inside the agent's synced folders","rel":[["sym","lib/ai/filesystem/path-utils.ts::isPathAllowed",3],["sym","lib/ai/vector-search/synthesizer.ts::isPathAllowed",2],["sym","validateExecutionDirectory",1],["sym","readSyncedFile",1]]}
+{"qid":"N035","kind":"nl","query":"read a file from a synced folder with size limits and typed error codes","rel":[["sym","readSyncedFile",3],["sym","ReadSyncedFileErrorCode",2]]}
+{"qid":"N036","kind":"nl","query":"write a file atomically through a temporary file and rename","rel":[["sym","atomicWriteFile",3]]}
+{"qid":"N037","kind":"nl","query":"search file contents with ripgrep","rel":[["sym","searchWithRipgrep",3],["sym","createLocalGrepTool",2],["sym","isRipgrepAvailable",1]]}
+{"qid":"N038","kind":"nl","query":"use a secondary LLM to synthesize search results into findings","rel":[["sym","synthesizeSearchResults",3]]}
+{"qid":"N039","kind":"nl","query":"vector search tool default max results and minimum score","rel":[["span","lib/ai/vector-search/tool.ts:235-262",3],["sym","createVectorSearchToolV2",2]]}
+{"qid":"N040","kind":"nl","query":"remember previous searches within the same chat session","rel":[["sym","getVectorSearchSession",3],["sym","addSearchHistory",3],["sym","getSearchHistory",2]]}
+{"qid":"N041","kind":"nl","query":"extract text from PDF files","rel":[["sym","extractFromPdf",3],["sym","loadPdfParseRuntime",2],["sym","extractTextFromDocument",2]]}
+{"qid":"N042","kind":"nl","query":"strip markdown links images and code blocks before indexing","rel":[["sym","normalizeMarkdown",3]]}
+{"qid":"N043","kind":"nl","query":"convert documents with docling","rel":[["sym","runDocling",3],["sym","extractWithDocling",3],["sym","createDoclingWorkDir",2]]}
+{"qid":"N044","kind":"nl","query":"load the o200k tokenizer at runtime","rel":[["sym","loadTokenizerRuntime",3]]}
+{"qid":"N045","kind":"nl","query":"cache settings and read the settings file from disk","rel":[["sym","loadSettings",3],["sym","invalidateSettingsCache",2]]}
+{"qid":"N046","kind":"nl","query":"copy app settings into process environment variables","rel":[["sym","updateEnvFromSettings",3],["sym","loadConfigFromEnv",2]]}
+{"qid":"N047","kind":"nl","query":"validate the embedding and reranker model configuration","rel":[["sym","validateModelConfiguration",3],["sym","isValidRerankerModel",2]]}
+{"qid":"N048","kind":"nl","query":"block dangerous shell commands before executing them","rel":[["sym","validateCommand",3],["sym","isCommandBlocked",2],["sym","executeCommandWithValidation",2]]}
+{"qid":"N049","kind":"nl","query":"keep the head and tail of very long terminal output","rel":[["sym","truncateOutput",3]]}
+{"qid":"N050","kind":"nl","query":"track background processes and kill them","rel":[["sym","startBackgroundProcess",3],["sym","killBackgroundProcess",3],["sym","listBackgroundProcesses",2]]}
+{"qid":"N051","kind":"nl","query":"fetch with timeout and retries that never throws","rel":[["sym","resilientFetch",3]]}
+{"qid":"N052","kind":"nl","query":"compute the next run time of a cron schedule","rel":[["sym","getNextRunDate",3],["sym","parseCronExpression",2]]}
+{"qid":"N053","kind":"nl","query":"deliver scheduled task results to Slack, email or a webhook","rel":[["sym","getDeliveryRouter",3],["sym","SlackDeliveryHandler",2],["sym","EmailDeliveryHandler",2],["sym","WebhookDeliveryHandler",2]]}
+{"qid":"N054","kind":"nl","query":"plugin hook that can block a tool call before it runs","rel":[["sym","runPreToolUseHooks",3],["sym","dispatchHook",3]]}
+{"qid":"N055","kind":"nl","query":"install a plugin together with its hooks and MCP servers","rel":[["sym","installPlugin",3],["sym","connectPluginMCPServers",1]]}
+{"qid":"N056","kind":"nl","query":"outbox for reliable channel message delivery with retries","rel":[["sym","claimChannelOutboxEntry",3],["sym","createChannelOutboxEntry",3],["sym","finalizeChannelOutboxEntry",2],["sym","resetStaleChannelOutboxEntries",2],["sym","listDueChannelOutboxEntries",2]]}
+{"qid":"N057","kind":"nl","query":"summarize old messages when the context window fills up","rel":[["sym","CompactionService",3],["sym","ContextWindowManager",2]]}
+{"qid":"N058","kind":"nl","query":"context window token limits per provider","rel":[["sym","PROVIDER_DEFAULT_LIMITS",3],["sym","getContextWindowConfig",3],["sym","getTokenThresholds",2]]}
+{"qid":"N059","kind":"nl","query":"replace an oversized tool output with a short stub","rel":[["sym","guardToolResultForStreaming",3],["sym","buildOutputStub",3],["sym","limitToolOutput",2]]}
+{"qid":"N060","kind":"nl","query":"estimate token count from characters per token","rel":[["sym","lib/ai/output-limiter.ts::estimateTokens",3],["sym","lib/ai/prompt-enhancement-utils.ts::estimateTokens",2],["sym","lib/ai/output-limiter.ts::CHARS_PER_TOKEN",2],["sym","lib/ai/log-slice.ts::CHARS_PER_TOKEN",1],["sym","lib/ai/output-stub.ts::CHARS_PER_TOKEN",1],["sym","lib/context-window/token-tracker.ts::CHARS_PER_TOKEN",1]]}
+{"qid":"N061","kind":"nl","query":"refresh an OAuth token before it expires","rel":[["sym","needsTokenRefresh",3],["sym","needsKimiTokenRefresh",3],["sym","refreshAntigravityToken",2],["sym","refreshKimiToken",2],["sym","ensureValidKimiToken",2]]}
+{"qid":"N062","kind":"nl","query":"local user login with email and password","rel":[["sym","authenticateUser",3],["sym","createLocalUser",2]]}
+{"qid":"N063","kind":"nl","query":"spawn an MCP server over stdio","rel":[["sym","StdioClientTransport",3],["sym","resolveMCPConfig",1]]}
+{"qid":"N064","kind":"nl","query":"resolve SYNCED_FOLDER environment variables in the MCP server config","rel":[["sym","resolveMCPConfig",3],["sym","hasFilesystemPathArg",2]]}
+{"qid":"N065","kind":"nl","query":"HTTP/2 reverse proxy in front of the Next.js server","rel":[["sym","startH2Proxy",3],["sym","startNextServer",1]]}
+{"qid":"N066","kind":"nl","query":"generate self-signed certificates for localhost","rel":[["sym","ensureLocalCerts",3]]}
+{"qid":"N067","kind":"nl","query":"create the system tray icon and its menu","rel":[["sym","initTray",3],["sym","destroyTray",1]]}
+{"qid":"N068","kind":"nl","query":"formula for scoring how important a memory is","rel":[["sym","calculateImportance",3],["sym","meetsThreshold",2],["sym","normalizeFactors",1]]}
+{"qid":"N069","kind":"nl","query":"extract memories from a conversation in the background","rel":[["sym","extractMemories",3],["sym","triggerExtraction",3]]}
+{"qid":"N070","kind":"nl","query":"normalize the Windows PATH environment variable","rel":[["sym","normalizeWindowsEnvironment",3],["sym","ensureWindowsSystemPaths",3],["sym","consolidatePathKeys",2]]}
+{"qid":"N071","kind":"nl","query":"clean up a git worktree workspace","rel":[["sym","cleanupWorkspace",3],["sym","GitService",1]]}
+{"qid":"N072","kind":"nl","query":"folder sync replaces the knowledge base","rel":[["span","RELEASE_NOTES_v0.3.4.md:44-50",3]]}
+{"qid":"N073","kind":"nl","query":"design workspace persisted snapshots and snapshot diff","rel":[["span","RELEASE_NOTES_v0.3.5.md:7-23",3],["sym","initDesignSnapshotsTableWith",2],["file","lib/db/schema/design-snapshots.ts",2],["span","RELEASE_NOTES_v0.3.4.md:17-28",1]]}
+{"qid":"N074","kind":"nl","query":"how do I install the task completion notifier plugin","rel":[["file","selene-plugins/task-completion-notifier/INSTALLATION.md",3],["file","selene-plugins/task-completion-notifier/QUICK_START.md",2],["file","selene-plugins/task-completion-notifier/README.md",2],["file","selene-plugins/PLUGIN_SUMMARY.md",1]]}
+{"qid":"N075","kind":"nl","query":"plugin that keeps the agent working overnight until a deadline","rel":[["file","selene-plugins/overnight-keep-alive/README.md",3]]}
+{"qid":"N076","kind":"nl","query":"frame app screenshots in phone and laptop mockups","rel":[["file","selene-plugins/app-mockup-kit/README.md",3],["file","selene-plugins/app-mockup-kit/skills/app-mockup/SKILL.md",2],["file","selene-plugins/app-mockup-kit/scripts/mockup-core.ts",2],["file","selene-plugins/app-mockup-kit/commands/mockup.md",1]]}
+{"qid":"N077","kind":"nl","query":"lightsaber sound effects for tool calls","rel":[["file","selene-plugins/starwars-soundfx/README.md",3]]}
+{"qid":"N078","kind":"nl","query":"ask the user for approval before every tool call","rel":[["file","selene-plugins/tool-approval-gate/README.md",3],["sym","runPreToolUseHooks",1]]}
+{"qid":"N079","kind":"nl","query":"open source projects and libraries Selene thanks","rel":[["file","THANKS.md",3]]}
+{"qid":"N080","kind":"nl","query":"available whisper speech to text models","rel":[["sym","WHISPER_MODELS",3],["sym","DEFAULT_WHISPER_MODEL",2],["sym","getWhisperModel",2]]}
+{"qid":"P001","kind":"path","query":"lib/vectordb/v2/hybrid-search.ts","rel":[["file","lib/vectordb/v2/hybrid-search.ts",3]]}
+{"qid":"P002","kind":"path","query":"vectordb/v2/lexical-vectors","rel":[["file","lib/vectordb/v2/lexical-vectors.ts",3]]}
+{"qid":"P003","kind":"path","query":"lib/ai/vector-search/v2/fusion.ts","rel":[["file","lib/ai/vector-search/v2/fusion.ts",3]]}
+{"qid":"P004","kind":"path","query":"sync-scheduler.ts","rel":[["file","lib/vectordb/sync-scheduler.ts",3]]}
+{"qid":"P005","kind":"path","query":"file-watcher-utils","rel":[["file","lib/vectordb/file-watcher-utils.ts",3],["file","lib/vectordb/file-watcher.ts",1]]}
+{"qid":"P006","kind":"path","query":"documents/v2/token-chunking.ts","rel":[["file","lib/documents/v2/token-chunking.ts",3]]}
+{"qid":"P007","kind":"path","query":"lib/config/vector-search.ts","rel":[["file","lib/config/vector-search.ts",3]]}
+{"qid":"P008","kind":"path","query":"settings-manager.ts","rel":[["file","lib/settings/settings-manager.ts",3]]}
+{"qid":"P009","kind":"path","query":"electron/window-manager.ts","rel":[["file","electron/window-manager.ts",3]]}
+{"qid":"P010","kind":"path","query":"electron/next-server","rel":[["file","electron/next-server.ts",3]]}
+{"qid":"P011","kind":"path","query":"ai/filesystem/path-utils","rel":[["file","lib/ai/filesystem/path-utils.ts",3]]}
+{"qid":"P012","kind":"path","query":"lib/ai/ripgrep/tool.ts","rel":[["file","lib/ai/ripgrep/tool.ts",3],["file","lib/ai/ripgrep/ripgrep.ts",1]]}
+{"qid":"P013","kind":"path","query":"lib/auth/kimi-auth.ts","rel":[["file","lib/auth/kimi-auth.ts",3]]}
+{"qid":"P014","kind":"path","query":"scheduler/delivery/router.ts","rel":[["file","lib/scheduler/delivery/router.ts",3]]}
+{"qid":"P015","kind":"path","query":"lib/db/migrations/character-tables.ts","rel":[["file","lib/db/migrations/character-tables.ts",3]]}
+{"qid":"P016","kind":"path","query":"lib/plugins/hooks-engine.ts","rel":[["file","lib/plugins/hooks-engine.ts",3]]}
+{"qid":"P017","kind":"path","query":"context-window/compaction-service.ts","rel":[["file","lib/context-window/compaction-service.ts",3]]}
+{"qid":"P018","kind":"path","query":"lib/command-execution/validator.ts","rel":[["file","lib/command-execution/validator.ts",3]]}
+{"qid":"P019","kind":"path","query":"lib/utils/cron-helpers.ts","rel":[["file","lib/utils/cron-helpers.ts",3]]}
+{"qid":"P020","kind":"path","query":"lib/mcp/stdio-transport.ts","rel":[["file","lib/mcp/stdio-transport.ts",3]]}
+{"qid":"P021","kind":"path","query":"vectordb/ignore-patterns.ts","rel":[["file","lib/vectordb/ignore-patterns.ts",3]]}
+{"qid":"P022","kind":"path","query":"lib/ai/local-embeddings.ts","rel":[["file","lib/ai/local-embeddings.ts",3]]}
+{"qid":"P023","kind":"path","query":"electron/preload.ts","rel":[["file","electron/preload.ts",3]]}
+{"qid":"P024","kind":"path","query":"lib/vectordb/sync-service.ts","rel":[["file","lib/vectordb/sync-service.ts",3]]}
+{"qid":"P025","kind":"path","query":"selene-plugins/task-completion-notifier/README.md","rel":[["file","selene-plugins/task-completion-notifier/README.md",3],["file","selene-plugins/task-completion-notifier/INSTALLATION.md",1],["file","selene-plugins/task-completion-notifier/QUICK_START.md",1]]}
+{"qid":"P026","kind":"path","query":"lib/documents/parser.ts","rel":[["file","lib/documents/parser.ts",3]]}
+{"qid":"P027","kind":"path","query":"scheduler presets","rel":[["file","lib/scheduler/presets/index.ts",3],["file","lib/scheduler/presets/types.ts",2],["file","lib/scheduler/presets/code-review.ts",2],["file","lib/scheduler/presets/daily-standup.ts",2],["file","lib/scheduler/presets/linear-summary.ts",2],["file","lib/scheduler/presets/weekly-digest.ts",2]]}
+{"qid":"P028","kind":"path","query":"ai/providers/dario","rel":[["file","lib/ai/providers/dario/sidecar.ts",2],["file","lib/ai/providers/dario/login.ts",2],["file","lib/ai/providers/dario/config.ts",2],["file","lib/ai/providers/dario/binary.ts",2],["file","lib/ai/providers/dario/status.ts",2],["file","lib/ai/providers/dario/environment.ts",2]]}
+{"qid":"P029","kind":"path","query":"lib/vectordb/sync-file-processor.ts","rel":[["file","lib/vectordb/sync-file-processor.ts",3]]}
+{"qid":"P030","kind":"path","query":"electron/tray-manager","rel":[["file","electron/tray-manager.ts",3]]}

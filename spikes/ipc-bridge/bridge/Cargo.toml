@@ -1,0 +1,33 @@
+[package]
+name = "sr-bridge"
+version = "0.0.1"
+edition = "2024"
+publish = false
+
+# Standalone: not part of the Selene repo or any outer workspace.
+[workspace]
+
+[[bin]]
+name = "sr-bridge"
+path = "src/main.rs"
+
+# The bridge must depend ONLY on tokio + windows-sys (architecture D1/M6).
+[dependencies]
+tokio = { version = "1.53", default-features = false, features = ["rt", "net", "io-util", "io-std", "time", "macros"] }
+windows-sys = { version = "0.61", features = [
+    "Win32_Foundation",
+    "Win32_Security",
+    "Win32_Security_Authorization",
+    "Win32_Storage_FileSystem",
+    "Win32_System_IO",
+    "Win32_System_Threading",
+    "Win32_System_Com",
+    "Win32_UI_Shell",
+] }
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = "symbols"

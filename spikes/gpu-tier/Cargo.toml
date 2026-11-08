@@ -1,0 +1,43 @@
+# M0-E spike: hardware detection, device tiers, ORT GPU execution provider.
+# Standalone: not part of the selene-retrieval workspace.
+[package]
+name = "gpu-tier-spike"
+version = "0.0.0"
+edition = "2024"
+publish = false
+license = "Apache-2.0"
+
+[workspace]
+
+[dependencies]
+# Same ort pin as fastembed 7.1.1 (=2.0.0-rc.13).
+# Static linking of the pyke ORT 1.28.0 build fails on this machine (MSVC 14.39/14.41 lack the
+# __std_find_last_of_trivial_pos_1 etc. STL vectorised symbols; needs VS 2022 17.12+ / MSVC 14.42+).
+# The copy of Microsoft's STL source once kept here for a link shim was removed; the workspace
+# builds with MSVC 14.44+ instead.
+# For the measurements we therefore load Microsoft's official onnxruntime.dll 1.24.4 (DirectML NuGet)
+# by absolute path (M8 rule). Kernels/EP are the same code; throughput is representative.
+ort = { version = "=2.0.0-rc.13", default-features = false, features = ["std", "ndarray", "half", "load-dynamic", "directml", "api-24"] }
+tokenizers = { version = "0.23.2", default-features = false, features = ["onig"] }
+half = "2"
+anyhow = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.62", features = [
+  "Win32_Foundation",
+  "Win32_System_SystemInformation",
+  "Win32_System_ProcessStatus",
+  "Win32_System_Threading",
+  "Win32_System_LibraryLoader",
+  "Win32_Storage_FileSystem",
+  "Win32_Graphics_Dxgi",
+  "Win32_Graphics_Dxgi_Common",
+  "Win32_Graphics_Direct3D",
+  "Win32_Graphics_Direct3D12",
+] }
+
+[profile.release]
+debug = 1

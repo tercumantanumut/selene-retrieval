@@ -1,0 +1,4 @@
+# `unwrap_used` is denied and `expect_used` warned workspace-wide; tests may use both.
+allow-unwrap-in-tests = true
+allow-expect-in-tests = true
+allow-dbg-in-tests = false

@@ -1,0 +1,202 @@
+[workspace]
+resolver = "3"
+members = [
+  "crates/common", "crates/catalog", "crates/providers", "crates/core", "crates/sync",
+  "crates/engine", "crates/mcp-server", "crates/client", "crates/bridge", "crates/extract",
+  "crates/extract/client", "crates/app", "xtask",
+]
+# `cargo test` at the root must not require Node/WebView; the app is built explicitly.
+default-members = [
+  "crates/common", "crates/catalog", "crates/providers", "crates/core", "crates/sync",
+  "crates/engine", "crates/mcp-server", "crates/client", "crates/bridge", "crates/extract",
+  "crates/extract/client",
+]
+# M0 spikes are standalone packages with their own lockfiles; they must never join the workspace.
+exclude = ["spikes", "patches"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.95"        # floor set by rusqlite_migration 2.6.0; toolchain pinned higher
+license = "Apache-2.0"
+publish = false
+
+[workspace.dependencies]
+# internal
+sr-common     = { path = "crates/common" }
+sr-catalog    = { path = "crates/catalog" }
+sr-providers  = { path = "crates/providers", default-features = false }  # engine enables "local" (ORT)
+sr-core       = { path = "crates/core" }
+sr-sync       = { path = "crates/sync" }
+sr-engine     = { path = "crates/engine" }
+sr-mcp-server = { path = "crates/mcp-server" }
+sr-client     = { path = "crates/client" }
+sr-extract-client = { path = "crates/extract/client" }  # M1-B: extract-worker supervisor (no pdfium)
+
+# runtime / ipc / http
+tokio      = { version = "1.53.3", features = ["rt-multi-thread", "macros", "sync", "signal", "fs", "time", "net", "io-util", "process"] }
+tokio-util = { version = "0.7.20", features = ["rt", "codec"] }
+futures    = "0.3.34"
+bytes      = "1.12.1"
+# M4-E opt-in streamable HTTP (sr-mcp-server): a hyper http1 server on 127.0.0.1 only. Moved here from the
+# crate manifest in M5-E (D7, Amendment 9.9); same requirements, so Cargo.lock is unchanged.
+hyper          = { version = "1.12", default-features = false, features = ["server", "http1"] }
+hyper-util     = { version = "0.1.21", default-features = false, features = ["tokio"] }
+http           = "1"
+http-body-util = "0.1"
+tower-service  = "0.3"
+# M4-E: 256-bit HTTP tool tokens from the OS CSPRNG (sr-engine). 0.3.4 is the locked version.
+getrandom      = "0.3"
+axum       = { version = "0.8.9", default-features = false, features = ["http1", "tokio", "json"] }
+tower      = { version = "0.5.3", features = ["timeout", "limit", "util"] }
+tower-http = { version = "0.7.1", features = ["trace", "timeout", "limit", "request-id"] }
+windows-sys = { version = "0.61.2", features = [
+  "Win32_Foundation", "Win32_Security", "Win32_Security_Authorization", "Win32_System_JobObjects",
+  "Win32_System_Threading", "Win32_System_Pipes", "Win32_Storage_FileSystem",
+  "Win32_System_LibraryLoader", "Win32_Storage_Packaging_Appx", "Win32_Networking_WinHttp",
+] }
+
+# mcp
+rmcp = { version = "3.5.1", default-features = false, features = ["server", "macros", "schemars", "transport-async-rw", "transport-streamable-http-server"] }
+
+# catalog
+rusqlite           = { version = "0.40.2", features = ["bundled"] }
+tokio-rusqlite     = "0.8.0"
+rusqlite_migration = "2.6.0"
+zstd               = "0.14.3"
+
+# vector / lexical
+lancedb      = { version = "=0.40.0", default-features = false }
+arrow-array  = "58.4.0"         # must match lancedb 0.40.0 (arrow ^58); arrow 60.0.0 is latest but incompatible
+arrow-schema = "58.4.0"
+tantivy      = "0.27.0"         # M0: bumped from 0.26.2 (0.27.0 released 2026-10-17); fall back to 0.26.2 if the native-stack spike regresses
+
+# embeddings / chunking
+fastembed     = { version = "=7.1.1", default-features = false, features = ["ort-download-binaries-rustls-tls"] }
+ort           = { version = "=2.0.0-rc.13", default-features = false }  # M1-D: same pin as fastembed 7.1.1 (EP types)
+sha2          = "0.11.1"                                                 # M1-D: model sha256 pins
+text-splitter = { version = "0.33.0", features = ["code", "markdown", "tokenizers"] }
+tokenizers    = { version = "0.23.2", default-features = false, features = ["onig"] }
+tree-sitter   = "0.27.1"
+# grammar crates (depend on tree-sitter-language ^0.1, not on tree-sitter directly)
+tree-sitter-rust       = "0.24.2"
+tree-sitter-python     = "0.25.0"
+tree-sitter-typescript = "0.23.2"
+tree-sitter-javascript = "0.25.0"
+tree-sitter-go         = "0.25.0"
+tree-sitter-java       = "0.23.5"
+tree-sitter-c-sharp    = "0.23.5"
+tree-sitter-cpp        = "0.23.4"
+
+# extraction (sr-extract only)
+pdfium-render = { version = "0.9.4", default-features = false }  # sr-extract picks pdfium_7881 + thread_safe (no image crate)
+pdf-extract   = "0.12.1"
+calamine      = "0.36.1"
+zip           = { version = "9.0.4", default-features = false, features = ["deflate"] }
+quick-xml     = "0.42.0"
+html2text     = "0.17.3"
+encoding_rs   = "0.8.42"        # M1-B: text decoding in sr-extract
+chardetng     = "1.0.0"         # M1-B: legacy-encoding detection for BOM-less non-UTF-8 text
+memchr        = "2.8.3"
+flate2        = "1.1.10"        # M1-B: test-corpus generation only (zlib streams in synthetic PDFs)
+
+# providers
+# M3-P: genai's default `rustls-tls` = `reqwest/rustls` = aws-lc (banned, 3.13). No defaults: genai gets
+# our own ring-only reqwest::Client (`ClientBuilder::with_reqwest`) with the system proxy and timeouts.
+genai    = { version = "=0.7.0-rc.8", default-features = false }
+# M2-G: `rustls` in reqwest 0.13 = aws-lc-rs (banned, 3.13). `rustls-no-provider` uses the ring provider the
+# process installs (sr_providers::download::ensure_crypto_provider) + the Windows trust store (platform
+# verifier); `system-proxy` reads the WinINet/registry proxy settings (no user step behind a corporate proxy).
+reqwest  = { version = "0.13.5", default-features = false, features = ["json", "stream", "rustls-no-provider", "system-proxy"] }
+windows  = { version = "0.62.2", default-features = false, features = ["std"] }  # M2-G: COM interfaces (DXGI/D3D12, INetworkCostManager)
+# Amendment 3.13: one rustls crypto provider per process, ring only (aws-lc is banned in
+# deny.toml). Exact pin = the lockfile's rustls (arrives via reqwest/ORT/LanceDB) so the provider
+# we install is the one every TLS client in the graph uses. sr-mcp-server installs it (CO-1).
+rustls   = { version = "=0.23.46", default-features = false, features = ["ring", "std"] }
+backon   = "1.6.0"
+governor = "0.10.4"
+keyring-core                 = "1.0.1"
+windows-native-keyring-store = { version = "1.1.0", default-features = false }
+
+# fs / sync
+notify                = "8.2.0"
+notify-debouncer-full = "0.7.0"
+ignore        = "0.4.33"
+globset       = "0.4.20"
+blake3        = "1.8.7"         # rayon/mmap only via sr-common/parallel-hash (daemon side, wave 2)
+cap-std       = "4.0.3"
+dunce         = "1.0.5"
+grep-searcher = "0.1.17"
+grep-regex    = "0.1.14"
+rayon         = "1.12.0"
+
+# common
+serde      = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.154"
+schemars   = "1.2.3"
+toml       = "1.1.8"
+thiserror  = "2.0.21"
+anyhow     = "1.0.104"
+tracing            = "0.1.44"
+tracing-subscriber = { version = "0.3.23", features = ["env-filter", "json", "fmt"] }
+tracing-appender   = "0.2.5"
+ulid  = "3.0.0"                  # no serde feature in 3.0.0 (verified M0): sr-common::ids newtypes serialise as strings
+unicode-normalization = "0.1.26" # NFC for text_hash (added M0)
+moka  = { version = "0.12.16", features = ["future"] }
+
+# app
+tauri                        = { version = "2.12.4", features = ["tray-icon"] }
+tauri-plugin-single-instance = "2.5.4"
+tauri-plugin-autostart       = "2.7.0"
+# M2 tester: no `zip` feature (default on). It only serves `.zip`/`.tar.gz` update bundles (macOS/Linux,
+# v1 artifacts); the Windows v2 updater runs the NSIS installer directly. Dropping it removes zip 4.6.1
+# (RUSTSEC-2026-0367/0368/0369, fixed only in zip >= 9; the updater pins zip 4).
+tauri-plugin-updater         = { version = "2.14.0", default-features = false, features = ["rustls-tls", "system-proxy"] }
+tauri-plugin-dialog          = "2.8.3"
+tauri-plugin-notification    = "2.7.0"
+specta            = { version = "=2.0.0-rc.25", features = ["derive"] }
+tauri-specta      = { version = "=2.0.0-rc.25", features = ["derive", "typescript"] }
+specta-typescript = "0.0.12"
+
+# dev / test (pinned in M0)
+tempfile = "3.27.0"
+proptest = "1.12.0"
+insta    = "1.49.0"
+
+[workspace.lints.rust]
+unsafe_code = "deny"             # allowed per module for reviewed Win32 FFI only: list in docs/02-architecture.md §2.6 "Reviewed unsafe"
+[workspace.lints.clippy]
+unwrap_used = "deny"
+expect_used = "warn"
+dbg_macro   = "deny"
+
+# Build-speed policy (M2, 2026-10-18; internal note, not published):
+#  * `release` = gates, benchmarks, checks. Thin LTO with 16 codegen units runs in parallel.
+#    Before this, codegen-units=1 made the final sr-daemon codegen single-threaded (~19 min per rebuild).
+#  * `dist` = shipping only (xtask package). Keeps codegen-units=1 for the smallest/fastest binary.
+#    Build it once, at the end of a milestone, never in an edit-test loop.
+#  * dev/test: line tables only for our crates, no debuginfo for dependencies. Full debuginfo across
+#    the lancedb/arrow/datafusion graph produced multi-GB PDBs and made every test exe link slowly.
+[profile.release]
+lto = "thin"
+codegen-units = 16
+debug = "line-tables-only"       # PDBs kept as CI artifacts for crash symbolication, not shipped
+panic = "unwind"                 # daemon catch_unwind per job; extract worker is process-isolated anyway
+[profile.dist]
+inherits = "release"
+codegen-units = 1
+[profile.ci]                     # fast PR builds
+inherits = "release"
+lto = false
+codegen-units = 16
+[profile.dev]
+debug = "line-tables-only"
+[profile.dev.package."*"]
+opt-level = 2                    # ONNX / tantivy usable in dev
+debug = false
+
+# lancedb 0.38-0.40 do not compile without the `remote` feature (lancedb#4142). Two-arm cfg patch in
+# src/job.rs only (M0-B). Upstream fixed it in lancedb 0.41.0 (see patches/README.md); remove the
+# patch when upgrading. (M1-E)
+[patch.crates-io]
+lancedb = { path = "patches/lancedb-0.40.0" }

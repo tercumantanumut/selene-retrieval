@@ -1,0 +1,10 @@
+e2e client_ver=2025-11-25 negotiated="2025-11-25" server="sr-daemon-spike" init_ms=36 tools=["ping", "pipe_sddl", "progress", "shutdown"]
+  ping: {"daemon_pid":18528,"data_dir":"C:\\Users\\<user>\\AppData\\Local\\SR-spike\\data","in_job":false,"launched_by":"breakaway","package":null,"parent":"24372 sr-bridge.exe","pong":true,"sessions":1,"total_sessions":1}
+  progress result="done 5" notifications=["1.0/5.0", "2.0/5.0", "3.0/5.0", "4.0/5.0", "5.0/5.0"]
+e2e client_ver=2025-06-18 negotiated="2025-06-18" server="sr-daemon-spike" init_ms=11 tools=["ping", "pipe_sddl", "progress", "shutdown"]
+  ping: {"daemon_pid":18528,"data_dir":"C:\\Users\\<user>\\AppData\\Local\\SR-spike\\data","in_job":false,"launched_by":"breakaway","package":null,"parent":"24372 <exited>","pong":true,"sessions":1,"total_sessions":2}
+  progress result="done 5" notifications=["1.0/5.0", "2.0/5.0", "3.0/5.0", "4.0/5.0", "5.0/5.0"]
+e2e client_ver=2024-11-05 negotiated="2024-11-05" server="sr-daemon-spike" init_ms=10 tools=["ping", "pipe_sddl", "progress", "shutdown"]
+  ping: {"daemon_pid":18528,"data_dir":"C:\\Users\\<user>\\AppData\\Local\\SR-spike\\data","in_job":false,"launched_by":"breakaway","package":null,"parent":"24372 <exited>","pong":true,"sessions":1,"total_sessions":3}
+  progress result="done 5" notifications=["1.0/5.0", "2.0/5.0", "3.0/5.0", "4.0/5.0", "5.0/5.0"]
+e2e client_ver=2026-07-28 via initialize => negotiated "2025-11-25"

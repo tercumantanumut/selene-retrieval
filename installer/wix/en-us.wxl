@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Plain-language overrides of the standard WiX UI strings (M5-I, README P1.5). -->
+<WixLocalization Culture="en-US" Codepage="1252" xmlns="http://wixtoolset.org/schemas/v4/wxl">
+  <String Id="WelcomeDlg_Title" Value="Install [ProductName]" />
+  <String Id="WelcomeDlgTitle" Value="{\WixUI_Font_Bigger}Install [ProductName]" />
+  <String Id="WelcomeDlgDescription" Value="[ProductName] lets Claude and other AI apps search the folders you choose, privately on this computer. It installs just for you and doesn't need administrator rights. Click Next to install." />
+  <String Id="ExitDialogTitle" Value="{\WixUI_Font_Bigger}[ProductName] setup is finished" />
+  <String Id="ExitDialogDescription" Value="Click Finish to close this window." />
+  <String Id="ProgressDlgTitleInstalling" Value="{\WixUI_Font_Title}Installing [ProductName]" />
+  <String Id="ProgressDlgTextInstalling" Value="This takes about a minute." />
+  <String Id="MaintenanceWelcomeDlgDescription" Value="Click Next to remove [ProductName] or to put back its files. Your search index is kept." />
+</WixLocalization>

@@ -1,0 +1,75 @@
+﻿pipe present before race: false  sr-daemon before: []
+  bridge 0: initialize+tools/list(4 tools) in 682 ms -> daemon pid 24564 (launched_by "breakaway")
+  bridge 1: initialize+tools/list(4 tools) in 690 ms -> daemon pid 24564 (launched_by "breakaway")
+  bridge 2: initialize+tools/list(4 tools) in 690 ms -> daemon pid 24564 (launched_by "breakaway")
+  bridge 3: initialize+tools/list(4 tools) in 691 ms -> daemon pid 24564 (launched_by "breakaway")
+  bridge 4: initialize+tools/list(4 tools) in 682 ms -> daemon pid 24564 (launched_by "breakaway")
+race N=5: connected=5/5 distinct daemon pids={24564} sr-daemon processes now=[24564]
+  bridge.log: 1792254121585 pid=23804 launch breakaway: breakaway pid=24564 (180 ms)
+  bridge.log: 1792254121974 pid=6716 attached client=race4 how=[after-spawn-lock wait=556ms] total=559.3ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":24564}
+  bridge.log: 1792254121974 pid=13344 attached client=race0 how=[after-spawn-lock wait=539ms] total=542.4ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":24564}
+  bridge.log: 1792254121975 pid=23804 attached client=race3 how=[spawned via breakaway (breakaway pid=24564); pipe ready after 569 ms] total=573.5ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":24564}
+  bridge.log: 1792254121975 pid=16892 attached client=race2 how=[after-spawn-lock wait=525ms] total=528.4ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":24564}
+  bridge.log: 1792254121975 pid=10084 attached client=race1 how=[after-spawn-lock wait=523ms] total=526.6ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":24564}
+  daemon processes started during race: 1; of which created the pipe: 1
+RACE PASS (order=breakaway,task): 5/5 complete, 1 distinct daemon(s), 1 pipe owner(s), 1 spawning bridge(s), 1 daemon process start(s)
+pipe present before race: false  sr-daemon before: []
+  bridge 0: initialize+tools/list(4 tools) in 212 ms -> daemon pid 23404 (launched_by "breakaway")
+  bridge 1: initialize+tools/list(4 tools) in 197 ms -> daemon pid 23404 (launched_by "breakaway")
+  bridge 2: initialize+tools/list(4 tools) in 190 ms -> daemon pid 23404 (launched_by "breakaway")
+  bridge 3: initialize+tools/list(4 tools) in 204 ms -> daemon pid 23404 (launched_by "breakaway")
+  bridge 4: initialize+tools/list(4 tools) in 225 ms -> daemon pid 23404 (launched_by "breakaway")
+race N=5: connected=5/5 distinct daemon pids={23404} sr-daemon processes now=[23404]
+  bridge.log: 1792254123542 pid=14120 launch breakaway: breakaway pid=23404 (5 ms)
+  bridge.log: 1792254123631 pid=14120 attached client=race2 how=[spawned via breakaway (breakaway pid=23404); pipe ready after 94 ms] total=97.5ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":23404}
+  bridge.log: 1792254123632 pid=18592 attached client=race1 how=[after-spawn-lock wait=72ms] total=75.6ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":23404}
+  bridge.log: 1792254123640 pid=2536 attached client=race0 how=[after-spawn-lock(busy) wait=70ms] total=81.4ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":23404}
+  bridge.log: 1792254123640 pid=17732 attached client=race3 how=[after-spawn-lock(busy) wait=65ms] total=75.5ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":23404}
+  bridge.log: 1792254123652 pid=17844 attached client=race4 how=[after-spawn-lock(busy) wait=37ms] total=60.1ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":23404}
+  daemon processes started during race: 1; of which created the pipe: 1
+RACE PASS (order=breakaway,task): 5/5 complete, 1 distinct daemon(s), 1 pipe owner(s), 1 spawning bridge(s), 1 daemon process start(s)
+pipe present before race: false  sr-daemon before: []
+  bridge 0: initialize+tools/list(4 tools) in 308 ms -> daemon pid 24188 (launched_by "breakaway")
+  bridge 1: initialize+tools/list(4 tools) in 298 ms -> daemon pid 24188 (launched_by "breakaway")
+  bridge 2: initialize+tools/list(4 tools) in 291 ms -> daemon pid 24188 (launched_by "breakaway")
+  bridge 3: initialize+tools/list(4 tools) in 360 ms -> daemon pid 24188 (launched_by "breakaway")
+  bridge 4: initialize+tools/list(4 tools) in 298 ms -> daemon pid 24188 (launched_by "breakaway")
+race N=5: connected=5/5 distinct daemon pids={24188} sr-daemon processes now=[24188]
+  bridge.log: 1792254125456 pid=20740 launch breakaway: breakaway pid=24188 (5 ms)
+  bridge.log: 1792254125573 pid=20740 attached client=race2 how=[spawned via breakaway (breakaway pid=24188); pipe ready after 119 ms] total=124.7ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":24188}
+  bridge.log: 1792254125593 pid=9172 attached client=race4 how=[after-spawn-lock(busy) wait=108ms] total=133.5ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":24188}
+  bridge.log: 1792254125593 pid=15812 attached client=race1 how=[after-spawn-lock(busy) wait=8ms] total=34.0ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":24188}
+  bridge.log: 1792254125614 pid=18868 attached client=race0 how=[after-spawn-lock(busy) wait=52ms] total=99.2ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":24188}
+  bridge.log: 1792254125662 pid=12768 attached client=race3 how=[after-spawn-lock(busy) wait=115ms] total=209.7ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":24188}
+  daemon processes started during race: 1; of which created the pipe: 1
+RACE PASS (order=breakaway,task): 5/5 complete, 1 distinct daemon(s), 1 pipe owner(s), 1 spawning bridge(s), 1 daemon process start(s)
+pipe present before race: false  sr-daemon before: []
+  bridge 0: initialize+tools/list(4 tools) in 820 ms -> daemon pid 18248 (launched_by "breakaway")
+  bridge 1: initialize+tools/list(4 tools) in 796 ms -> daemon pid 18248 (launched_by "breakaway")
+  bridge 2: initialize+tools/list(4 tools) in 836 ms -> daemon pid 18248 (launched_by "breakaway")
+  bridge 3: initialize+tools/list(4 tools) in 796 ms -> daemon pid 18248 (launched_by "breakaway")
+  bridge 4: initialize+tools/list(4 tools) in 796 ms -> daemon pid 18248 (launched_by "breakaway")
+race N=5: connected=5/5 distinct daemon pids={18248} sr-daemon processes now=[18248]
+  bridge.log: 1792254128595 pid=20924 launch breakaway: breakaway pid=18248 (8 ms)
+  bridge.log: 1792254128650 pid=20924 attached client=race1 how=[spawned via breakaway (breakaway pid=18248); pipe ready after 57 ms] total=69.6ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":18248}
+  bridge.log: 1792254128664 pid=6056 attached client=race3 how=[after-spawn-lock(busy) wait=48ms] total=71.3ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":18248}
+  bridge.log: 1792254128664 pid=2792 attached client=race4 how=[after-spawn-lock(busy) wait=52ms] total=83.8ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":18248}
+  bridge.log: 1792254128665 pid=18024 attached client=race0 how=[after-spawn-lock(busy) wait=39ms] total=62.2ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":18248}
+  bridge.log: 1792254128695 pid=22596 attached client=race2 how=[after-spawn-lock(busy) wait=49ms] total=106.2ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":18248}
+  daemon processes started during race: 1; of which created the pipe: 1
+RACE PASS (order=breakaway,task): 5/5 complete, 1 distinct daemon(s), 1 pipe owner(s), 1 spawning bridge(s), 1 daemon process start(s)
+pipe present before race: false  sr-daemon before: []
+  bridge 0: initialize+tools/list(4 tools) in 232 ms -> daemon pid 23892 (launched_by "breakaway")
+  bridge 1: initialize+tools/list(4 tools) in 232 ms -> daemon pid 23892 (launched_by "breakaway")
+  bridge 2: initialize+tools/list(4 tools) in 248 ms -> daemon pid 23892 (launched_by "breakaway")
+  bridge 3: initialize+tools/list(4 tools) in 231 ms -> daemon pid 23892 (launched_by "breakaway")
+  bridge 4: initialize+tools/list(4 tools) in 256 ms -> daemon pid 23892 (launched_by "breakaway")
+race N=5: connected=5/5 distinct daemon pids={23892} sr-daemon processes now=[23892]
+  bridge.log: 1792254130481 pid=17492 launch breakaway: breakaway pid=23892 (6 ms)
+  bridge.log: 1792254130600 pid=11532 attached client=race4 how=[direct] total=3.7ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":23892}
+  bridge.log: 1792254130604 pid=21960 attached client=race3 how=[after-spawn-lock wait=122ms] total=125.0ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":23892}
+  bridge.log: 1792254130604 pid=16792 attached client=race0 how=[after-spawn-lock wait=116ms] total=119.0ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":23892}
+  bridge.log: 1792254130604 pid=17492 attached client=race1 how=[spawned via breakaway (breakaway pid=23892); pipe ready after 128 ms] total=132.0ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":23892}
+  bridge.log: 1792254130605 pid=15208 attached client=race2 how=[after-spawn-lock wait=56ms] total=60.0ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":23892}
+  daemon processes started during race: 1; of which created the pipe: 1
+RACE PASS (order=breakaway,task): 5/5 complete, 1 distinct daemon(s), 1 pipe owner(s), 1 spawning bridge(s), 1 daemon process start(s)

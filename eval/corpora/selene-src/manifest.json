@@ -1,0 +1,2436 @@
+{
+ "corpus": "selene-src",
+ "source": "Selene repository (first-party), git-tracked files only",
+ "commit": "e09802592ccb61e1764e1f0c2c1ffbb3e8de25d4",
+ "materialise": "python eval/scripts/build_selene_corpus.py --commit <commit>",
+ "include_dirs": [
+  "lib/vectordb/",
+  "lib/documents/",
+  "lib/config/",
+  "lib/settings/",
+  "lib/ai/vector-search/",
+  "lib/ai/providers/",
+  "lib/ai/filesystem/",
+  "lib/ai/ripgrep/",
+  "lib/db/",
+  "lib/auth/",
+  "lib/mcp/",
+  "lib/scheduler/",
+  "lib/background-tasks/",
+  "lib/agent-memory/",
+  "lib/workspace/",
+  "lib/context-window/",
+  "lib/command-execution/",
+  "lib/plugins/",
+  "lib/utils/",
+  "lib/observability/",
+  "electron/",
+  "selene-plugins/",
+  "lib/ai/*.ts (direct children)",
+  "*.md (repo root)"
+ ],
+ "exclude_substrings": [
+  ".test.",
+  "__tests__",
+  "/bundled/",
+  ".d.ts"
+ ],
+ "file_count": 342,
+ "total_bytes": 2729799,
+ "files": [
+  {
+   "path": "README.md",
+   "sha256": "1e548d3a8e10b56c8984a459b04a18c6d4987cdcdeb4ef2c3eeaa9db30505c83",
+   "bytes": 10636,
+   "lines": 158,
+   "max_line_chars": 2432
+  },
+  {
+   "path": "RELEASE_NOTES_v0.3.4.md",
+   "sha256": "ca832ebf266f4d6c6bbaf7cd541701b9cc1c896dbb65792692dd25067cfd6688",
+   "bytes": 10307,
+   "lines": 165,
+   "max_line_chars": 273
+  },
+  {
+   "path": "RELEASE_NOTES_v0.3.5.md",
+   "sha256": "f28f15aed078e22b4358a1e7548d1f32a5cd62da3a68c586400c508c7f2fcac2",
+   "bytes": 13751,
+   "lines": 129,
+   "max_line_chars": 507
+  },
+  {
+   "path": "THANKS.md",
+   "sha256": "7df5b57ce881be28cef57feb794726131769f319617904577fd2e74dc547191f",
+   "bytes": 6169,
+   "lines": 97,
+   "max_line_chars": 223
+  },
+  {
+   "path": "electron/certs.ts",
+   "sha256": "f567843fcb6c51366072a536f2de2b3efbc3103373c857e1032176ac4c5a072c",
+   "bytes": 4014,
+   "lines": 120,
+   "max_line_chars": 84
+  },
+  {
+   "path": "electron/debug-logger.ts",
+   "sha256": "12fea77bf21b817937a4ca68c0ed27727e4d903d570235e30711c3864a11ccc8",
+   "bytes": 9072,
+   "lines": 262,
+   "max_line_chars": 99
+  },
+  {
+   "path": "electron/h2-proxy.ts",
+   "sha256": "409899a7ae02c4514a5d8cedf90dbe233f83b4dd3a271ee36cef000bbeabfade",
+   "bytes": 10805,
+   "lines": 288,
+   "max_line_chars": 126
+  },
+  {
+   "path": "electron/hotkey-manager.ts",
+   "sha256": "2deac23d74f674f328965822a0db80d30a87bc1a9d1b09e5df026d979ab07a1e",
+   "bytes": 6730,
+   "lines": 225,
+   "max_line_chars": 107
+  },
+  {
+   "path": "electron/ipc-browser-session-handlers.ts",
+   "sha256": "76969019921ba76a37eb8b459a81aed562d94f6e970a19bbbba9616b6fb312c0",
+   "bytes": 6336,
+   "lines": 168,
+   "max_line_chars": 122
+  },
+  {
+   "path": "electron/ipc-context.ts",
+   "sha256": "a55765c38ce787de7bd39711c7ce9678842683bd109ddb97b5321b421bbc4311",
+   "bytes": 480,
+   "lines": 17,
+   "max_line_chars": 61
+  },
+  {
+   "path": "electron/ipc-file-handlers.ts",
+   "sha256": "58f623eca68c59ec7f4bd632b69cb1e30a136f0e35c6495c18c94a5ca102e6a5",
+   "bytes": 4892,
+   "lines": 146,
+   "max_line_chars": 93
+  },
+  {
+   "path": "electron/ipc-ghost-os-handlers.ts",
+   "sha256": "d21a002322c5edd62d2c179de05ce649bcb5f0c56c6051900303b9ee3144d2b0",
+   "bytes": 21384,
+   "lines": 592,
+   "max_line_chars": 125
+  },
+  {
+   "path": "electron/ipc-handlers.ts",
+   "sha256": "9ecbec4e36752557c779de807f7249602ed2bcd7c68a7281836bc617ce377db2",
+   "bytes": 8093,
+   "lines": 227,
+   "max_line_chars": 116
+  },
+  {
+   "path": "electron/ipc-model-handlers.ts",
+   "sha256": "b2d68d2f6e6fb85ad0994ef1616ce17253f6791f3948a76adb29d15c8418525f",
+   "bytes": 26496,
+   "lines": 722,
+   "max_line_chars": 124
+  },
+  {
+   "path": "electron/ipc-overlay-session-handlers.ts",
+   "sha256": "4ae58e8d411590432520347412105e77192992aa21eb90018b1d4a8fad20d75b",
+   "bytes": 2806,
+   "lines": 66,
+   "max_line_chars": 97
+  },
+  {
+   "path": "electron/ipc-screen-capture-handlers.ts",
+   "sha256": "34c49787e2180604b2f9c9c6ba4ad2389c867e7fa4f35d562454fc4cbd82fbce",
+   "bytes": 3353,
+   "lines": 109,
+   "max_line_chars": 100
+  },
+  {
+   "path": "electron/ipc-unified-capture-handlers.ts",
+   "sha256": "2f56dfc915cfd1f9e4a6a340c8071fd67e7385ca564aca116d1c228f42e4ea69",
+   "bytes": 9439,
+   "lines": 248,
+   "max_line_chars": 126
+  },
+  {
+   "path": "electron/ipc-voice-hotkey-handlers.ts",
+   "sha256": "2b47ee6a23ff9893fb6a1b1dcecba6e2ed91dbb329d5bd6243068ceaa710d566",
+   "bytes": 2163,
+   "lines": 71,
+   "max_line_chars": 104
+  },
+  {
+   "path": "electron/local-url-policy.ts",
+   "sha256": "3ee7c9720a6d30eeb415e247a139b3573bdd833732b8d35b4c7fba46a0d501c9",
+   "bytes": 405,
+   "lines": 17,
+   "max_line_chars": 79
+  },
+  {
+   "path": "electron/main.ts",
+   "sha256": "2a8e68e6149607d7634a8213624b6b5cabb1129ffe24f786f1c6f3588bfd0ac1",
+   "bytes": 24813,
+   "lines": 654,
+   "max_line_chars": 220
+  },
+  {
+   "path": "electron/metadata-collector.ts",
+   "sha256": "ca4fc1b4f1fe05368b5b790c90fcc425bcaf8ef384786775aa12561dae021aa7",
+   "bytes": 5792,
+   "lines": 153,
+   "max_line_chars": 128
+  },
+  {
+   "path": "electron/mini-overlay-ipc-handlers.ts",
+   "sha256": "6f44402558a6c3baa6423f8e28bc7a051da775602d697f7474cf3a0a6f08641e",
+   "bytes": 3614,
+   "lines": 79,
+   "max_line_chars": 82
+  },
+  {
+   "path": "electron/mini-overlay-window.ts",
+   "sha256": "0dbef24f91162c2f63633a3fdb03a53c66eee71d93b15052cb2bd7f173345f06",
+   "bytes": 9685,
+   "lines": 287,
+   "max_line_chars": 102
+  },
+  {
+   "path": "electron/next-server.ts",
+   "sha256": "bf7d7a095497641cdd4f6e0a5d24b2ca9adb1b2bacb121499ed505a59484d5a9",
+   "bytes": 14863,
+   "lines": 405,
+   "max_line_chars": 139
+  },
+  {
+   "path": "electron/permission-manager.ts",
+   "sha256": "8ed3afe7df57106691f1390978b4915fe4d4561d302f7731102a91813a19b510",
+   "bytes": 5729,
+   "lines": 171,
+   "max_line_chars": 98
+  },
+  {
+   "path": "electron/preload.ts",
+   "sha256": "7dab19250790343119b1ad5f9dd1546394269d841f8a90fbebbe2b72ed4c55c4",
+   "bytes": 30256,
+   "lines": 759,
+   "max_line_chars": 500
+  },
+  {
+   "path": "electron/screen-capture.ts",
+   "sha256": "7d3fc05d7ced6ec8ddeafca98baf1235cf039ee5babb60509971e4541612d17e",
+   "bytes": 5292,
+   "lines": 155,
+   "max_line_chars": 121
+  },
+  {
+   "path": "electron/tray-manager.ts",
+   "sha256": "1ee1626d1aa4580eb4989c8a0b9c0dca722775f46faeaa3db550ebaa0092c95b",
+   "bytes": 8046,
+   "lines": 251,
+   "max_line_chars": 121
+  },
+  {
+   "path": "electron/window-manager.ts",
+   "sha256": "11ea2af840e4416a6f688e3f9f163672310a593eb6add690e23dfc2a3c878235",
+   "bytes": 22748,
+   "lines": 559,
+   "max_line_chars": 237
+  },
+  {
+   "path": "lib/agent-memory/evermemos/client.ts",
+   "sha256": "863e24166d947e5a46160abc1b82e6ab56ab7f696bd418e4e5912d0a339f73bd",
+   "bytes": 5411,
+   "lines": 174,
+   "max_line_chars": 134
+  },
+  {
+   "path": "lib/agent-memory/evermemos/dual-layer.ts",
+   "sha256": "9ccfe9baee93db061d8ea4305b27641cf8647f1f5a16e3f78835ec9038f757c0",
+   "bytes": 10932,
+   "lines": 354,
+   "max_line_chars": 99
+  },
+  {
+   "path": "lib/agent-memory/evermemos/index.ts",
+   "sha256": "4c41c46846bc69d9cfe98364f32440302fa572a7dc22da40b9a5dd7601073d1e",
+   "bytes": 1021,
+   "lines": 33,
+   "max_line_chars": 94
+  },
+  {
+   "path": "lib/agent-memory/evermemos/types.ts",
+   "sha256": "fdf9eb0a64de26a670b61a054a5f385025d7701282291b3660be6e35ac6483f4",
+   "bytes": 2157,
+   "lines": 74,
+   "max_line_chars": 82
+  },
+  {
+   "path": "lib/agent-memory/extraction/importance.ts",
+   "sha256": "0533573b31398ecb8ae95217fe419f1c2e2fdab44f1ff2c0d0eeade5859df331",
+   "bytes": 4177,
+   "lines": 112,
+   "max_line_chars": 192
+  },
+  {
+   "path": "lib/agent-memory/extraction/index.ts",
+   "sha256": "5968733ec60389dbfd438974434713879630a827c3475e2e6a22427439f4d600",
+   "bytes": 169,
+   "lines": 10,
+   "max_line_chars": 49
+  },
+  {
+   "path": "lib/agent-memory/extraction/prompt.ts",
+   "sha256": "2baf51ed8f807f60008b82a29fb4f3f83ef88372909f2bedabc446a5b20279f6",
+   "bytes": 5062,
+   "lines": 114,
+   "max_line_chars": 249
+  },
+  {
+   "path": "lib/agent-memory/extraction/service.ts",
+   "sha256": "66eb815744d39ae8cb437edf671a6c13080b6e44103c1661cd32c2c00dc4a208",
+   "bytes": 9047,
+   "lines": 287,
+   "max_line_chars": 117
+  },
+  {
+   "path": "lib/agent-memory/extraction/trigger.ts",
+   "sha256": "7743dfe73fbe4a0bd34b39ee46d1947e0ef943d5d971f6f254f2907c23567523",
+   "bytes": 4975,
+   "lines": 172,
+   "max_line_chars": 121
+  },
+  {
+   "path": "lib/agent-memory/index.ts",
+   "sha256": "7efa47295912d93fc8bd9d4d2183ec169837017f2489f761f6488cb476d321dc",
+   "bytes": 1076,
+   "lines": 41,
+   "max_line_chars": 104
+  },
+  {
+   "path": "lib/agent-memory/memory-manager.ts",
+   "sha256": "00bc42d2d18813babae6890d1f36d18477d3ec2ef0696eaf5d24d15448065fb5",
+   "bytes": 15578,
+   "lines": 541,
+   "max_line_chars": 110
+  },
+  {
+   "path": "lib/agent-memory/prompt-injection.ts",
+   "sha256": "9432cb6f507eb8bc27df36cc26df034daeaf262df1214cac8bb74a534629328d",
+   "bytes": 1559,
+   "lines": 56,
+   "max_line_chars": 80
+  },
+  {
+   "path": "lib/agent-memory/types.ts",
+   "sha256": "aa2a23790fb4fa2549b13371655978a4556b6d59dccc509b62d53cbf1c401306",
+   "bytes": 4830,
+   "lines": 154,
+   "max_line_chars": 99
+  },
+  {
+   "path": "lib/ai/character-prompt.ts",
+   "sha256": "52f38e66f32cb344099ebb70244d172a1089c3b238d6ab7f3278ef2d01e56631",
+   "bytes": 12275,
+   "lines": 355,
+   "max_line_chars": 142
+  },
+  {
+   "path": "lib/ai/character-tools.ts",
+   "sha256": "4a70c666c0e24290cb2f5f9d12200c6f06147195f64979482720ae6a38d45889",
+   "bytes": 5352,
+   "lines": 156,
+   "max_line_chars": 177
+  },
+  {
+   "path": "lib/ai/config.ts",
+   "sha256": "8e4aa3131443ddd6ca6164fe5555d09adb9508424b787ab94b67ae1ebc8cf31d",
+   "bytes": 3166,
+   "lines": 83,
+   "max_line_chars": 90
+  },
+  {
+   "path": "lib/ai/datetime-context.ts",
+   "sha256": "e34a143745ea187e5289ecc025650e362dc218b3807b845fa7868d2a04a6a0f9",
+   "bytes": 2544,
+   "lines": 90,
+   "max_line_chars": 99
+  },
+  {
+   "path": "lib/ai/embedding-utils.ts",
+   "sha256": "36145359a3d0d3f79184d25e8357c80243e58f0a601cd27efc45d147c69fa4fb",
+   "bytes": 662,
+   "lines": 25,
+   "max_line_chars": 74
+  },
+  {
+   "path": "lib/ai/file-tree.ts",
+   "sha256": "9c49f90296e75fffcf3800dca7eb80300f5f503bb503f28490ee502acab12f35",
+   "bytes": 7123,
+   "lines": 242,
+   "max_line_chars": 104
+  },
+  {
+   "path": "lib/ai/filesystem/diagnostics.ts",
+   "sha256": "aa55ded9d384e46d7ff847e4b078dfbb1772ccc1928eb9e22312b3cbd6039906",
+   "bytes": 8790,
+   "lines": 305,
+   "max_line_chars": 96
+  },
+  {
+   "path": "lib/ai/filesystem/diff-utils.ts",
+   "sha256": "b1178874fa3d33425598d041546a3e3954b9c89016f1e992dd688de4485a92e0",
+   "bytes": 5033,
+   "lines": 187,
+   "max_line_chars": 84
+  },
+  {
+   "path": "lib/ai/filesystem/edit-logic.ts",
+   "sha256": "b7870f9d8f3d9e6c10804e0c4947a0acebf1c9ce9b85147b9fd767c3c1e1ed70",
+   "bytes": 9252,
+   "lines": 316,
+   "max_line_chars": 127
+  },
+  {
+   "path": "lib/ai/filesystem/file-history.ts",
+   "sha256": "7822c209de06ba1dc29807fe97cd1ffa710c20d80e55c6100faa37f78355cfb9",
+   "bytes": 3422,
+   "lines": 103,
+   "max_line_chars": 91
+  },
+  {
+   "path": "lib/ai/filesystem/index.ts",
+   "sha256": "c66bc7935b909fe60a8fb90b1eb27284135ae9fd6cac206e84220552f64ecd44",
+   "bytes": 759,
+   "lines": 41,
+   "max_line_chars": 90
+  },
+  {
+   "path": "lib/ai/filesystem/path-utils.ts",
+   "sha256": "66c3a9135c017495be71b048a4df0c3babdf145b21eb6e2e0a3ae58295062058",
+   "bytes": 13606,
+   "lines": 362,
+   "max_line_chars": 113
+  },
+  {
+   "path": "lib/ai/filesystem/read-utils.ts",
+   "sha256": "aefe554737e17fd596a0f4ea3a90e36482a7eaced7985c02cc8e979ecb4331d5",
+   "bytes": 7405,
+   "lines": 203,
+   "max_line_chars": 111
+  },
+  {
+   "path": "lib/ai/filesystem/write-utils.ts",
+   "sha256": "3528d399f5aec5ca31560bb4f223791fa9ee292252403d8d5ac522921820db88",
+   "bytes": 1823,
+   "lines": 66,
+   "max_line_chars": 90
+  },
+  {
+   "path": "lib/ai/flux2-client.ts",
+   "sha256": "b39b765e56e17dd5018f80ff1c1214721e3eb9211bce8d0a5d05aac6add9a86a",
+   "bytes": 4506,
+   "lines": 153,
+   "max_line_chars": 108
+  },
+  {
+   "path": "lib/ai/json-schema-sanitizer.ts",
+   "sha256": "561ca5738342c3c0c628e8684d7287fcb4a7d654cd2be8a90e985caa993b8df8",
+   "bytes": 14991,
+   "lines": 515,
+   "max_line_chars": 105
+  },
+  {
+   "path": "lib/ai/local-embeddings.ts",
+   "sha256": "e7582ce23ef38b1d8199de8d119e4f04feaba0bd066b1e13b3fd423a21c08be6",
+   "bytes": 16480,
+   "lines": 490,
+   "max_line_chars": 127
+  },
+  {
+   "path": "lib/ai/log-slice.ts",
+   "sha256": "7bf17792d0cac9e64ee40e32d3cc2cab93d0eeedb8527fb64f8f6d043cbc1d77",
+   "bytes": 6760,
+   "lines": 207,
+   "max_line_chars": 199
+  },
+  {
+   "path": "lib/ai/media-utils.ts",
+   "sha256": "ed41af30186d0415feefe2bce9b881ebbc8d8e2253308efbcb3fc44dfebdfc2a",
+   "bytes": 1933,
+   "lines": 58,
+   "max_line_chars": 80
+  },
+  {
+   "path": "lib/ai/model-validation.ts",
+   "sha256": "71ac6b566da5accb5f0a003e4dffb5cf1097b9f9878324e1d2358e42b0b2c645",
+   "bytes": 10196,
+   "lines": 293,
+   "max_line_chars": 118
+  },
+  {
+   "path": "lib/ai/output-limiter.ts",
+   "sha256": "4907be9a87dfb6f04ad3ad5c2598545f2a45836b576fb7cddb95cb0c6a55cb12",
+   "bytes": 8597,
+   "lines": 254,
+   "max_line_chars": 93
+  },
+  {
+   "path": "lib/ai/output-stub-telemetry.ts",
+   "sha256": "da4da6f0ccfd161000afb287fdfc8db5e08ab3c3a759ee0febb0135be57c29f5",
+   "bytes": 5196,
+   "lines": 169,
+   "max_line_chars": 84
+  },
+  {
+   "path": "lib/ai/output-stub.ts",
+   "sha256": "48e3148f0b1e376b6e5a9ec79ef80d98a47ef51bcfd6e09d7302765387f08e9c",
+   "bytes": 9040,
+   "lines": 266,
+   "max_line_chars": 128
+  },
+  {
+   "path": "lib/ai/prompt-enhancement-history.ts",
+   "sha256": "9120c763bfe6957c0972f550165621e880202af03533847c1082a0e73a20c0f2",
+   "bytes": 12150,
+   "lines": 327,
+   "max_line_chars": 111
+  },
+  {
+   "path": "lib/ai/prompt-enhancement-llm.ts",
+   "sha256": "d94017fa9ef56398661944219c969f69991a27bae616d50cd44d4366356de087",
+   "bytes": 14798,
+   "lines": 315,
+   "max_line_chars": 197
+  },
+  {
+   "path": "lib/ai/prompt-enhancement-memory.ts",
+   "sha256": "c3eaae1667ed3b57eea94abf6987b0de3e6e137ddb5eb85ce2f672bfc34d0b29",
+   "bytes": 2923,
+   "lines": 101,
+   "max_line_chars": 75
+  },
+  {
+   "path": "lib/ai/prompt-enhancement-utils.ts",
+   "sha256": "12134cf3201a87badb5ac46ba7c225a224ee598e5f1633fa20d478ffbc66e19e",
+   "bytes": 20900,
+   "lines": 646,
+   "max_line_chars": 113
+  },
+  {
+   "path": "lib/ai/prompt-enhancement-v2.ts",
+   "sha256": "d9eea1eab67fd3b8f62befdd3630cc3ba277ade9da982ae7a6e74656c73c3564",
+   "bytes": 21508,
+   "lines": 591,
+   "max_line_chars": 148
+  },
+  {
+   "path": "lib/ai/prompt-enhancement.ts",
+   "sha256": "3a92480cdbf32206f41583bfae5062894ef1f78624eb320ef82b76bfaedb47e9",
+   "bytes": 8554,
+   "lines": 263,
+   "max_line_chars": 157
+  },
+  {
+   "path": "lib/ai/provider-types.ts",
+   "sha256": "4c9f8c751a835d5e59f3b2f1276f7601935fa609c5bd66702aa17c65ec5f016a",
+   "bytes": 2353,
+   "lines": 73,
+   "max_line_chars": 106
+  },
+  {
+   "path": "lib/ai/providers.ts",
+   "sha256": "1b6d288f6aed0a9c0cd1a736de66e28b285ff528e16f9afb8fa0f979c7519af1",
+   "bytes": 34690,
+   "lines": 1050,
+   "max_line_chars": 113
+  },
+  {
+   "path": "lib/ai/providers/antigravity-provider.ts",
+   "sha256": "854f92b011e64f9cf87d682443f5213fa322ecb3de5e762c8e6d33fdf5d4dace",
+   "bytes": 4804,
+   "lines": 133,
+   "max_line_chars": 98
+  },
+  {
+   "path": "lib/ai/providers/antigravity-schema.ts",
+   "sha256": "c69dced4d7a272d3a10b8e01538ccc34f5f025e7d49126d7ff6d7a5aa39c1ced",
+   "bytes": 9354,
+   "lines": 272,
+   "max_line_chars": 103
+  },
+  {
+   "path": "lib/ai/providers/antigravity-streaming.ts",
+   "sha256": "927d1fdae2bcfdb284704b0926eb234744d3e441f76e19f6c494bd9c35a9cd59",
+   "bytes": 25102,
+   "lines": 716,
+   "max_line_chars": 115
+  },
+  {
+   "path": "lib/ai/providers/blackboxai-client.ts",
+   "sha256": "5b4db9681dd69b5787a4fce36b290ca8c6e35777f579b8376b66684ea64bbed7",
+   "bytes": 1630,
+   "lines": 51,
+   "max_line_chars": 82
+  },
+  {
+   "path": "lib/ai/providers/claudecode-client.ts",
+   "sha256": "a22ca2cbfd25b5bb88baba6f1c99402017f10fac4a50aad35411442fd083695d",
+   "bytes": 2127,
+   "lines": 60,
+   "max_line_chars": 81
+  },
+  {
+   "path": "lib/ai/providers/claudecode-sdk/agent-definition-mapper.ts",
+   "sha256": "240ab6a727277c458c73d163ea1d95cef2b4c425940f96d180d9f411614f7ca1",
+   "bytes": 3966,
+   "lines": 110,
+   "max_line_chars": 86
+  },
+  {
+   "path": "lib/ai/providers/claudecode-sdk/auth.ts",
+   "sha256": "9017c32d18d76f399ed2ffab9e555342bde5523cfb31e671b10d2546b9b536c4",
+   "bytes": 15149,
+   "lines": 468,
+   "max_line_chars": 117
+  },
+  {
+   "path": "lib/ai/providers/claudecode-sdk/hook-adapter.ts",
+   "sha256": "7d401f4552cb28b708f497813c878e085581da40f753ba8470930d208be8cf8a",
+   "bytes": 4054,
+   "lines": 108,
+   "max_line_chars": 104
+  },
+  {
+   "path": "lib/ai/providers/claudecode-sdk/login-process.ts",
+   "sha256": "ddfb69f4766e217339fd525b75dbf63bfa40171906c03b6f7ea96cb5604593ec",
+   "bytes": 15104,
+   "lines": 418,
+   "max_line_chars": 118
+  },
+  {
+   "path": "lib/ai/providers/claudecode-sdk/mcp-server.ts",
+   "sha256": "6146e11191a33dedf9952e84f4a6f75c45ba1edc6563c1fdbfc4727fcfedc6ce",
+   "bytes": 15511,
+   "lines": 421,
+   "max_line_chars": 121
+  },
+  {
+   "path": "lib/ai/providers/claudecode-sdk/provider.ts",
+   "sha256": "a98856f6f82f95fb4fe6e6447238cac9a9eff25ca9f015b41fb2471e3a8197a8",
+   "bytes": 98200,
+   "lines": 2546,
+   "max_line_chars": 201
+  },
+  {
+   "path": "lib/ai/providers/claudecode-sdk/sanitize.ts",
+   "sha256": "aa0ce8da2b4893d3c602e65140485760cc34469ca38e10f0b777abbb4e26a200",
+   "bytes": 5881,
+   "lines": 183,
+   "max_line_chars": 97
+  },
+  {
+   "path": "lib/ai/providers/cliproxy/codex-bridge.ts",
+   "sha256": "910654ad740e9ffe9d3b6bb67b9f0b46c5851fb4b733c4bc7004a8f7f24b6e1f",
+   "bytes": 6011,
+   "lines": 161,
+   "max_line_chars": 102
+  },
+  {
+   "path": "lib/ai/providers/cliproxy/config.ts",
+   "sha256": "2ba23d2eaf41a082c729ba889d8f21693fca50ac75d30a2612bc008029c6f1c6",
+   "bytes": 4455,
+   "lines": 125,
+   "max_line_chars": 86
+  },
+  {
+   "path": "lib/ai/providers/cliproxy/credentials.ts",
+   "sha256": "3e9e61f56ca929bfa5dc1f83903de54460d7d2ffeb60cd731fd345b97de8666e",
+   "bytes": 3864,
+   "lines": 117,
+   "max_line_chars": 90
+  },
+  {
+   "path": "lib/ai/providers/cliproxy/images-client.ts",
+   "sha256": "1394f6e5170bb2755b7f044246f66632adb93b6264f1cdc7344f316f0d9d8115",
+   "bytes": 10208,
+   "lines": 261,
+   "max_line_chars": 131
+  },
+  {
+   "path": "lib/ai/providers/cliproxy/login.ts",
+   "sha256": "94b4692874478bdb0b3d96d4ec73b591fafba2d4c136b3c8da1ff6b2f42e4064",
+   "bytes": 6021,
+   "lines": 208,
+   "max_line_chars": 93
+  },
+  {
+   "path": "lib/ai/providers/cliproxy/sidecar.ts",
+   "sha256": "acc4ee4ea35022046c52e0c6c4257462e3525231513f59bf5940203b20ea5fad",
+   "bytes": 6146,
+   "lines": 197,
+   "max_line_chars": 92
+  },
+  {
+   "path": "lib/ai/providers/codex-client.ts",
+   "sha256": "844ba6a469c2b50795d8400264220c44c5a19d304a92b358653e8e5cc48f7644",
+   "bytes": 7189,
+   "lines": 203,
+   "max_line_chars": 141
+  },
+  {
+   "path": "lib/ai/providers/dario/binary.ts",
+   "sha256": "792e160d637670154eb5c042c175b1b119483955ad932be9474c8b80ba5047ac",
+   "bytes": 4113,
+   "lines": 122,
+   "max_line_chars": 126
+  },
+  {
+   "path": "lib/ai/providers/dario/config.ts",
+   "sha256": "113328c74dbb34d429fca7d0bbb6bd869285a7b74f8c99e6917b73ca713d33cf",
+   "bytes": 2846,
+   "lines": 89,
+   "max_line_chars": 83
+  },
+  {
+   "path": "lib/ai/providers/dario/environment.ts",
+   "sha256": "96d48b19253ed20b574893734e6171874c767049ce9e8568dae8f39b4936dcd2",
+   "bytes": 1317,
+   "lines": 41,
+   "max_line_chars": 85
+  },
+  {
+   "path": "lib/ai/providers/dario/login.ts",
+   "sha256": "a0c8a122801dcf79ce43f0349e5e950d682002ef9073523cbe4c52f5aee45191",
+   "bytes": 9034,
+   "lines": 300,
+   "max_line_chars": 119
+  },
+  {
+   "path": "lib/ai/providers/dario/sidecar.ts",
+   "sha256": "4168371b13e519af87511af188e82ff87285b25210f790b69ad275b82c1b94d8",
+   "bytes": 8404,
+   "lines": 274,
+   "max_line_chars": 97
+  },
+  {
+   "path": "lib/ai/providers/dario/status.ts",
+   "sha256": "be2bb21c73cd8f47df44a2dc30353dd4cf01253e24f0d335808de7250c07bef1",
+   "bytes": 2730,
+   "lines": 83,
+   "max_line_chars": 107
+  },
+  {
+   "path": "lib/ai/providers/deepseek-client.ts",
+   "sha256": "13ff466f87ecf8c7cb6197e74bf053a39ed6b9d106d2e0969a37291b9d436189",
+   "bytes": 3815,
+   "lines": 119,
+   "max_line_chars": 82
+  },
+  {
+   "path": "lib/ai/providers/embedding-provider.ts",
+   "sha256": "d0b8758814f21a6e0c761c439c27d0cda2852a61b594d839ad2c403849df9edd",
+   "bytes": 6642,
+   "lines": 193,
+   "max_line_chars": 119
+  },
+  {
+   "path": "lib/ai/providers/kimi-client.ts",
+   "sha256": "304b33ff587c070f16b1952aeb2010eec4906763adc8f7a0b11a401c32fd4f59",
+   "bytes": 5918,
+   "lines": 165,
+   "max_line_chars": 126
+  },
+  {
+   "path": "lib/ai/providers/mcp-context-store.ts",
+   "sha256": "bfd7409076b3aa7de8d59925e11528e6ce095824f5fe91768da5f49c57d1e359",
+   "bytes": 5406,
+   "lines": 139,
+   "max_line_chars": 117
+  },
+  {
+   "path": "lib/ai/providers/message-shaping.ts",
+   "sha256": "e49a4acd7d630310735e86f77d92073e47c72f59b6a575c10a144e19eeb6652a",
+   "bytes": 8907,
+   "lines": 244,
+   "max_line_chars": 98
+  },
+  {
+   "path": "lib/ai/providers/minimax-client.ts",
+   "sha256": "f049f3bcb5132d4c76435eaa1c15b9b5d669fc2055aaad87795b074927c49d48",
+   "bytes": 1504,
+   "lines": 50,
+   "max_line_chars": 82
+  },
+  {
+   "path": "lib/ai/providers/ollama-capabilities.ts",
+   "sha256": "0acb0f0be8ed7c6463963cd46a498cffb4cd7f1895b61ded83f8eb8daeedf2b6",
+   "bytes": 10606,
+   "lines": 330,
+   "max_line_chars": 101
+  },
+  {
+   "path": "lib/ai/providers/ollama-client.ts",
+   "sha256": "c3a80c770fa713f5aa96859c72acb4512079389e38a006ce21e744d8c15f2d16",
+   "bytes": 1601,
+   "lines": 54,
+   "max_line_chars": 91
+  },
+  {
+   "path": "lib/ai/providers/openrouter-client.ts",
+   "sha256": "4173bfe1a39e8f6715ff071a4c43227f79a591fa3fdb862bbec9f0d82ecb79de",
+   "bytes": 2424,
+   "lines": 76,
+   "max_line_chars": 84
+  },
+  {
+   "path": "lib/ai/providers/provider-utils.ts",
+   "sha256": "2663db2509918125d513a119fff82918e4bb2edd56f07b65e674e20cb6cb8e89",
+   "bytes": 841,
+   "lines": 33,
+   "max_line_chars": 78
+  },
+  {
+   "path": "lib/ai/providers/vllm-client.ts",
+   "sha256": "f54d3f087ce8ab83b2c1eaa7d61ae31c5c8d852951309bc5db3a2ca6fc594eae",
+   "bytes": 2542,
+   "lines": 79,
+   "max_line_chars": 90
+  },
+  {
+   "path": "lib/ai/quick-create.ts",
+   "sha256": "2b1b3bef6a81b01f93e8471a277a226fd4ac0a202aad970d96ca21636f112114",
+   "bytes": 2251,
+   "lines": 56,
+   "max_line_chars": 164
+  },
+  {
+   "path": "lib/ai/ripgrep/index.ts",
+   "sha256": "5f34e052f584cbdb7db37aa047cfcd4be2408bd2d4af90a21fabf9a46d0dcb5e",
+   "bytes": 236,
+   "lines": 13,
+   "max_line_chars": 46
+  },
+  {
+   "path": "lib/ai/ripgrep/ripgrep.ts",
+   "sha256": "2544fb68c87b437d5f2798d4dd563897455e17bda9137ed31f3c74715c5a86e5",
+   "bytes": 9448,
+   "lines": 288,
+   "max_line_chars": 138
+  },
+  {
+   "path": "lib/ai/ripgrep/tool.ts",
+   "sha256": "d1f35d3ee8ff60105d1661ea561435e66076ff8e29e258baf4e4027201fa5642",
+   "bytes": 23636,
+   "lines": 587,
+   "max_line_chars": 221
+  },
+  {
+   "path": "lib/ai/runway-video-client.ts",
+   "sha256": "cc725823250dc1a8c8f2a2a5283f0446e7f9799bf7b71036438a4b04e4c40712",
+   "bytes": 8690,
+   "lines": 261,
+   "max_line_chars": 153
+  },
+  {
+   "path": "lib/ai/session-model-resolver.ts",
+   "sha256": "a72dddbb80befd4f0a33595e505e975021aefb7b7de101d01834cd55f251848d",
+   "bytes": 21553,
+   "lines": 596,
+   "max_line_chars": 135
+  },
+  {
+   "path": "lib/ai/title-generator.ts",
+   "sha256": "a0e785d5d78065e2b0ca4ac6a854ea015cf77a2b03f471377f269c7b266eed0e",
+   "bytes": 2063,
+   "lines": 69,
+   "max_line_chars": 111
+  },
+  {
+   "path": "lib/ai/tool-input-stall-watchdog.ts",
+   "sha256": "cfd2189d755df82ddc307fad0f2e840e0b19960657321e5c3cedc17be2787e6b",
+   "bytes": 3958,
+   "lines": 99,
+   "max_line_chars": 112
+  },
+  {
+   "path": "lib/ai/tool-result-stream-guard.ts",
+   "sha256": "71095efb54b27d5854774a187723c65ca4ab594cf1c2ae2172a83eef9a94d0fc",
+   "bytes": 12114,
+   "lines": 332,
+   "max_line_chars": 99
+  },
+  {
+   "path": "lib/ai/tool-result-utils.ts",
+   "sha256": "30e0731c26685b114e0098095669ba546353d28802e2f4b6ba246e756cff7838",
+   "bytes": 23358,
+   "lines": 574,
+   "max_line_chars": 128
+  },
+  {
+   "path": "lib/ai/tools.ts",
+   "sha256": "ef6c584769c92fe6b3b87fcb6194a4dda9c72c9d06ff1fdf3a76055610b0bde1",
+   "bytes": 3752,
+   "lines": 102,
+   "max_line_chars": 82
+  },
+  {
+   "path": "lib/ai/transformer-device.ts",
+   "sha256": "26a2b6fdfe8f1a301dbbcac7ac415a8ed8dea1d64edb22ccb6edaff86177e418",
+   "bytes": 5028,
+   "lines": 180,
+   "max_line_chars": 79
+  },
+  {
+   "path": "lib/ai/transformers-runtime.ts",
+   "sha256": "3c5eae5b7d21ed894bf424b8d9f04c613b0366ab3979e2e2361f071955770517",
+   "bytes": 1825,
+   "lines": 58,
+   "max_line_chars": 101
+  },
+  {
+   "path": "lib/ai/vector-search/file-tree-cache.ts",
+   "sha256": "211e89cd9da931cee132cf3b3da18e6fe081e218a3d266a88462360d4cba524f",
+   "bytes": 1292,
+   "lines": 47,
+   "max_line_chars": 97
+  },
+  {
+   "path": "lib/ai/vector-search/index.ts",
+   "sha256": "a1e4b54b21c43516bd458ed19ecc9e98855bafce1ea09bdf25699865f1ae9fdf",
+   "bytes": 566,
+   "lines": 21,
+   "max_line_chars": 76
+  },
+  {
+   "path": "lib/ai/vector-search/session-store.ts",
+   "sha256": "ac0b2ba7214ebe18d9bf70119b64de5c1244aa29cbf7408c80d3fdc37e663229",
+   "bytes": 3969,
+   "lines": 151,
+   "max_line_chars": 81
+  },
+  {
+   "path": "lib/ai/vector-search/synthesizer.ts",
+   "sha256": "e6a3b4b72e9c79ac8f216dd98a39ebffa1bb9b11c5e7fcf8defd7d0c27fd5108",
+   "bytes": 21777,
+   "lines": 629,
+   "max_line_chars": 144
+  },
+  {
+   "path": "lib/ai/vector-search/tool.ts",
+   "sha256": "33260dd4c9189744119c7281bd999824044296811b47d373027b2008f4d273cc",
+   "bytes": 20133,
+   "lines": 606,
+   "max_line_chars": 173
+  },
+  {
+   "path": "lib/ai/vector-search/types.ts",
+   "sha256": "f6a53338336e8df48bbc5a61fa421ed2bd9843dea0510ee8afe6cb067e51a0c4",
+   "bytes": 4447,
+   "lines": 161,
+   "max_line_chars": 83
+  },
+  {
+   "path": "lib/ai/vector-search/v2/fusion.ts",
+   "sha256": "2e11bfcb8ae0c3bea18f577aceb322e4da4e3ad76e94a7f13dc3773ca496a526",
+   "bytes": 3394,
+   "lines": 136,
+   "max_line_chars": 70
+  },
+  {
+   "path": "lib/ai/vector-search/v2/index.ts",
+   "sha256": "2f16035cbeb7d50b7d49c1f5956ab239126196b9a83767c957777422e6f18313",
+   "bytes": 56,
+   "lines": 2,
+   "max_line_chars": 28
+  },
+  {
+   "path": "lib/ai/vector-search/v2/reranker.ts",
+   "sha256": "9b662126fedd2ece2d5ff11a47fedd8ad53eb121db57dc80c5be6239719609a0",
+   "bytes": 9070,
+   "lines": 279,
+   "max_line_chars": 121
+  },
+  {
+   "path": "lib/ai/vertex-ai-video-client.ts",
+   "sha256": "408e7a558d79b1f03d0791f24191d4c76927428188ae649be59393f5085a470c",
+   "bytes": 12366,
+   "lines": 365,
+   "max_line_chars": 200
+  },
+  {
+   "path": "lib/ai/wan22-imagen-client.ts",
+   "sha256": "7c94770a22f92fdf3c03e0826abddeccb004bd5cc3d91e9b15c9a9ee02f39186",
+   "bytes": 3398,
+   "lines": 134,
+   "max_line_chars": 85
+  },
+  {
+   "path": "lib/ai/wan22-utils.ts",
+   "sha256": "71a7e3818c71935943a131e24721888e76dfb0f0420e53fc805157e9fec3f377",
+   "bytes": 1466,
+   "lines": 47,
+   "max_line_chars": 89
+  },
+  {
+   "path": "lib/ai/wan22-video-client.ts",
+   "sha256": "9132b9c6968edbb90c3736c42c497553ed4529f7dc94e52bfc862fbb32faf57f",
+   "bytes": 5389,
+   "lines": 187,
+   "max_line_chars": 98
+  },
+  {
+   "path": "lib/auth/antigravity-auth.ts",
+   "sha256": "515745404e0005d8f49c9180bc527c11e96c3a313b8366af890ad9579927a403",
+   "bytes": 22904,
+   "lines": 609,
+   "max_line_chars": 490
+  },
+  {
+   "path": "lib/auth/antigravity-models.ts",
+   "sha256": "12f9aa2fe577332631f7659d01a05b3a0fd58d71eb78d1834a349c4831a9f5c0",
+   "bytes": 1004,
+   "lines": 30,
+   "max_line_chars": 90
+  },
+  {
+   "path": "lib/auth/blackboxai-models.ts",
+   "sha256": "edabc1565747c1969cf4d250462cd8511b940132e0e7c9afef7b5c2aacac4067",
+   "bytes": 37356,
+   "lines": 1051,
+   "max_line_chars": 86
+  },
+  {
+   "path": "lib/auth/claudecode-auth.ts",
+   "sha256": "a2474989fa9354e8237d643682af56a388b65a46e9327ab746bf51072d63bd9a",
+   "bytes": 10175,
+   "lines": 295,
+   "max_line_chars": 123
+  },
+  {
+   "path": "lib/auth/claudecode-models.ts",
+   "sha256": "b471384c12ec705d36d751abb9f58ace346dd2a9d0ebeb612b4f6d2a0908c74b",
+   "bytes": 1236,
+   "lines": 40,
+   "max_line_chars": 88
+  },
+  {
+   "path": "lib/auth/codex-auth.ts",
+   "sha256": "0d35ffe8b6fc6bd031629178ad83952933a6a8bcacd76ebfa7e5995acf720d63",
+   "bytes": 7326,
+   "lines": 222,
+   "max_line_chars": 101
+  },
+  {
+   "path": "lib/auth/codex-input-utils.ts",
+   "sha256": "7304b426e4bf0c024090658eff2f18f95a574c3623f5c640c2033296884ee48c",
+   "bytes": 22273,
+   "lines": 693,
+   "max_line_chars": 120
+  },
+  {
+   "path": "lib/auth/codex-instructions.ts",
+   "sha256": "d0972a90bd93261e9bdc934d411a77a9f56c6dc4dd532716dca90b5e30aeb01c",
+   "bytes": 6437,
+   "lines": 203,
+   "max_line_chars": 114
+  },
+  {
+   "path": "lib/auth/codex-models.ts",
+   "sha256": "58b3b2f9361661f63cf51a818cea791c0bc6c47cc4f935514ac7df3b4786e928",
+   "bytes": 11523,
+   "lines": 371,
+   "max_line_chars": 136
+  },
+  {
+   "path": "lib/auth/codex-request.ts",
+   "sha256": "475395bb50fdf6e9ecc233f3f997a6d8c82021f02ef849eb0fb1693c0cd0bada",
+   "bytes": 10017,
+   "lines": 300,
+   "max_line_chars": 115
+  },
+  {
+   "path": "lib/auth/codex-response.ts",
+   "sha256": "e5bac290351f02be283021db485ffd7f82700e762ce18493f2bfa3f1b6782633",
+   "bytes": 9139,
+   "lines": 264,
+   "max_line_chars": 117
+  },
+  {
+   "path": "lib/auth/deepseek-models.ts",
+   "sha256": "d51b22d8a4fbc69863a95c60f3b0495159cb9f24ce30d6a9f89693a666b832a4",
+   "bytes": 5043,
+   "lines": 148,
+   "max_line_chars": 85
+  },
+  {
+   "path": "lib/auth/kimi-auth.ts",
+   "sha256": "b40165a62e2aa940b9d0a46e47db2026ea1a3a8dccfe5239e3b6e505eee8544b",
+   "bytes": 11702,
+   "lines": 392,
+   "max_line_chars": 112
+  },
+  {
+   "path": "lib/auth/kimi-models.ts",
+   "sha256": "65cddb7b84fa037a34d9d27e600e710bb345d4e6892e5037f1d02b5ef5eb2411",
+   "bytes": 4187,
+   "lines": 147,
+   "max_line_chars": 86
+  },
+  {
+   "path": "lib/auth/local-auth.ts",
+   "sha256": "1eab1964aa60a62e4014bda046cf17a95d79a0f208833ef47ba93907bd34f303",
+   "bytes": 6929,
+   "lines": 289,
+   "max_line_chars": 84
+  },
+  {
+   "path": "lib/auth/minimax-models.ts",
+   "sha256": "d7c0d83f4d29f3aa1987da5d12b5ca49559d9ddb8c9e1c8515d1cc2013359fb3",
+   "bytes": 1462,
+   "lines": 55,
+   "max_line_chars": 82
+  },
+  {
+   "path": "lib/auth/request-utils.ts",
+   "sha256": "59e3ccf7a580c31537e9d673505a984fc61999e69ce6fafd31b578ecfe0664e9",
+   "bytes": 311,
+   "lines": 9,
+   "max_line_chars": 63
+  },
+  {
+   "path": "lib/auth/route-auth.ts",
+   "sha256": "919d1911908f42180b2c1bf80a3d03728aaf071a8395de84edfb7891381505c4",
+   "bytes": 635,
+   "lines": 15,
+   "max_line_chars": 81
+  },
+  {
+   "path": "lib/background-tasks/background-process-task.ts",
+   "sha256": "d6236fff0d6354627b3e03074be036ccc01b1152190f126a1270977c15c05d1a",
+   "bytes": 5622,
+   "lines": 150,
+   "max_line_chars": 193
+  },
+  {
+   "path": "lib/background-tasks/chat-abort-registry.ts",
+   "sha256": "c517233e5872a6144c538011748b560291883d354a1445d8ba8a0dd5c84ce613",
+   "bytes": 813,
+   "lines": 27,
+   "max_line_chars": 96
+  },
+  {
+   "path": "lib/background-tasks/delegation-auto-resume.ts",
+   "sha256": "b61c04aba3d76879be05ad6c7fecd9e384b8cea4d534a07497840476cb408c09",
+   "bytes": 9931,
+   "lines": 258,
+   "max_line_chars": 143
+  },
+  {
+   "path": "lib/background-tasks/delegation-completion-signal.ts",
+   "sha256": "d00fe1dd9e37a301da9b3bf2c581edc768d548214ed37921f796fcb5007f3922",
+   "bytes": 1525,
+   "lines": 47,
+   "max_line_chars": 80
+  },
+  {
+   "path": "lib/background-tasks/live-prompt-helpers.ts",
+   "sha256": "10fcb2b7e9587fd8a91d076ed5e4dab64dba97d324be06bf92d06f881b22daa5",
+   "bytes": 5971,
+   "lines": 142,
+   "max_line_chars": 173
+  },
+  {
+   "path": "lib/background-tasks/live-prompt-queue-registry.ts",
+   "sha256": "4f2cb6359aabf8ca2e07c171c7aa29aaea7d56feaec1795ba0b206baaf234458",
+   "bytes": 11924,
+   "lines": 351,
+   "max_line_chars": 97
+  },
+  {
+   "path": "lib/background-tasks/progress-content-limiter.ts",
+   "sha256": "43c4c15494c228623cacd18786da7a19414ec544253fdc5bd19920b9621a9f73",
+   "bytes": 12093,
+   "lines": 363,
+   "max_line_chars": 129
+  },
+  {
+   "path": "lib/background-tasks/registry.ts",
+   "sha256": "f38e1265ad2f41be781aae7c8475c2bb6aea5c4111f91a0d6da569193733caae",
+   "bytes": 12327,
+   "lines": 400,
+   "max_line_chars": 116
+  },
+  {
+   "path": "lib/background-tasks/types.ts",
+   "sha256": "ee36a1e4b4fd7ee9001c4612e20210ebf53449d382fbe440f1205d2b6b4d85a5",
+   "bytes": 4378,
+   "lines": 163,
+   "max_line_chars": 97
+  },
+  {
+   "path": "lib/background-tasks/undrained-signal.ts",
+   "sha256": "2de3dbabce35415afdbb42018228790149423af62234f799846e04bfb9b070c1",
+   "bytes": 2174,
+   "lines": 58,
+   "max_line_chars": 83
+  },
+  {
+   "path": "lib/background-tasks/visible-active-tasks.ts",
+   "sha256": "753ee96684845820f1e59e37fa9704216902a913b6a9c4935e0e32fdb7f9c67d",
+   "bytes": 1874,
+   "lines": 52,
+   "max_line_chars": 103
+  },
+  {
+   "path": "lib/command-execution/cwd-state.ts",
+   "sha256": "ab619680be164527e71ed64e80a09eae02907344fd3fb132776deb337d740a33",
+   "bytes": 1696,
+   "lines": 54,
+   "max_line_chars": 94
+  },
+  {
+   "path": "lib/command-execution/executor-ebadf.ts",
+   "sha256": "c6572c5c1eae137e337bbad218a0a93ca7662505c47b3f78c0fac3831fdbd92f",
+   "bytes": 4300,
+   "lines": 121,
+   "max_line_chars": 93
+  },
+  {
+   "path": "lib/command-execution/executor-rtk.ts",
+   "sha256": "96feb63b52006ad8fcacbcc839a957b65619862f32f69f88938c4f90112ec7b2",
+   "bytes": 6146,
+   "lines": 162,
+   "max_line_chars": 102
+  },
+  {
+   "path": "lib/command-execution/executor-runtime.ts",
+   "sha256": "8ac40f5ba5e3b34062c949940605dfa51a887014cf7a8f98c744d44548571d6f",
+   "bytes": 15892,
+   "lines": 356,
+   "max_line_chars": 157
+  },
+  {
+   "path": "lib/command-execution/executor.ts",
+   "sha256": "e97ffe3d93082c09bddb5d6fae465114bd7ed2c0968f4bf2cc0f244ffec03c14",
+   "bytes": 43521,
+   "lines": 1103,
+   "max_line_chars": 172
+  },
+  {
+   "path": "lib/command-execution/index.ts",
+   "sha256": "47b841fbe36f08857b03430f5fd11274785ce5a106f6a4afec98a808e411d7cc",
+   "bytes": 608,
+   "lines": 25,
+   "max_line_chars": 75
+  },
+  {
+   "path": "lib/command-execution/log-manager.ts",
+   "sha256": "5cc11e208740d6239593f768786cbe981ced2292870cb1357753789ac28d088b",
+   "bytes": 6029,
+   "lines": 182,
+   "max_line_chars": 102
+  },
+  {
+   "path": "lib/command-execution/logger.ts",
+   "sha256": "16d22c8dbedcb9fb062b8d35bbc09faf804fa7ed36fe114daf5f64c6a40f2d3d",
+   "bytes": 4853,
+   "lines": 184,
+   "max_line_chars": 80
+  },
+  {
+   "path": "lib/command-execution/types.ts",
+   "sha256": "47a9857a3e6aa83d21ac35cac5e430eca16aa07034cced0aa1339e8decddd66b",
+   "bytes": 10970,
+   "lines": 332,
+   "max_line_chars": 105
+  },
+  {
+   "path": "lib/command-execution/validator.ts",
+   "sha256": "0d29f9098725d1216bde792243c5ee59805c4768a05843757e38cf901e2551e6",
+   "bytes": 4728,
+   "lines": 148,
+   "max_line_chars": 123
+  },
+  {
+   "path": "lib/config/embedding-models.ts",
+   "sha256": "a46914ec1dc5d717d4681b69d2f76af4859c05ee52f3fc82da11ec05b7947dab",
+   "bytes": 13865,
+   "lines": 390,
+   "max_line_chars": 114
+  },
+  {
+   "path": "lib/config/internal-api-secret.ts",
+   "sha256": "b5496af98a6062b90805c54f51ae6b65042047116025d7da93229cabb302d9e8",
+   "bytes": 1160,
+   "lines": 34,
+   "max_line_chars": 107
+  },
+  {
+   "path": "lib/config/model-catalog.ts",
+   "sha256": "2bb7c5bb03ffd6f7ede2a729aba3d92b1f324d66291481d42c6b822ac4bf0e65",
+   "bytes": 22361,
+   "lines": 598,
+   "max_line_chars": 103
+  },
+  {
+   "path": "lib/config/unsafe-agent-permissions.ts",
+   "sha256": "a6a53c0ce5bbb336f8cf4937ed431533513e7cbb72e186e1f760674a70f074c5",
+   "bytes": 472,
+   "lines": 10,
+   "max_line_chars": 100
+  },
+  {
+   "path": "lib/config/vector-search.ts",
+   "sha256": "befe1a4a4dfc73f4e1bb6ea963267857acee6b2f6c134f14e856b14581bd5f9b",
+   "bytes": 5935,
+   "lines": 177,
+   "max_line_chars": 97
+  },
+  {
+   "path": "lib/config/whisper-models.ts",
+   "sha256": "644dc94aa712eace7a5fb8e4585ec38ac54aeff9f0ec0bc5f9897d19cad9007d",
+   "bytes": 3014,
+   "lines": 104,
+   "max_line_chars": 83
+  },
+  {
+   "path": "lib/context-window/claudecode-scope-classifier.ts",
+   "sha256": "8b69a0370d0cf556ebe32c899f4309e51e2c02e7beb3e66eaf667bb2dff783ca",
+   "bytes": 1621,
+   "lines": 53,
+   "max_line_chars": 80
+  },
+  {
+   "path": "lib/context-window/compaction-service.ts",
+   "sha256": "bdf9940de15985009339ae01dbef3a2e2b2183dfee59871c0b43accc74d42530",
+   "bytes": 38285,
+   "lines": 1071,
+   "max_line_chars": 210
+  },
+  {
+   "path": "lib/context-window/fallback-scope-parser.ts",
+   "sha256": "020f73cc659c9ec965b26db5babdf994bb6130874ed52718a9caa4fe62907abb",
+   "bytes": 3100,
+   "lines": 112,
+   "max_line_chars": 85
+  },
+  {
+   "path": "lib/context-window/index.ts",
+   "sha256": "ba1e6da66b82a6e9aa08ae27ee07b7f662b1f206bb0876343f90d6ce820147b2",
+   "bytes": 1046,
+   "lines": 41,
+   "max_line_chars": 89
+  },
+  {
+   "path": "lib/context-window/manager.ts",
+   "sha256": "70bdf97b256002e914a8027223c704704d0adddef733784a3cebb47470a02637",
+   "bytes": 28235,
+   "lines": 837,
+   "max_line_chars": 129
+  },
+  {
+   "path": "lib/context-window/provider-limits.ts",
+   "sha256": "c8e56fb16866f48d069d73b5d312cb60ccc884e2922616fd68b10b0afb1b7155",
+   "bytes": 20861,
+   "lines": 734,
+   "max_line_chars": 97
+  },
+  {
+   "path": "lib/context-window/scoped-counting-contract.ts",
+   "sha256": "1cd92b91362addfde0ca1b2355a0775b977d9d08eeac11f41a3e26215471fc32",
+   "bytes": 3003,
+   "lines": 84,
+   "max_line_chars": 114
+  },
+  {
+   "path": "lib/context-window/scoped-counting-telemetry.ts",
+   "sha256": "5ce0f8712e2f8a52a6818c349ebc7792eb2ba7da24d813615dff682c9bb8ca4b",
+   "bytes": 1197,
+   "lines": 36,
+   "max_line_chars": 101
+  },
+  {
+   "path": "lib/context-window/token-tracker.ts",
+   "sha256": "5be63558a2c65b4621cd2adcb4df2b9b5d88bfb62fb763c46011fd00a6037a5b",
+   "bytes": 20644,
+   "lines": 638,
+   "max_line_chars": 102
+  },
+  {
+   "path": "lib/db/character-schema.ts",
+   "sha256": "07343710412a2ed585e74c9704bf58f1ad06746b9ceaaec255b6079071da902b",
+   "bytes": 163,
+   "lines": 4,
+   "max_line_chars": 70
+  },
+  {
+   "path": "lib/db/client.ts",
+   "sha256": "79ade0ee7ce494c2b52684ec2f8abf03636f699d2fc6edc4c97211359e89ef26",
+   "bytes": 261,
+   "lines": 10,
+   "max_line_chars": 64
+  },
+  {
+   "path": "lib/db/maintenance.ts",
+   "sha256": "9ca15c73044deac696a425dcba7e006105ee1bf16920f324fc21da3fc6af56ef",
+   "bytes": 5494,
+   "lines": 150,
+   "max_line_chars": 113
+  },
+  {
+   "path": "lib/db/migrations/channel-tables.ts",
+   "sha256": "a6f1f2b6b2ac87f2453b286ae1f7963da21fd9ce3a6b6ad87321b40e54fff260",
+   "bytes": 13152,
+   "lines": 330,
+   "max_line_chars": 123
+  },
+  {
+   "path": "lib/db/migrations/character-tables.ts",
+   "sha256": "e2c96229842c40d5c30166b7f8301c08d6829c9eb98c786e45c9e1efaeb88903",
+   "bytes": 17087,
+   "lines": 404,
+   "max_line_chars": 144
+  },
+  {
+   "path": "lib/db/migrations/claudecode-subagent-tables.ts",
+   "sha256": "65ef73e655a96166477e0af5cb18a3aef97bf9fbd0aa4015b5320ff10e7b79b3",
+   "bytes": 2317,
+   "lines": 60,
+   "max_line_chars": 114
+  },
+  {
+   "path": "lib/db/migrations/core-tables.ts",
+   "sha256": "8e1c0e69af80816e2e69fd7aac8424e4c6f90ec870e05bec75ba604450cb4510",
+   "bytes": 11735,
+   "lines": 332,
+   "max_line_chars": 139
+  },
+  {
+   "path": "lib/db/migrations/data-migrations.ts",
+   "sha256": "096e9d8a884f42fa7d1a4e104c6a2673d1f902543e8b2d2778decca300dc5f5a",
+   "bytes": 28716,
+   "lines": 667,
+   "max_line_chars": 170
+  },
+  {
+   "path": "lib/db/migrations/delegation-completions-table.ts",
+   "sha256": "521258fc2113c865d80be6d39875003b34e1c008cf9eff312908991cdb10f5d3",
+   "bytes": 2287,
+   "lines": 50,
+   "max_line_chars": 86
+  },
+  {
+   "path": "lib/db/migrations/design-gallery-tables.ts",
+   "sha256": "333215d79f1505a95575acce7b5f49d43635731f84897b1983dea0f53ad9710b",
+   "bytes": 4664,
+   "lines": 124,
+   "max_line_chars": 89
+  },
+  {
+   "path": "lib/db/migrations/design-snapshots-table.ts",
+   "sha256": "e537802b000196e5c988069fefa0236a15cb0eaf13de78fd4341ed3cf22aad52",
+   "bytes": 2697,
+   "lines": 66,
+   "max_line_chars": 85
+  },
+  {
+   "path": "lib/db/migrations/observability-tables.ts",
+   "sha256": "e3787830e5540d8c770cbd5756310a05f6b39c61d295a73879fb32293e0e2ded",
+   "bytes": 5468,
+   "lines": 144,
+   "max_line_chars": 121
+  },
+  {
+   "path": "lib/db/migrations/plugin-workflow-tables.ts",
+   "sha256": "914ed6058153729a0b8c7a240f98185c388ef29856d47a351b1ec4f05d3dda5a",
+   "bytes": 8542,
+   "lines": 250,
+   "max_line_chars": 124
+  },
+  {
+   "path": "lib/db/migrations/session-last-active-component.ts",
+   "sha256": "c90a2c8dd1ff43dd092397d7102a04424cd287919175d962c15d230449a5a317",
+   "bytes": 2400,
+   "lines": 53,
+   "max_line_chars": 78
+  },
+  {
+   "path": "lib/db/migrations/skills-tables.ts",
+   "sha256": "d86c2ff7b975740dd0553abd86fc3d0a807abe9f7247432cac31766001154ff6",
+   "bytes": 13599,
+   "lines": 311,
+   "max_line_chars": 143
+  },
+  {
+   "path": "lib/db/queries-channel.ts",
+   "sha256": "10e74b3639328233f74f95cd206275885e427676304e132930c5049b640622ab",
+   "bytes": 11621,
+   "lines": 339,
+   "max_line_chars": 112
+  },
+  {
+   "path": "lib/db/queries-messages.ts",
+   "sha256": "4ca18e36a1ee35351ba61f183774d202ae855ae8cfc1da1255d7529afa6d6167",
+   "bytes": 17423,
+   "lines": 499,
+   "max_line_chars": 119
+  },
+  {
+   "path": "lib/db/queries-sessions.ts",
+   "sha256": "b682fe34768ea839255262dfd0564f907da55966f21ac69cc617568d85e0121c",
+   "bytes": 11499,
+   "lines": 370,
+   "max_line_chars": 133
+  },
+  {
+   "path": "lib/db/queries-users.ts",
+   "sha256": "bdd57b2ecabe9e0e14b7a9f2dc13dc6368e082ccb512b12ca14bcc04386e71c6",
+   "bytes": 1198,
+   "lines": 49,
+   "max_line_chars": 88
+  },
+  {
+   "path": "lib/db/queries-web-browse.ts",
+   "sha256": "2a3ec9112749b8d92f716ffe119c3453e52293f20790f91c632c5e18a3cea43a",
+   "bytes": 2342,
+   "lines": 74,
+   "max_line_chars": 101
+  },
+  {
+   "path": "lib/db/queries.ts",
+   "sha256": "244fd3e3df0646faa4d8e3341eb1c1f418ea4d713b733cb6bd7e7188d8f152db",
+   "bytes": 143,
+   "lines": 3,
+   "max_line_chars": 61
+  },
+  {
+   "path": "lib/db/schema.ts",
+   "sha256": "bb4fe05cc68d5127275e4278449dae75515144246807b2058b55fc6d0d896135",
+   "bytes": 141,
+   "lines": 3,
+   "max_line_chars": 60
+  },
+  {
+   "path": "lib/db/schema/design-gallery.ts",
+   "sha256": "7326e8a29e5ce859e16934b37b48ba637510e3034ca9c1e63c2876041e758322",
+   "bytes": 4414,
+   "lines": 105,
+   "max_line_chars": 107
+  },
+  {
+   "path": "lib/db/schema/design-snapshots.ts",
+   "sha256": "22b5004bc93ca5e85baa624586dc3c273233538da7e1ebdd4fba39e102e097e7",
+   "bytes": 2301,
+   "lines": 54,
+   "max_line_chars": 82
+  },
+  {
+   "path": "lib/db/sqlite-character-schema.ts",
+   "sha256": "f083162b9079925f5248c3746f443d64f6cdb3ee35cedb1f57976d2212385311",
+   "bytes": 18518,
+   "lines": 417,
+   "max_line_chars": 128
+  },
+  {
+   "path": "lib/db/sqlite-client.ts",
+   "sha256": "b87c4115e2ba80ffd255b8ef9cc0e5a36541acc4f27c1c6c72f6f77f91db8ed0",
+   "bytes": 4202,
+   "lines": 126,
+   "max_line_chars": 103
+  },
+  {
+   "path": "lib/db/sqlite-migrations.ts",
+   "sha256": "d17e0ed5035c76e6288e443feded0d93db264440451e76cde37c41a6e523c8e8",
+   "bytes": 2564,
+   "lines": 50,
+   "max_line_chars": 97
+  },
+  {
+   "path": "lib/db/sqlite-observability-schema.ts",
+   "sha256": "44822ac247e581303b6c960a076f7c643e7dc95378d670b1be870a486a76cdce",
+   "bytes": 8530,
+   "lines": 210,
+   "max_line_chars": 104
+  },
+  {
+   "path": "lib/db/sqlite-plugins-schema.ts",
+   "sha256": "2506ee49fecb0b75b338fb0aa682e2a52f86ce6ee9819473939c6d824d80f50e",
+   "bytes": 13806,
+   "lines": 319,
+   "max_line_chars": 126
+  },
+  {
+   "path": "lib/db/sqlite-queries.ts",
+   "sha256": "44aeb275f9dfba36fffc9e72df17a4b18e80079f6434cfd99debc3c4ec50ddb2",
+   "bytes": 931,
+   "lines": 20,
+   "max_line_chars": 81
+  },
+  {
+   "path": "lib/db/sqlite-schedule-schema.ts",
+   "sha256": "bb6cf60184b438d4c3172a60a15fff201d7ffc37747da1e1f642aa547beb6032",
+   "bytes": 7572,
+   "lines": 214,
+   "max_line_chars": 110
+  },
+  {
+   "path": "lib/db/sqlite-schema-base.ts",
+   "sha256": "f1266dc2383ca115a81581e09af3c2b329c3b9f83ce99130900b5feb5879b027",
+   "bytes": 12198,
+   "lines": 287,
+   "max_line_chars": 262
+  },
+  {
+   "path": "lib/db/sqlite-schema.ts",
+   "sha256": "7cdb6fd6f6c4b28dd44447d2fad38d0bd8a5dc3680a82a5e44e51efd1e88ce8d",
+   "bytes": 983,
+   "lines": 31,
+   "max_line_chars": 76
+  },
+  {
+   "path": "lib/db/sqlite-skills-schema.ts",
+   "sha256": "0fdd4d40f10f069baf0864c23968043b6cc5a93681ef6f01cb7bed93a622a124",
+   "bytes": 7342,
+   "lines": 152,
+   "max_line_chars": 132
+  },
+  {
+   "path": "lib/db/sqlite-voice-schema.ts",
+   "sha256": "c380dbf1d0830b2be5c9fbac65319bf6a36d69d1c47a2b10e713bf4c1b7f9869",
+   "bytes": 3188,
+   "lines": 87,
+   "max_line_chars": 116
+  },
+  {
+   "path": "lib/db/sqlite-workflows-schema.ts",
+   "sha256": "d4d3639d7e1fb5ca9f6a358cd6b8bd6449c0980f487f16e3771b51d559ba164a",
+   "bytes": 3227,
+   "lines": 76,
+   "max_line_chars": 106
+  },
+  {
+   "path": "lib/documents/chunking.ts",
+   "sha256": "273a74db5a8bf6332e4365afc33fd576e6d520eb920d9874603453bfc11e7e4f",
+   "bytes": 2850,
+   "lines": 105,
+   "max_line_chars": 75
+  },
+  {
+   "path": "lib/documents/docling-runner.ts",
+   "sha256": "fbf83f5ec7e0ee83db69b624db82ac8bab130f5a2587bfb18e8df03743a8246e",
+   "bytes": 4557,
+   "lines": 161,
+   "max_line_chars": 90
+  },
+  {
+   "path": "lib/documents/errors.ts",
+   "sha256": "73e229818b4268f973728aa789f7a1544bf03b4a1de51f64f1ea60065dd52439",
+   "bytes": 831,
+   "lines": 28,
+   "max_line_chars": 63
+  },
+  {
+   "path": "lib/documents/file-types.ts",
+   "sha256": "c62e7d5aed10e1013176b4acdbf4b41afeb2000a6d43b5f696187b2c403cda09",
+   "bytes": 3713,
+   "lines": 128,
+   "max_line_chars": 108
+  },
+  {
+   "path": "lib/documents/parser.ts",
+   "sha256": "31b5590e7c34187c19c614a76fe62ef4269c033609f97e3c4ae5403ea0c172e3",
+   "bytes": 16853,
+   "lines": 554,
+   "max_line_chars": 140
+  },
+  {
+   "path": "lib/documents/pdf-parse-runtime.ts",
+   "sha256": "8d8a419d03bc9575c80c10fa9a2774ae473c3757bf063d4de72a5ef3f7a9c4d9",
+   "bytes": 1387,
+   "lines": 45,
+   "max_line_chars": 96
+  },
+  {
+   "path": "lib/documents/v2/index.ts",
+   "sha256": "0cb4817413cfdb5775b4889c1be63d08d5a5e6a84da318fedcb85c4ec7b17088",
+   "bytes": 35,
+   "lines": 1,
+   "max_line_chars": 34
+  },
+  {
+   "path": "lib/documents/v2/token-chunking.ts",
+   "sha256": "6172b21bbf55f18af51572fb4397780fb7cca8a653e1b7563cc49aa5378b6025",
+   "bytes": 2302,
+   "lines": 89,
+   "max_line_chars": 85
+  },
+  {
+   "path": "lib/documents/v2/tokenizer-runtime.ts",
+   "sha256": "e26115c2ed198a701882c3f26d44f49f056db29a1c35d54190de7b784bcc10b9",
+   "bytes": 1471,
+   "lines": 45,
+   "max_line_chars": 103
+  },
+  {
+   "path": "lib/mcp/auth-cache.ts",
+   "sha256": "b3d396ed8b2be882aca09dfd0433472c80f559f64d07f4af000486c695309c78",
+   "bytes": 5032,
+   "lines": 140,
+   "max_line_chars": 99
+  },
+  {
+   "path": "lib/mcp/chat-integration.ts",
+   "sha256": "d011387c56af85675f7fc776844d522468df0ac8595794e774adea41fd677397",
+   "bytes": 11626,
+   "lines": 267,
+   "max_line_chars": 163
+  },
+  {
+   "path": "lib/mcp/client-manager.ts",
+   "sha256": "7d7d0f6a1646c288e9e907582304f196385850a485d3925a61dd2cfea772c8ff",
+   "bytes": 52681,
+   "lines": 1224,
+   "max_line_chars": 148
+  },
+  {
+   "path": "lib/mcp/mcp-config-resolver.ts",
+   "sha256": "b62da800c9cd4ba2532e23a60393df4bd95f31a53c10da08dfd6736a912a47ed",
+   "bytes": 9717,
+   "lines": 231,
+   "max_line_chars": 135
+  },
+  {
+   "path": "lib/mcp/oauth-provider.ts",
+   "sha256": "df254befbc4d2c78ff20ba0828c69278c587c0dedde2186032b30b61a0a59911",
+   "bytes": 18117,
+   "lines": 534,
+   "max_line_chars": 120
+  },
+  {
+   "path": "lib/mcp/result-formatter.ts",
+   "sha256": "41480d07e4c566ab1d4d20b8040c6cf1927387990b652c0ad8357a27a38c4171",
+   "bytes": 11280,
+   "lines": 323,
+   "max_line_chars": 114
+  },
+  {
+   "path": "lib/mcp/stdio-transport.ts",
+   "sha256": "48667a0397c4b090475471130ae8fc5c893b184a8e90400e62255eab38aa7617",
+   "bytes": 39448,
+   "lines": 1002,
+   "max_line_chars": 188
+  },
+  {
+   "path": "lib/mcp/types.ts",
+   "sha256": "dc309ae43c402f4af0c252bbe15e2d5d0421578612b114b0da940e663c2a58e9",
+   "bytes": 3361,
+   "lines": 121,
+   "max_line_chars": 139
+  },
+  {
+   "path": "lib/observability/cleanup-job.ts",
+   "sha256": "41e0d7404d18f54d037b5346f8993567de078086f5f7e993b0483e169456c874",
+   "bytes": 3230,
+   "lines": 107,
+   "max_line_chars": 132
+  },
+  {
+   "path": "lib/observability/index.ts",
+   "sha256": "82b04394a02e7ab7b7b7d5f68f7a30a44f9911be92121fac53e52a4a1d39f77f",
+   "bytes": 1546,
+   "lines": 64,
+   "max_line_chars": 97
+  },
+  {
+   "path": "lib/observability/queries.ts",
+   "sha256": "da3cef220672c5bc9de17930e67e3bb5c8417a7cc9a192544acecb515f12d09a",
+   "bytes": 19751,
+   "lines": 701,
+   "max_line_chars": 114
+  },
+  {
+   "path": "lib/observability/run-context.ts",
+   "sha256": "a4e1cc3635c147bdbb2f535bfa995dbbf0aa7f80d1364a7fd2c74b9f3e80557b",
+   "bytes": 4966,
+   "lines": 167,
+   "max_line_chars": 97
+  },
+  {
+   "path": "lib/observability/tool-event-handler.ts",
+   "sha256": "32b0e282f373714deb206800e6183d198a24ed6604ca7a83e1e6394e980a99b7",
+   "bytes": 7397,
+   "lines": 219,
+   "max_line_chars": 105
+  },
+  {
+   "path": "lib/plugins/hook-integration.ts",
+   "sha256": "edf824e860d928c6db2fbf32b3f90ee3d319a73c8d7b614a899fa0b5402daed8",
+   "bytes": 4145,
+   "lines": 148,
+   "max_line_chars": 103
+  },
+  {
+   "path": "lib/plugins/hooks-engine.ts",
+   "sha256": "42c2435977fd42150357cc824691cac5f8a3eb25ebaedbc12110e05abc91c3f6",
+   "bytes": 11691,
+   "lines": 391,
+   "max_line_chars": 95
+  },
+  {
+   "path": "lib/plugins/import-parser-components.ts",
+   "sha256": "51e9f70e725aec31c92e27954b978dd3195c2700a0b67c81f626a7ad30344f65",
+   "bytes": 12434,
+   "lines": 357,
+   "max_line_chars": 129
+  },
+  {
+   "path": "lib/plugins/import-parser.ts",
+   "sha256": "4f1b230a5f739b6bd51fc09f69f010142f121525bd8151afc96911229210b7b9",
+   "bytes": 18884,
+   "lines": 553,
+   "max_line_chars": 118
+  },
+  {
+   "path": "lib/plugins/index.ts",
+   "sha256": "5c71059579677a35d83c100913ef4b09490c1e09ebefa66e5c14f7caddd3a819",
+   "bytes": 1403,
+   "lines": 69,
+   "max_line_chars": 64
+  },
+  {
+   "path": "lib/plugins/mcp-integration.ts",
+   "sha256": "85efc92daa56b791b53ae23c77c4bf90fd3deb039d88359e7d31867ff34616c0",
+   "bytes": 5094,
+   "lines": 157,
+   "max_line_chars": 138
+  },
+  {
+   "path": "lib/plugins/registry.ts",
+   "sha256": "4c0541676c8ff3d452e6f216a0ecfb9afbce99913d347ece72153710b5cd867a",
+   "bytes": 23410,
+   "lines": 785,
+   "max_line_chars": 102
+  },
+  {
+   "path": "lib/plugins/skill-loader.ts",
+   "sha256": "eafc6e9a5287ebb55f4a0eab5ad24cbe85681354b9b64c866d6024315a78412f",
+   "bytes": 2616,
+   "lines": 83,
+   "max_line_chars": 84
+  },
+  {
+   "path": "lib/plugins/skill-revision-queries.ts",
+   "sha256": "4e19d44791e82af7d6ac0c5eb9e3223b15e30a41e93aa698d109a9b35087170d",
+   "bytes": 5711,
+   "lines": 223,
+   "max_line_chars": 100
+  },
+  {
+   "path": "lib/plugins/types.ts",
+   "sha256": "7a350863d050d9f27f49c3e098630b4282b1733a738c9c9dd3256ac717cbbe7a",
+   "bytes": 13224,
+   "lines": 488,
+   "max_line_chars": 82
+  },
+  {
+   "path": "lib/plugins/validation.ts",
+   "sha256": "10408d8a8b749f1743d8c1e3fd969f32ab5aa80452e89379fffec33085c96992",
+   "bytes": 7056,
+   "lines": 204,
+   "max_line_chars": 98
+  },
+  {
+   "path": "lib/scheduler/context-sources/index.ts",
+   "sha256": "a969fedb381eee9a23b191ae38f9c36efaa917c72679a3419b647740c0f16802",
+   "bytes": 188,
+   "lines": 9,
+   "max_line_chars": 68
+  },
+  {
+   "path": "lib/scheduler/context-sources/manager.ts",
+   "sha256": "c210a2ea64eb064139447425d4cda27e8a8c13efc70ceb6ab6692b406da56234",
+   "bytes": 3096,
+   "lines": 113,
+   "max_line_chars": 92
+  },
+  {
+   "path": "lib/scheduler/context-sources/types.ts",
+   "sha256": "c0ec42d855bdbec7e2e75a26d906a1c2b864c02b7913e93cee095412c2f087f0",
+   "bytes": 1193,
+   "lines": 52,
+   "max_line_chars": 69
+  },
+  {
+   "path": "lib/scheduler/delivery/channel-handler.ts",
+   "sha256": "181a90a2f47b76a9a4415d34adac794c65971d2cee6e30299aba00d0ce2c280c",
+   "bytes": 3499,
+   "lines": 115,
+   "max_line_chars": 96
+  },
+  {
+   "path": "lib/scheduler/delivery/email-handler.ts",
+   "sha256": "2dbda937c176519698d80d60f025bb38ca49c6424885a64df4c747f0307914cb",
+   "bytes": 4965,
+   "lines": 138,
+   "max_line_chars": 146
+  },
+  {
+   "path": "lib/scheduler/delivery/index.ts",
+   "sha256": "5328e6a5756703957500e0aa8a269fc3f94e0b2626395c6cdceb1ab680f3753d",
+   "bytes": 168,
+   "lines": 8,
+   "max_line_chars": 57
+  },
+  {
+   "path": "lib/scheduler/delivery/router.ts",
+   "sha256": "9c16ce9da28d9047603cc8117c8af7eca024af231d740659d3623d3dd26b0901",
+   "bytes": 2420,
+   "lines": 78,
+   "max_line_chars": 87
+  },
+  {
+   "path": "lib/scheduler/delivery/slack-handler.ts",
+   "sha256": "9c8052bf21a0af87c3bc15566fa5f2223fda553a3d0b2e0a4be6e07987d5611e",
+   "bytes": 3210,
+   "lines": 123,
+   "max_line_chars": 91
+  },
+  {
+   "path": "lib/scheduler/delivery/types.ts",
+   "sha256": "60342714615361f5c7b1bf9d5f7a9d0e3902acd307cfce68110c07e3fccc8903",
+   "bytes": 621,
+   "lines": 29,
+   "max_line_chars": 85
+  },
+  {
+   "path": "lib/scheduler/delivery/webhook-handler.ts",
+   "sha256": "af397445e9cdf226b6f9c5937bb5cf47e000971cc75b3abec9fc43c4dc600a4b",
+   "bytes": 2007,
+   "lines": 76,
+   "max_line_chars": 81
+  },
+  {
+   "path": "lib/scheduler/index.ts",
+   "sha256": "6de879cb5b1e2892d3c0243f5999ad7f3205f3a49decdfc435d9b00016db49c7",
+   "bytes": 406,
+   "lines": 23,
+   "max_line_chars": 91
+  },
+  {
+   "path": "lib/scheduler/presets/code-review.ts",
+   "sha256": "4c1d3a12ebcdae8bef85dbbb15003b1f5e6077d174e3b575e0477349ece3d37e",
+   "bytes": 1098,
+   "lines": 44,
+   "max_line_chars": 111
+  },
+  {
+   "path": "lib/scheduler/presets/daily-standup.ts",
+   "sha256": "6abe142f2a3983968201206af18bd3024b7a5b3286c071932bfd589caa8ce617",
+   "bytes": 1010,
+   "lines": 41,
+   "max_line_chars": 102
+  },
+  {
+   "path": "lib/scheduler/presets/index.ts",
+   "sha256": "965c1fd7cc838de14cc649d1bb9f29a9fde1188560b494925c931b0ade942155",
+   "bytes": 1458,
+   "lines": 61,
+   "max_line_chars": 85
+  },
+  {
+   "path": "lib/scheduler/presets/linear-summary.ts",
+   "sha256": "ec7433eb0a983184f79d1fb0b6bf3ac532e8f36113639687ebe734f2fced3393",
+   "bytes": 971,
+   "lines": 35,
+   "max_line_chars": 108
+  },
+  {
+   "path": "lib/scheduler/presets/types.ts",
+   "sha256": "25763765074f13dec2f208c3f7bb7d6fd1fa675b3513a5f5bf68adb9fa1899b1",
+   "bytes": 823,
+   "lines": 30,
+   "max_line_chars": 76
+  },
+  {
+   "path": "lib/scheduler/presets/weekly-digest.ts",
+   "sha256": "d356c53d127debca4cb05790b9aa68ad0b1297186e5159d60670c22d49331a2f",
+   "bytes": 1182,
+   "lines": 45,
+   "max_line_chars": 119
+  },
+  {
+   "path": "lib/scheduler/run-lookup.ts",
+   "sha256": "db31ab0295d1207bd7bec1df7577c666b2ef5475035faf963be8f01dadafd36d",
+   "bytes": 800,
+   "lines": 23,
+   "max_line_chars": 103
+  },
+  {
+   "path": "lib/scheduler/scheduler-service.ts",
+   "sha256": "e958ac7647c19a7d257f84c5aa59de27b50c67c4b7212797c151e86fed374ca9",
+   "bytes": 12932,
+   "lines": 404,
+   "max_line_chars": 149
+  },
+  {
+   "path": "lib/scheduler/task-queue.ts",
+   "sha256": "9ef106857299773e4d46c7894a10f16e248c643538689c9ea0e11db1828f1202",
+   "bytes": 21168,
+   "lines": 646,
+   "max_line_chars": 133
+  },
+  {
+   "path": "lib/scheduler/template-variables.ts",
+   "sha256": "2aa92a8dd3bf194588d18e1e08a23232465e7232b253f199152d7fb1dd67801e",
+   "bytes": 2105,
+   "lines": 73,
+   "max_line_chars": 86
+  },
+  {
+   "path": "lib/settings/settings-manager.ts",
+   "sha256": "33ba06311ae86a07ada6a81faa883f6c94a9386b33667f10f0a085f0b079339b",
+   "bytes": 38659,
+   "lines": 912,
+   "max_line_chars": 132
+  },
+  {
+   "path": "lib/settings/voice-settings-fields.ts",
+   "sha256": "61cb61c4804c651c7305ba4800d50d5f850905085a8f280cbad2d6a806506414",
+   "bytes": 2027,
+   "lines": 58,
+   "max_line_chars": 89
+  },
+  {
+   "path": "lib/utils/app-visibility.ts",
+   "sha256": "0570ceaf561695bd6c0224fcf1ee8f1ba5c8f8423b0d3b395f1ca8b40ee79f60",
+   "bytes": 1234,
+   "lines": 36,
+   "max_line_chars": 85
+  },
+  {
+   "path": "lib/utils/array-utils.ts",
+   "sha256": "6359fa3c4fc4502f349205fc4499dec3e5455494972eb3a263971dd54de7ea9e",
+   "bytes": 343,
+   "lines": 12,
+   "max_line_chars": 75
+  },
+  {
+   "path": "lib/utils/cron-helpers.ts",
+   "sha256": "3d56d7c1a036c580eeb5218b081a9f7678dca6df9495c2492d9b068c3b63e2fb",
+   "bytes": 6006,
+   "lines": 186,
+   "max_line_chars": 101
+  },
+  {
+   "path": "lib/utils/environment.ts",
+   "sha256": "5ad0b67c7d7eef225911d3eb5afd27f0ef47e43be53cb2f37495f70334218bcd",
+   "bytes": 2510,
+   "lines": 89,
+   "max_line_chars": 86
+  },
+  {
+   "path": "lib/utils/heartbeat-stream.ts",
+   "sha256": "267b1c468645137c65c20538eee94e7156c9d73791dcc485f96014bde8dae826",
+   "bytes": 1158,
+   "lines": 43,
+   "max_line_chars": 71
+  },
+  {
+   "path": "lib/utils/in-flight-cache.ts",
+   "sha256": "fc0b777276b95de1389aac09817e67084dc101cfebb7d4ee9de288301ace47d7",
+   "bytes": 634,
+   "lines": 19,
+   "max_line_chars": 74
+  },
+  {
+   "path": "lib/utils/parse-nested-json.ts",
+   "sha256": "169874d07d442098fa025ebe434ceb86d176f2116369e5dacfce0106f19786fb",
+   "bytes": 1094,
+   "lines": 36,
+   "max_line_chars": 98
+  },
+  {
+   "path": "lib/utils/project-root.ts",
+   "sha256": "05f435d6424a1a877156daa7b0b5616108bbc0583b19900d4103fb7bbcd1e13c",
+   "bytes": 1214,
+   "lines": 35,
+   "max_line_chars": 79
+  },
+  {
+   "path": "lib/utils/resilient-fetch.ts",
+   "sha256": "e4a220970fcc8157a727b466c9a9a47774d95ff7c9f011892d52c473e01434ff",
+   "bytes": 7192,
+   "lines": 224,
+   "max_line_chars": 109
+  },
+  {
+   "path": "lib/utils/strip-markdown.ts",
+   "sha256": "36b6c91eb8442dade15c5866a86c6711f3aa31c0f47c0c64d7d6558a7c0fa85b",
+   "bytes": 2062,
+   "lines": 59,
+   "max_line_chars": 84
+  },
+  {
+   "path": "lib/utils/timestamp.ts",
+   "sha256": "b0fa43a45eb4be2ce96e9a6cc550efb5d59f62ba6e68ccc9fb6d76d970bcd013",
+   "bytes": 2723,
+   "lines": 105,
+   "max_line_chars": 81
+  },
+  {
+   "path": "lib/utils/timezone.ts",
+   "sha256": "5de40edf8cf302b8f7a38a9b6c469566944ce488a9ce29383271c188cb491f06",
+   "bytes": 8503,
+   "lines": 257,
+   "max_line_chars": 129
+  },
+  {
+   "path": "lib/utils/windows-env.ts",
+   "sha256": "64c17f79c01c10bcdd55f72e0bfe23433549c244f85a4acd90bd74178fc7f4c2",
+   "bytes": 8726,
+   "lines": 273,
+   "max_line_chars": 140
+  },
+  {
+   "path": "lib/vectordb/accessible-sync-folders.ts",
+   "sha256": "a04933dc4256dc93e955e41ec82908cde1f61995b5a0259d9c8e5f59cf59d259",
+   "bytes": 2374,
+   "lines": 66,
+   "max_line_chars": 103
+  },
+  {
+   "path": "lib/vectordb/background-sync.ts",
+   "sha256": "9d472837f1ebba7450e81aeb2b79f7f9f05f76fc01a3a88ee34ee25081ee6be8",
+   "bytes": 8345,
+   "lines": 237,
+   "max_line_chars": 241
+  },
+  {
+   "path": "lib/vectordb/client.ts",
+   "sha256": "48b23ba06d07634e1ab718791461abc43c9bbb21e138bae394f86c0b4133b3a3",
+   "bytes": 4323,
+   "lines": 145,
+   "max_line_chars": 98
+  },
+  {
+   "path": "lib/vectordb/collections.ts",
+   "sha256": "5d32838c85b6dbb66170260903a3bd17a55b52054401517e9a37adec62d60ae4",
+   "bytes": 8910,
+   "lines": 318,
+   "max_line_chars": 138
+  },
+  {
+   "path": "lib/vectordb/dangerous-paths.ts",
+   "sha256": "7c545b2067ee3c7c540ca4781a6a51215255d8cfbd6bb6cf44a75637b561bd8d",
+   "bytes": 3286,
+   "lines": 98,
+   "max_line_chars": 127
+  },
+  {
+   "path": "lib/vectordb/file-watcher-utils.ts",
+   "sha256": "dde09bbe2a4945090daa096c2cd87a8de8f6432121f52f4f6fd02710956eacf6",
+   "bytes": 4914,
+   "lines": 146,
+   "max_line_chars": 85
+  },
+  {
+   "path": "lib/vectordb/file-watcher.ts",
+   "sha256": "9973a9c6214999f63f7aab5d19159458293cdf46ca10afe3c945fac8fa14da1e",
+   "bytes": 49100,
+   "lines": 1297,
+   "max_line_chars": 167
+  },
+  {
+   "path": "lib/vectordb/folder-events.ts",
+   "sha256": "523eb6e2ce0dac0b23cc880bac9ae3da02603fc72c50c7567a13253efb0148b2",
+   "bytes": 2497,
+   "lines": 67,
+   "max_line_chars": 132
+  },
+  {
+   "path": "lib/vectordb/ignore-patterns.ts",
+   "sha256": "47881ee7a413294f026734d316450716ac2ec35d62f069da48f662e248153ce1",
+   "bytes": 10048,
+   "lines": 391,
+   "max_line_chars": 98
+  },
+  {
+   "path": "lib/vectordb/index.ts",
+   "sha256": "dedaa78537e9e3788a99b4b8bd88586515f9d079d45d8d8ef7f4ca21b264d200",
+   "bytes": 474,
+   "lines": 21,
+   "max_line_chars": 87
+  },
+  {
+   "path": "lib/vectordb/indexing.ts",
+   "sha256": "271472f65feef7f8bb2cc9b8daafe31e5f3c1595f3ce3be9a29f57211c49f5ac",
+   "bytes": 11157,
+   "lines": 357,
+   "max_line_chars": 131
+  },
+  {
+   "path": "lib/vectordb/path-validation.ts",
+   "sha256": "6876a4f315ff439989ee78928c4b2277eebc53d28c8789e25ab03d687c0d79c6",
+   "bytes": 2318,
+   "lines": 77,
+   "max_line_chars": 101
+  },
+  {
+   "path": "lib/vectordb/resource-errors.ts",
+   "sha256": "6c5d9331e452dd375579cacb0f9a15b93cd554b43975444c5a3b13cfb4c2f108",
+   "bytes": 1889,
+   "lines": 54,
+   "max_line_chars": 128
+  },
+  {
+   "path": "lib/vectordb/search-router.ts",
+   "sha256": "f0bf1e3b3eecb75e712274e5dd54f7b859e5066eb8bd40a40b794c6af3de00e6",
+   "bytes": 797,
+   "lines": 26,
+   "max_line_chars": 93
+  },
+  {
+   "path": "lib/vectordb/search.ts",
+   "sha256": "a9f44a62ec9680572bc726bfb25f8d6832d7ceea504f5c9124b9801e800c3399",
+   "bytes": 4878,
+   "lines": 153,
+   "max_line_chars": 144
+  },
+  {
+   "path": "lib/vectordb/shared-folder-registry.ts",
+   "sha256": "ed13e32dbdba8993e85a24811a69def0635c098b940fb3beb45319c9e32461c1",
+   "bytes": 6824,
+   "lines": 217,
+   "max_line_chars": 91
+  },
+  {
+   "path": "lib/vectordb/source-predicates.ts",
+   "sha256": "d7e378a1b9f1d79dc288e19a5a20aa8281bf2477f0fdb7a0b15b693318d43f71",
+   "bytes": 2294,
+   "lines": 55,
+   "max_line_chars": 82
+  },
+  {
+   "path": "lib/vectordb/sync-file-processor.ts",
+   "sha256": "080872a5266ce9097a1ffb422050483dd6f4dfd1fc4ebe849e589240def78532",
+   "bytes": 10802,
+   "lines": 303,
+   "max_line_chars": 141
+  },
+  {
+   "path": "lib/vectordb/sync-folder-crud.ts",
+   "sha256": "7dfe394effa9f4cb2fd13c3999fda262a27b19ab3aad69ec91c4640974ceda5b",
+   "bytes": 7792,
+   "lines": 227,
+   "max_line_chars": 125
+  },
+  {
+   "path": "lib/vectordb/sync-helpers.ts",
+   "sha256": "96e91e90d7f1b268f87a975a239c08f866d033f58a154e2123743cd4c91be775",
+   "bytes": 10917,
+   "lines": 369,
+   "max_line_chars": 110
+  },
+  {
+   "path": "lib/vectordb/sync-mode-resolver.ts",
+   "sha256": "1412d22e9316f8aea0b6a6158797cfa7b7d5226b6f93adf53cd49231d1c04ca2",
+   "bytes": 4995,
+   "lines": 143,
+   "max_line_chars": 108
+  },
+  {
+   "path": "lib/vectordb/sync-scheduler.ts",
+   "sha256": "7bbb997f9e9f6b6bebfa42c734348ec429c43d9b344cbbb7cd08067232ca6b9d",
+   "bytes": 13657,
+   "lines": 397,
+   "max_line_chars": 125
+  },
+  {
+   "path": "lib/vectordb/sync-service.ts",
+   "sha256": "8b57712d5ab0a84800bf0806a6ea42e2ec715508bda7d3ac5ca6adb0a73e376a",
+   "bytes": 39971,
+   "lines": 1060,
+   "max_line_chars": 195
+  },
+  {
+   "path": "lib/vectordb/sync-types.ts",
+   "sha256": "c21b3d5f91352c745fcc8714388b3c1a99b88e887e1635f4f19ad1fb8287647e",
+   "bytes": 2545,
+   "lines": 86,
+   "max_line_chars": 89
+  },
+  {
+   "path": "lib/vectordb/v2/hybrid-search.ts",
+   "sha256": "d9a87e2f47df9ac7f48630c9dea1d263ff15e9d3840b9b723415698db8ce3865",
+   "bytes": 6976,
+   "lines": 202,
+   "max_line_chars": 130
+  },
+  {
+   "path": "lib/vectordb/v2/index.ts",
+   "sha256": "6e65fd711938b661984d4af66ce0e644da0d40c67cc7c5c0f6d8cffb7db9f226",
+   "bytes": 106,
+   "lines": 3,
+   "max_line_chars": 35
+  },
+  {
+   "path": "lib/vectordb/v2/lexical-vectors.ts",
+   "sha256": "64dce497e6b4677de213d17e7acace6dce5cdb41fdbe7271f55fab3fba91b1b2",
+   "bytes": 2547,
+   "lines": 86,
+   "max_line_chars": 70
+  },
+  {
+   "path": "lib/vectordb/v2/query-expansion.ts",
+   "sha256": "88d053d96f80adcaca5f21849a4789ad038b1335a38d2d50c6d0fdd245e0c3ef",
+   "bytes": 1930,
+   "lines": 69,
+   "max_line_chars": 94
+  },
+  {
+   "path": "lib/workspace/cleanup.ts",
+   "sha256": "157166b73a5a12f0016e600a3e67f631532ba70d221e57fe1e197927959e5a38",
+   "bytes": 4708,
+   "lines": 135,
+   "max_line_chars": 120
+  },
+  {
+   "path": "lib/workspace/git-runner.ts",
+   "sha256": "2b393ae9fc3bd98177e07c09609baf3b72fe6c37fb3d8a054b48c3ee01035f7c",
+   "bytes": 2345,
+   "lines": 79,
+   "max_line_chars": 90
+  },
+  {
+   "path": "lib/workspace/git-service.ts",
+   "sha256": "e5c950f27b6115f2e08d1d9e1373eb7106b8973416b3a5ab08bc1503b3f1466a",
+   "bytes": 16675,
+   "lines": 577,
+   "max_line_chars": 123
+  },
+  {
+   "path": "lib/workspace/metadata.ts",
+   "sha256": "705262f66085751ccabe32044175cd16a1d8824a8ed77014761ca3d24521d58a",
+   "bytes": 7057,
+   "lines": 219,
+   "max_line_chars": 123
+  },
+  {
+   "path": "lib/workspace/metrics.ts",
+   "sha256": "0b1e4f8fc37fd8cf5d59dcf5c20b1cd8c12b7679e7de4b3a74a3f57a80744f3f",
+   "bytes": 6196,
+   "lines": 192,
+   "max_line_chars": 89
+  },
+  {
+   "path": "lib/workspace/setup.ts",
+   "sha256": "13facafcea979bd9edde7787b90a6eee442f264e6a1591299f40468c0cbd1f3f",
+   "bytes": 1314,
+   "lines": 44,
+   "max_line_chars": 81
+  },
+  {
+   "path": "lib/workspace/types.ts",
+   "sha256": "b844a9efa511dd4f207083f79faacb27bbaec48864bae1e34e75f797682f4d77",
+   "bytes": 4448,
+   "lines": 175,
+   "max_line_chars": 86
+  },
+  {
+   "path": "selene-plugins/PLUGIN_SUMMARY.md",
+   "sha256": "f16fd21ea829ab0c19a6e765d804d39e2f37c81941b4cfe5f87912c6fd649bb9",
+   "bytes": 8727,
+   "lines": 315,
+   "max_line_chars": 209
+  },
+  {
+   "path": "selene-plugins/app-mockup-kit/README.md",
+   "sha256": "15a4050d6e3619030f7f252fa7dcd9f04b16477d3faa7c1d87f20c2a83428a16",
+   "bytes": 2150,
+   "lines": 85,
+   "max_line_chars": 205
+  },
+  {
+   "path": "selene-plugins/app-mockup-kit/commands/mockup.md",
+   "sha256": "1856f2ce3735bc7f35d2459ed12d0c893493047efbec9c45a39c836d2006f35d",
+   "bytes": 1117,
+   "lines": 33,
+   "max_line_chars": 169
+  },
+  {
+   "path": "selene-plugins/app-mockup-kit/references/screenshot-rocks-review.md",
+   "sha256": "8015a6a2e4d8746d7c4295c9d776a0d274c872b0d8116138c6decf69991246ec",
+   "bytes": 1705,
+   "lines": 30,
+   "max_line_chars": 156
+  },
+  {
+   "path": "selene-plugins/app-mockup-kit/scripts/mockup-core.ts",
+   "sha256": "4b1d44a5f147db2fd9558c9f8c5764b85021578381f494ad78b88809d678fbbe",
+   "bytes": 28142,
+   "lines": 653,
+   "max_line_chars": 438
+  },
+  {
+   "path": "selene-plugins/app-mockup-kit/scripts/render-mockup.ts",
+   "sha256": "5b6db70099a78f0ccd05e77eb7e020478a3156ddc133e424a745b4fcae27fafe",
+   "bytes": 3136,
+   "lines": 107,
+   "max_line_chars": 136
+  },
+  {
+   "path": "selene-plugins/app-mockup-kit/skills/app-mockup/SKILL.md",
+   "sha256": "fce7ed5cc0c88190c5032be7d09dad7c17e5dfa61cf60a9b4748de41e536e3d7",
+   "bytes": 3283,
+   "lines": 100,
+   "max_line_chars": 249
+  },
+  {
+   "path": "selene-plugins/overnight-keep-alive/README.md",
+   "sha256": "9d3a225a7c00ab06799b36a7589b6a63984aee1863b8bd547687f39cedcb18d8",
+   "bytes": 6617,
+   "lines": 169,
+   "max_line_chars": 137
+  },
+  {
+   "path": "selene-plugins/starwars-soundfx/README.md",
+   "sha256": "b8c2955bfc1be480498e242057d2961ea24191cae1da1593fa6668acba531ba9",
+   "bytes": 2716,
+   "lines": 88,
+   "max_line_chars": 169
+  },
+  {
+   "path": "selene-plugins/task-completion-notifier/INSTALLATION.md",
+   "sha256": "3afce6b33de4b1ba20890296567d320804419b038c9016bd2431e20110ccc44a",
+   "bytes": 4350,
+   "lines": 184,
+   "max_line_chars": 76
+  },
+  {
+   "path": "selene-plugins/task-completion-notifier/QUICK_START.md",
+   "sha256": "f81b92d605199214f6eb7020941a7df7e784d96b10fa94ff9c0df046f7cd3624",
+   "bytes": 1667,
+   "lines": 75,
+   "max_line_chars": 87
+  },
+  {
+   "path": "selene-plugins/task-completion-notifier/README.md",
+   "sha256": "040a531fd50eda5ab1fec4aac11227a2877ea5dad8842b5c161c65000168147e",
+   "bytes": 4318,
+   "lines": 156,
+   "max_line_chars": 129
+  },
+  {
+   "path": "selene-plugins/tool-approval-gate/README.md",
+   "sha256": "b444217a7d323c0b9c14c3fcc390f96c0539c207701424cd22112cb0e91e00a8",
+   "bytes": 1069,
+   "lines": 33,
+   "max_line_chars": 121
+  }
+ ]
+}

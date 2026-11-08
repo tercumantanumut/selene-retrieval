@@ -1,0 +1,8 @@
+﻿cpu load: 29%
+System32\hostname.exe              n=30 min 18.9 median 21.9 p95 36.1 ms
+release\sr-bridge.exe              n=30 min 17.2 median 20.8 p95 24.0 ms
+release\sr-bridge.exe              n=30 min 17.0 median 18.1 p95 21.3 ms
+System32\hostname.exe              n=30 min 17.3 median 18.5 p95 20.6 ms
+release\sr-bridge.exe              n=30 min 17.0 median 18.1 p95 29.0 ms
+release\sr-bridge.exe              n=30 min 16.8 median 17.8 p95 19.3 ms
+cpu load: 66%

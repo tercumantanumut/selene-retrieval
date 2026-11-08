@@ -1,0 +1,506 @@
+{"qid": "W18", "query": "Should I use HTML5 and/or CSS3 to build my website?", "kind": "nl", "relevant": [{"path": "15400", "grade": 3}]}
+{"qid": "W45", "query": "What are some options for taking payments on my website?", "kind": "nl", "relevant": [{"path": "2875", "grade": 3}]}
+{"qid": "W216", "query": "What are some good resources for generating privacy policies and terms of use?", "kind": "nl", "relevant": [{"path": "47411", "grade": 3}]}
+{"qid": "W274", "query": "How to choose between web hosting and cloud hosting?", "kind": "nl", "relevant": [{"path": "18110", "grade": 3}]}
+{"qid": "W310", "query": "HTML validation: is it worth it?", "kind": "nl", "relevant": [{"path": "29568", "grade": 3}]}
+{"qid": "W335", "query": "What are some great tools to use for keyword research?", "kind": "nl", "relevant": [{"path": "30459", "grade": 3}]}
+{"qid": "W533", "query": "How to add SMS text messaging functionality to my website?", "kind": "nl", "relevant": [{"path": "24850", "grade": 3}, {"path": "33607", "grade": 3}]}
+{"qid": "W593", "query": "Which meta tags are not worth the effort?", "kind": "nl", "relevant": [{"path": "36223", "grade": 3}]}
+{"qid": "W803", "query": "When does a website require a privacy policy and/or terms of use?", "kind": "nl", "relevant": [{"path": "34980", "grade": 3}]}
+{"qid": "W848", "query": "How to use rel='canonical' properly", "kind": "nl", "relevant": [{"path": "50049", "grade": 3}]}
+{"qid": "W971", "query": "What are the best ways to implement cross browser css?", "kind": "nl", "relevant": [{"path": "1055", "grade": 3}]}
+{"qid": "W1115", "query": "Can we ignore visitors without JavaScript enabled?", "kind": "nl", "relevant": [{"path": "68387", "grade": 3}]}
+{"qid": "W1208", "query": "Self-rated Content", "kind": "nl", "relevant": [{"path": "548", "grade": 3}]}
+{"qid": "W1318", "query": "Alternatives to Google Website Optimizer", "kind": "nl", "relevant": [{"path": "5", "grade": 3}]}
+{"qid": "W1355", "query": "Is there any way to have search engines not index a certain section of a page?", "kind": "nl", "relevant": [{"path": "17680", "grade": 3}]}
+{"qid": "W1449", "query": "Why does SEO seem to hinge on using wordpress?", "kind": "nl", "relevant": [{"path": "48941", "grade": 3}]}
+{"qid": "W1766", "query": "New HTML5 elements and search engine ranking impact?", "kind": "nl", "relevant": [{"path": "1413", "grade": 3}, {"path": "25052", "grade": 3}, {"path": "39746", "grade": 3}]}
+{"qid": "W2272", "query": "Does Google cache robots.txt?", "kind": "nl", "relevant": [{"path": "62938", "grade": 3}]}
+{"qid": "W2448", "query": "How to choose a CMS system for a small web site?", "kind": "nl", "relevant": [{"path": "54538", "grade": 3}]}
+{"qid": "W2726", "query": "How can I get search engines to crawl my site and see a localised view of my data?", "kind": "nl", "relevant": [{"path": "23112", "grade": 3}, {"path": "23117", "grade": 3}, {"path": "23123", "grade": 3}, {"path": "3786", "grade": 3}, {"path": "53330", "grade": 3}]}
+{"qid": "W2793", "query": "Live view of online visitors", "kind": "nl", "relevant": [{"path": "7607", "grade": 3}]}
+{"qid": "W2822", "query": "free SSL certificates?", "kind": "nl", "relevant": [{"path": "67779", "grade": 3}]}
+{"qid": "W2823", "query": "Problem integrating Adsense with Google Analytics", "kind": "nl", "relevant": [{"path": "25765", "grade": 3}]}
+{"qid": "W3242", "query": "What are the best ways to start driving traffic to a new website?", "kind": "nl", "relevant": [{"path": "6855", "grade": 3}, {"path": "9183", "grade": 3}]}
+{"qid": "W3320", "query": "Why google is not showing links to my site in result?", "kind": "nl", "relevant": [{"path": "3635", "grade": 3}]}
+{"qid": "W3496", "query": "Do subdomains help/hurt SEO?", "kind": "nl", "relevant": [{"path": "33217", "grade": 3}, {"path": "44624", "grade": 3}, {"path": "52567", "grade": 3}, {"path": "53920", "grade": 3}, {"path": "56113", "grade": 3}, {"path": "60088", "grade": 3}, {"path": "61461", "grade": 3}]}
+{"qid": "W3770", "query": "SEO Geolocation", "kind": "nl", "relevant": [{"path": "64802", "grade": 3}]}
+{"qid": "W3932", "query": "keyword stuffing in SEO", "kind": "nl", "relevant": [{"path": "31048", "grade": 3}]}
+{"qid": "W3952", "query": "Understanding Alexa rank, it isn't showing many of my back links?", "kind": "nl", "relevant": [{"path": "63055", "grade": 3}, {"path": "64836", "grade": 3}]}
+{"qid": "W4166", "query": "SEO benefits of URL as: www.example.com/category/subcategory/", "kind": "nl", "relevant": [{"path": "3726", "grade": 3}]}
+{"qid": "W4269", "query": "Where is the best place to find stock website templates?", "kind": "nl", "relevant": [{"path": "25534", "grade": 3}]}
+{"qid": "W4424", "query": "addthis button default message", "kind": "nl", "relevant": [{"path": "4497", "grade": 3}]}
+{"qid": "W4473", "query": "What is a \"back link\" and how does it affect search ranking?", "kind": "nl", "relevant": [{"path": "67004", "grade": 3}]}
+{"qid": "W4596", "query": "How to remove malware from website?", "kind": "nl", "relevant": [{"path": "49478", "grade": 3}, {"path": "50629", "grade": 3}]}
+{"qid": "W4780", "query": "What role do article submission directories play in SEO?", "kind": "nl", "relevant": [{"path": "14912", "grade": 3}]}
+{"qid": "W5007", "query": "Seo: Change the title of a page", "kind": "nl", "relevant": [{"path": "50383", "grade": 3}]}
+{"qid": "W5265", "query": "How do I set expiration headers for CSS, JS, and Images?", "kind": "nl", "relevant": [{"path": "55421", "grade": 3}]}
+{"qid": "W5269", "query": "Self hosted Web Analytics like urchin", "kind": "nl", "relevant": [{"path": "34383", "grade": 3}]}
+{"qid": "W5385", "query": "Page appears indexed in Google but not findable for any search terms?", "kind": "nl", "relevant": [{"path": "51406", "grade": 3}]}
+{"qid": "W5550", "query": "How to provide Google reviews information?", "kind": "nl", "relevant": [{"path": "29705", "grade": 3}]}
+{"qid": "W5653", "query": "Does the Google spider render JavaScript?", "kind": "nl", "relevant": [{"path": "29229", "grade": 3}, {"path": "38423", "grade": 3}, {"path": "42400", "grade": 3}, {"path": "57980", "grade": 3}, {"path": "58495", "grade": 3}]}
+{"qid": "W5662", "query": "How do I get images containing text to be indexed by search engines?", "kind": "nl", "relevant": [{"path": "44397", "grade": 3}]}
+{"qid": "W5845", "query": "Alternative to AdSense", "kind": "nl", "relevant": [{"path": "47921", "grade": 3}, {"path": "57023", "grade": 3}]}
+{"qid": "W5852", "query": "What's the a good mailing list manager/platform?", "kind": "nl", "relevant": [{"path": "25080", "grade": 3}]}
+{"qid": "W6185", "query": "New META TAGS with positive effects for seo ranking in 2011 and beyond", "kind": "nl", "relevant": [{"path": "23043", "grade": 3}]}
+{"qid": "W6519", "query": "Does server location or TLD affects SEO", "kind": "nl", "relevant": [{"path": "25279", "grade": 3}, {"path": "38592", "grade": 3}, {"path": "67782", "grade": 3}]}
+{"qid": "W6556", "query": "Does the order of keywords matter in a page title?", "kind": "nl", "relevant": [{"path": "25490", "grade": 3}]}
+{"qid": "W6602", "query": "Data sources for Alexa and Compete rankings", "kind": "nl", "relevant": [{"path": "10442", "grade": 3}]}
+{"qid": "W6790", "query": "Dating CMS ideas", "kind": "nl", "relevant": [{"path": "10187", "grade": 3}, {"path": "10600", "grade": 3}, {"path": "10681", "grade": 3}, {"path": "11066", "grade": 3}, {"path": "11316", "grade": 3}, {"path": "11442", "grade": 3}, {"path": "11687", "grade": 3}, {"path": "12277", "grade": 3}, {"path": "12389", "grade": 3}, {"path": "12929", "grade": 3}, {"path": "13456", "grade": 3}, {"path": "13522", "grade": 3}, {"path": "13791", "grade": 3}, {"path": "14878", "grade": 3}, {"path": "1540", "grade": 3}, {"path": "15553", "grade": 3}, {"path": "16046", "grade": 3}, {"path": "1622", "grade": 3}, {"path": "16265", "grade": 3}, {"path": "16837", "grade": 3}, {"path": "16862", "grade": 3}, {"path": "16930", "grade": 3}, {"path": "16949", "grade": 3}, {"path": "17959", "grade": 3}, {"path": "18141", "grade": 3}, {"path": "18645", "grade": 3}, {"path": "19627", "grade": 3}, {"path": "19948", "grade": 3}, {"path": "2006", "grade": 3}, {"path": "21144", "grade": 3}, {"path": "21371", "grade": 3}, {"path": "22282", "grade": 3}, {"path": "22362", "grade": 3}, {"path": "22438", "grade": 3}, {"path": "23173", "grade": 3}, {"path": "23494", "grade": 3}, {"path": "23577", "grade": 3}, {"path": "24058", "grade": 3}, {"path": "24115", "grade": 3}, {"path": "24140", "grade": 3}, {"path": "24351", "grade": 3}, {"path": "24420", "grade": 3}, {"path": "24705", "grade": 3}, {"path": "24987", "grade": 3}, {"path": "25652", "grade": 3}, {"path": "25745", "grade": 3}, {"path": "26144", "grade": 3}, {"path": "26150", "grade": 3}, {"path": "26632", "grade": 3}, {"path": "28499", "grade": 3}, {"path": "29869", "grade": 3}, {"path": "30142", "grade": 3}, {"path": "30444", "grade": 3}, {"path": "31658", "grade": 3}, {"path": "32530", "grade": 3}, {"path": "33298", "grade": 3}, {"path": "33706", "grade": 3}, {"path": "3398", "grade": 3}, {"path": "34946", "grade": 3}, {"path": "36349", "grade": 3}, {"path": "36409", "grade": 3}, {"path": "38668", "grade": 3}, {"path": "38849", "grade": 3}, {"path": "39731", "grade": 3}, {"path": "42228", "grade": 3}, {"path": "42802", "grade": 3}, {"path": "43941", "grade": 3}, {"path": "44222", "grade": 3}, {"path": "44861", "grade": 3}, {"path": "45167", "grade": 3}, {"path": "46793", "grade": 3}, {"path": "46994", "grade": 3}, {"path": "47794", "grade": 3}, {"path": "48329", "grade": 3}, {"path": "48850", "grade": 3}, {"path": "50410", "grade": 3}, {"path": "53026", "grade": 3}, {"path": "53325", "grade": 3}, {"path": "53707", "grade": 3}, {"path": "53760", "grade": 3}, {"path": "54836", "grade": 3}, {"path": "5540", "grade": 3}, {"path": "56279", "grade": 3}, {"path": "56419", "grade": 3}, {"path": "56443", "grade": 3}, {"path": "57119", "grade": 3}, {"path": "61090", "grade": 3}, {"path": "61642", "grade": 3}, {"path": "67783", "grade": 3}, {"path": "68867", "grade": 3}, {"path": "7322", "grade": 3}, {"path": "7549", "grade": 3}, {"path": "8412", "grade": 3}, {"path": "8438", "grade": 3}, {"path": "8513", "grade": 3}, {"path": "8769", "grade": 3}, {"path": "9584", "grade": 3}]}
+{"qid": "W6791", "query": "image behind adsense", "kind": "nl", "relevant": [{"path": "6912", "grade": 3}]}
+{"qid": "W6796", "query": "Make the content area div come next the menu bar", "kind": "nl", "relevant": [{"path": "6793", "grade": 3}]}
+{"qid": "W6890", "query": "Are HTML tables bad for SEO?", "kind": "nl", "relevant": [{"path": "47425", "grade": 3}]}
+{"qid": "W7136", "query": "Pagination, Duplicate Content, and SEO", "kind": "nl", "relevant": [{"path": "59168", "grade": 3}]}
+{"qid": "W7209", "query": ".CO Domains. Worthwhile?", "kind": "nl", "relevant": [{"path": "12807", "grade": 3}]}
+{"qid": "W7299", "query": "StackOverflow and Google search", "kind": "nl", "relevant": [{"path": "18017", "grade": 3}, {"path": "53128", "grade": 3}, {"path": "59181", "grade": 3}, {"path": "8111", "grade": 3}, {"path": "8786", "grade": 3}]}
+{"qid": "W7377", "query": "How to register a domain for a beginner?", "kind": "nl", "relevant": [{"path": "7375", "grade": 3}]}
+{"qid": "W7383", "query": "SEO one longer page vs. several targeted subpages?", "kind": "nl", "relevant": [{"path": "26244", "grade": 3}]}
+{"qid": "W7424", "query": "New Domain Registration - Price differences", "kind": "nl", "relevant": [{"path": "8804", "grade": 3}]}
+{"qid": "W7451", "query": "google cache grabber", "kind": "nl", "relevant": [{"path": "18881", "grade": 3}, {"path": "30218", "grade": 3}]}
+{"qid": "W7484", "query": "bounce rate and Alexa ranking clarifications", "kind": "nl", "relevant": [{"path": "59456", "grade": 3}, {"path": "7396", "grade": 3}]}
+{"qid": "W7864", "query": "How to Estimate Needed Bandwidth for New Web Application?", "kind": "nl", "relevant": [{"path": "43786", "grade": 3}]}
+{"qid": "W7889", "query": "Are there any difference between `<h1> ... <h6>` tags for SEO?", "kind": "nl", "relevant": [{"path": "4524", "grade": 3}]}
+{"qid": "W8001", "query": "Am I legally liable for user generated content and comments?", "kind": "nl", "relevant": [{"path": "28176", "grade": 3}]}
+{"qid": "W8206", "query": "How do you start an on-line community?", "kind": "nl", "relevant": [{"path": "17532", "grade": 3}]}
+{"qid": "W8273", "query": "SSL certificate - which one to buy?", "kind": "nl", "relevant": [{"path": "10428", "grade": 3}, {"path": "1742", "grade": 3}]}
+{"qid": "W8354", "query": "What does the double slash mean in URLs?", "kind": "nl", "relevant": [{"path": "28330", "grade": 3}]}
+{"qid": "W8501", "query": "Self ads targeting", "kind": "nl", "relevant": [{"path": "8811", "grade": 3}]}
+{"qid": "W8536", "query": "How do I get a domain from a grabber without paying?", "kind": "nl", "relevant": [{"path": "30040", "grade": 3}, {"path": "4502", "grade": 3}]}
+{"qid": "W8710", "query": "Google doesn't seem to update the description or title of my homepage", "kind": "nl", "relevant": [{"path": "27658", "grade": 3}, {"path": "29469", "grade": 3}, {"path": "32171", "grade": 3}, {"path": "65767", "grade": 3}, {"path": "69050", "grade": 3}]}
+{"qid": "W8798", "query": "Hosted version of Yahoo! answers", "kind": "nl", "relevant": [{"path": "14604", "grade": 3}, {"path": "1484", "grade": 3}]}
+{"qid": "W8836", "query": "Do dedicated IP addresses improve SEO?", "kind": "nl", "relevant": [{"path": "20584", "grade": 3}]}
+{"qid": "W8861", "query": "Is there anything better than awstats?", "kind": "nl", "relevant": [{"path": "4852", "grade": 3}]}
+{"qid": "W9118", "query": "Should page contents be same all time for SEO?", "kind": "nl", "relevant": [{"path": "9085", "grade": 3}]}
+{"qid": "W9347", "query": "IE6 Support - When to drop it?", "kind": "nl", "relevant": [{"path": "134", "grade": 3}, {"path": "31221", "grade": 3}]}
+{"qid": "W9540", "query": "Where is the line drawn with domain names which include a trademark?", "kind": "nl", "relevant": [{"path": "19203", "grade": 3}, {"path": "57249", "grade": 3}]}
+{"qid": "W9543", "query": "Search Engine results from different locations", "kind": "nl", "relevant": [{"path": "6078", "grade": 3}]}
+{"qid": "W9572", "query": "Why won't title attributes get indexed in Google?", "kind": "nl", "relevant": [{"path": "9689", "grade": 3}]}
+{"qid": "W9739", "query": "Which URL format is better? domain.com/[id]/title OR domain.com/title/[id].html", "kind": "nl", "relevant": [{"path": "16641", "grade": 3}]}
+{"qid": "W9777", "query": "Risk for hosting SEO links", "kind": "nl", "relevant": [{"path": "3480", "grade": 3}]}
+{"qid": "W9848", "query": "Squeezing all the SEO out of a URL as possible", "kind": "nl", "relevant": [{"path": "56695", "grade": 3}]}
+{"qid": "W9897", "query": "How does google calculate bounce rate?", "kind": "nl", "relevant": [{"path": "35189", "grade": 3}]}
+{"qid": "W9943", "query": "Helpdesk software", "kind": "nl", "relevant": [{"path": "26825", "grade": 3}]}
+{"qid": "W9947", "query": "How can I buy a domain that has already been registered?", "kind": "nl", "relevant": [{"path": "12397", "grade": 3}, {"path": "49004", "grade": 3}, {"path": "6643", "grade": 3}]}
+{"qid": "W9968", "query": "When removing a bunch of files from a website, is 301 to the start page appropriate?", "kind": "nl", "relevant": [{"path": "9847", "grade": 3}]}
+{"qid": "W10012", "query": "Google Analytics - Showing multiple site stats at once", "kind": "nl", "relevant": [{"path": "43607", "grade": 3}]}
+{"qid": "W10104", "query": "Looking for software that has a shopping cart where I can sell licensed photos", "kind": "nl", "relevant": [{"path": "17115", "grade": 3}, {"path": "20752", "grade": 3}]}
+{"qid": "W10177", "query": "how to do bing seo", "kind": "nl", "relevant": [{"path": "3763", "grade": 3}, {"path": "49200", "grade": 3}]}
+{"qid": "W10242", "query": "PHP based ad server ( alternative to OpenX )", "kind": "nl", "relevant": [{"path": "18537", "grade": 3}]}
+{"qid": "W10473", "query": "Providing fake info during domain registration - does it matter?", "kind": "nl", "relevant": [{"path": "37541", "grade": 3}]}
+{"qid": "W10626", "query": "Strange spam posts not making sense", "kind": "nl", "relevant": [{"path": "19897", "grade": 3}, {"path": "20839", "grade": 3}]}
+{"qid": "W10756", "query": "Will HTML5 adoption render my site search engine unoptimized?", "kind": "nl", "relevant": [{"path": "9936", "grade": 3}]}
+{"qid": "W10838", "query": "How is anti-hotlinking done?", "kind": "nl", "relevant": [{"path": "22339", "grade": 3}]}
+{"qid": "W10886", "query": "Any recommended forum software for commercial/busniess discussion", "kind": "nl", "relevant": [{"path": "10863", "grade": 3}, {"path": "11467", "grade": 3}, {"path": "14425", "grade": 3}, {"path": "14570", "grade": 3}, {"path": "1965", "grade": 3}, {"path": "2097", "grade": 3}, {"path": "21132", "grade": 3}, {"path": "23004", "grade": 3}, {"path": "24036", "grade": 3}, {"path": "25160", "grade": 3}, {"path": "25771", "grade": 3}, {"path": "26804", "grade": 3}, {"path": "28104", "grade": 3}, {"path": "4891", "grade": 3}, {"path": "5321", "grade": 3}, {"path": "53610", "grade": 3}, {"path": "56571", "grade": 3}, {"path": "6059", "grade": 3}, {"path": "6983", "grade": 3}, {"path": "7668", "grade": 3}, {"path": "8650", "grade": 3}, {"path": "8973", "grade": 3}, {"path": "9082", "grade": 3}, {"path": "9612", "grade": 3}, {"path": "9997", "grade": 3}]}
+{"qid": "W10993", "query": "SSL Certification on both www and no-www domains", "kind": "nl", "relevant": [{"path": "11004", "grade": 3}]}
+{"qid": "W11256", "query": "Are temporarily hidden elements bad for search-engine rankings?", "kind": "nl", "relevant": [{"path": "19090", "grade": 3}]}
+{"qid": "W11262", "query": "How to make sure that my web application would be stable?", "kind": "nl", "relevant": [{"path": "385", "grade": 3}, {"path": "9373", "grade": 3}]}
+{"qid": "W11383", "query": "Alternative to Pingdom website monitoring service", "kind": "nl", "relevant": [{"path": "13649", "grade": 3}]}
+{"qid": "W11413", "query": "SEO - 2 websites in the same domain", "kind": "nl", "relevant": [{"path": "11426", "grade": 3}]}
+{"qid": "W11457", "query": "IP Addresses of Known Spammers", "kind": "nl", "relevant": [{"path": "8966", "grade": 3}]}
+{"qid": "W11492", "query": "SEO Heading Tags", "kind": "nl", "relevant": [{"path": "54016", "grade": 3}]}
+{"qid": "W11544", "query": "How can I help Google build SiteLinks?", "kind": "nl", "relevant": [{"path": "18443", "grade": 3}, {"path": "18547", "grade": 3}, {"path": "19518", "grade": 3}, {"path": "20936", "grade": 3}, {"path": "22430", "grade": 3}, {"path": "25590", "grade": 3}, {"path": "26908", "grade": 3}, {"path": "27490", "grade": 3}, {"path": "29411", "grade": 3}, {"path": "35738", "grade": 3}, {"path": "42439", "grade": 3}, {"path": "44308", "grade": 3}, {"path": "45424", "grade": 3}, {"path": "47982", "grade": 3}, {"path": "49966", "grade": 3}, {"path": "50142", "grade": 3}, {"path": "503", "grade": 3}, {"path": "50877", "grade": 3}, {"path": "52031", "grade": 3}, {"path": "54942", "grade": 3}, {"path": "55814", "grade": 3}, {"path": "55873", "grade": 3}, {"path": "56395", "grade": 3}, {"path": "57308", "grade": 3}, {"path": "58164", "grade": 3}, {"path": "60680", "grade": 3}, {"path": "60875", "grade": 3}, {"path": "61307", "grade": 3}, {"path": "61555", "grade": 3}, {"path": "61682", "grade": 3}, {"path": "67795", "grade": 3}, {"path": "67816", "grade": 3}, {"path": "67965", "grade": 3}, {"path": "68588", "grade": 3}, {"path": "9090", "grade": 3}, {"path": "978", "grade": 3}, {"path": "9908", "grade": 3}]}
+{"qid": "W11560", "query": "SEO preference for WWW or HTTP:// protocol redirection? Do www websites rank better than NON-www?", "kind": "nl", "relevant": [{"path": "20302", "grade": 3}, {"path": "45451", "grade": 3}]}
+{"qid": "W11637", "query": "Strange incoming links appearing on site statistics", "kind": "nl", "relevant": [{"path": "34955", "grade": 3}]}
+{"qid": "W11663", "query": "How can we find the develpoment language of a specific website?", "kind": "nl", "relevant": [{"path": "44762", "grade": 3}]}
+{"qid": "W12228", "query": "Google Analytics: How can I track between http:// and https:// profiles for a domain?", "kind": "nl", "relevant": [{"path": "60245", "grade": 3}]}
+{"qid": "W12333", "query": "How to grep (or find) on cPanel?", "kind": "nl", "relevant": [{"path": "67727", "grade": 3}]}
+{"qid": "W12583", "query": "Subdomain versus new domain", "kind": "nl", "relevant": [{"path": "50486", "grade": 3}]}
+{"qid": "W12690", "query": "Ratio of No-follow & Do-follow Backlinks", "kind": "nl", "relevant": [{"path": "13242", "grade": 3}]}
+{"qid": "W12759", "query": "Should I choose sub-directories over sub-domains in this case?", "kind": "nl", "relevant": [{"path": "54713", "grade": 3}]}
+{"qid": "W12911", "query": "What is linkbaiting?", "kind": "nl", "relevant": [{"path": "53148", "grade": 3}]}
+{"qid": "W12960", "query": "SEO: How to Separate Fact from Fiction?", "kind": "nl", "relevant": [{"path": "47857", "grade": 3}]}
+{"qid": "W12974", "query": "SEO - New web page are not getting indexing", "kind": "nl", "relevant": [{"path": "12706", "grade": 3}]}
+{"qid": "W13056", "query": "Buying/registering domain name", "kind": "nl", "relevant": [{"path": "10746", "grade": 3}, {"path": "46962", "grade": 3}, {"path": "9", "grade": 3}]}
+{"qid": "W13170", "query": "Alt attribute for SEO recommendation", "kind": "nl", "relevant": [{"path": "53288", "grade": 3}]}
+{"qid": "W13510", "query": "Are hyphens bad for domain names?", "kind": "nl", "relevant": [{"path": "14475", "grade": 3}, {"path": "15019", "grade": 3}, {"path": "25570", "grade": 3}, {"path": "410", "grade": 3}, {"path": "55916", "grade": 3}, {"path": "57654", "grade": 3}, {"path": "62904", "grade": 3}, {"path": "68163", "grade": 3}]}
+{"qid": "W13850", "query": "Will Google's New +1 Count For SEO", "kind": "nl", "relevant": [{"path": "17508", "grade": 3}]}
+{"qid": "W13920", "query": "Does a site's bounce rate influence Google rankings?", "kind": "nl", "relevant": [{"path": "54986", "grade": 3}]}
+{"qid": "W13959", "query": "Changing nameservers for a domain on GoDaddy", "kind": "nl", "relevant": [{"path": "13957", "grade": 3}]}
+{"qid": "W14174", "query": "How to hide my website from search engines using robots.txt?", "kind": "nl", "relevant": [{"path": "11700", "grade": 3}, {"path": "61148", "grade": 3}]}
+{"qid": "W14390", "query": "Is SEO effected when URL changes from .php to not including .php", "kind": "nl", "relevant": [{"path": "11525", "grade": 3}]}
+{"qid": "W14457", "query": "What does WWW do?", "kind": "nl", "relevant": [{"path": "25082", "grade": 3}]}
+{"qid": "W14473", "query": "Google Analytics and the EU cookie directive. Who will fall foul of the law? Google or the developer?", "kind": "nl", "relevant": [{"path": "29775", "grade": 3}, {"path": "30083", "grade": 3}, {"path": "30099", "grade": 3}, {"path": "31874", "grade": 3}]}
+{"qid": "W14543", "query": "Building for different screen sizes", "kind": "nl", "relevant": [{"path": "21987", "grade": 3}]}
+{"qid": "W14546", "query": "best practice to migrate server", "kind": "nl", "relevant": [{"path": "26148", "grade": 3}, {"path": "45366", "grade": 3}]}
+{"qid": "W14644", "query": "How do I find the Alexa traffic rank of a site that uses a subdomain?", "kind": "nl", "relevant": [{"path": "45566", "grade": 3}]}
+{"qid": "W14669", "query": "Hide a file showing up in google search", "kind": "nl", "relevant": [{"path": "14520", "grade": 3}]}
+{"qid": "W14818", "query": "Improve SEO for a project that differs from another only by 1 character", "kind": "nl", "relevant": [{"path": "8427", "grade": 3}]}
+{"qid": "W15137", "query": "So now Google has said no to old browsers when can the rest of us follow suit?", "kind": "nl", "relevant": [{"path": "34031", "grade": 3}]}
+{"qid": "W15361", "query": "Cheap stock images website (per image pricing)", "kind": "nl", "relevant": [{"path": "4025", "grade": 3}]}
+{"qid": "W15362", "query": "Stackexchange meta tags", "kind": "nl", "relevant": [{"path": "13995", "grade": 3}]}
+{"qid": "W15422", "query": "SEO: What are SEO benefits of submitting to Yahoo Directory?", "kind": "nl", "relevant": [{"path": "7331", "grade": 3}]}
+{"qid": "W15578", "query": "help with htaccess code for navigation", "kind": "nl", "relevant": [{"path": "15560", "grade": 3}]}
+{"qid": "W15834", "query": "Why do websites have a contact form? isn't an email address enough?", "kind": "nl", "relevant": [{"path": "33013", "grade": 3}]}
+{"qid": "W15871", "query": "404 monitoring tool for websites?", "kind": "nl", "relevant": [{"path": "14010", "grade": 3}]}
+{"qid": "W15878", "query": "Content appearing under multiple categories; anything I can do to prevent duplicate penalty?", "kind": "nl", "relevant": [{"path": "12057", "grade": 3}, {"path": "12269", "grade": 3}, {"path": "13480", "grade": 3}, {"path": "14284", "grade": 3}, {"path": "14775", "grade": 3}, {"path": "16187", "grade": 3}, {"path": "16988", "grade": 3}, {"path": "17154", "grade": 3}, {"path": "19032", "grade": 3}, {"path": "19522", "grade": 3}, {"path": "21885", "grade": 3}, {"path": "25174", "grade": 3}, {"path": "26974", "grade": 3}, {"path": "28629", "grade": 3}, {"path": "28760", "grade": 3}, {"path": "3078", "grade": 3}, {"path": "31814", "grade": 3}, {"path": "31821", "grade": 3}, {"path": "34855", "grade": 3}, {"path": "35002", "grade": 3}, {"path": "35567", "grade": 3}, {"path": "35652", "grade": 3}, {"path": "38789", "grade": 3}, {"path": "4660", "grade": 3}, {"path": "48715", "grade": 3}, {"path": "53919", "grade": 3}, {"path": "55596", "grade": 3}, {"path": "56485", "grade": 3}, {"path": "57752", "grade": 3}, {"path": "58980", "grade": 3}, {"path": "60867", "grade": 3}, {"path": "6269", "grade": 3}, {"path": "65295", "grade": 3}, {"path": "7935", "grade": 3}, {"path": "8401", "grade": 3}, {"path": "9690", "grade": 3}]}
+{"qid": "W16067", "query": "How do I control how often search engines visit my site?", "kind": "nl", "relevant": [{"path": "18557", "grade": 3}]}
+{"qid": "W16170", "query": "Effect of adding link from PR1 site to PR0 site?", "kind": "nl", "relevant": [{"path": "29398", "grade": 3}]}
+{"qid": "W16186", "query": "Any tool to sketch layout?", "kind": "nl", "relevant": [{"path": "21078", "grade": 3}]}
+{"qid": "W16299", "query": "Is there a maximum size that web pages should be kept under?", "kind": "nl", "relevant": [{"path": "22296", "grade": 3}]}
+{"qid": "W16390", "query": "Preventing robots from crawling specific part of a page", "kind": "nl", "relevant": [{"path": "30854", "grade": 3}, {"path": "35486", "grade": 3}]}
+{"qid": "W16396", "query": "website dns redirects to another", "kind": "nl", "relevant": [{"path": "16395", "grade": 3}]}
+{"qid": "W16398", "query": "is it a good seo practice to put relative keywords in a hidden div?", "kind": "nl", "relevant": [{"path": "15060", "grade": 3}, {"path": "36320", "grade": 3}]}
+{"qid": "W16420", "query": "Subfolder won't permenantly redirect to subdomain", "kind": "nl", "relevant": [{"path": "16419", "grade": 3}]}
+{"qid": "W16437", "query": "URLs which begin \"www2\"", "kind": "nl", "relevant": [{"path": "44188", "grade": 3}]}
+{"qid": "W16614", "query": "Anonymous website", "kind": "nl", "relevant": [{"path": "21084", "grade": 3}]}
+{"qid": "W16769", "query": "Why is my site not approved by Google Adsense?", "kind": "nl", "relevant": [{"path": "14256", "grade": 3}]}
+{"qid": "W16799", "query": "Are files in a hidden directory safe?", "kind": "nl", "relevant": [{"path": "24774", "grade": 3}]}
+{"qid": "W16999", "query": "Tool or plugin required to show out in which html files a given css selectors is used", "kind": "nl", "relevant": [{"path": "16995", "grade": 3}]}
+{"qid": "W17080", "query": "Ad service that supports ssl (secure publishing)", "kind": "nl", "relevant": [{"path": "16946", "grade": 3}]}
+{"qid": "W17124", "query": "Where can I host / run periodically a ruby script for free?", "kind": "nl", "relevant": [{"path": "17589", "grade": 3}, {"path": "8129", "grade": 3}, {"path": "8304", "grade": 3}]}
+{"qid": "W17162", "query": "Step by step website developent", "kind": "nl", "relevant": [{"path": "13902", "grade": 3}, {"path": "48405", "grade": 3}]}
+{"qid": "W17281", "query": "Can I find out who is +1ing my website?", "kind": "nl", "relevant": [{"path": "29286", "grade": 3}]}
+{"qid": "W17314", "query": "SEO questions about website page titles", "kind": "nl", "relevant": [{"path": "2631", "grade": 3}]}
+{"qid": "W17724", "query": "Is there risk to registering a domain using extension from another country?", "kind": "nl", "relevant": [{"path": "48761", "grade": 3}]}
+{"qid": "W17914", "query": "What is a lot of traffic?", "kind": "nl", "relevant": [{"path": "57072", "grade": 3}]}
+{"qid": "W18011", "query": "HTTP and HTTPS impacts on SEO", "kind": "nl", "relevant": [{"path": "68441", "grade": 3}]}
+{"qid": "W18050", "query": "One multi-domain analytics profile, or one analytics profiles per domain?", "kind": "nl", "relevant": [{"path": "19237", "grade": 3}, {"path": "48370", "grade": 3}]}
+{"qid": "W18185", "query": "How to find the records for domain name purchased today and in past?", "kind": "nl", "relevant": [{"path": "13237", "grade": 3}]}
+{"qid": "W18395", "query": "How does Google recognize publish date of a post", "kind": "nl", "relevant": [{"path": "34587", "grade": 3}]}
+{"qid": "W18607", "query": "Unlimited free sitemap generator for Nginx?", "kind": "nl", "relevant": [{"path": "11625", "grade": 3}, {"path": "22993", "grade": 3}, {"path": "27918", "grade": 3}, {"path": "4179", "grade": 3}]}
+{"qid": "W18763", "query": "How Google reacts on display:none for CSS media query?", "kind": "nl", "relevant": [{"path": "59355", "grade": 3}]}
+{"qid": "W18978", "query": "Retrieve Facebook Like count after changing URL structure for entire website", "kind": "nl", "relevant": [{"path": "19651", "grade": 3}, {"path": "48159", "grade": 3}]}
+{"qid": "W19134", "query": "My website was spammed with Russian porn links and my ranking dropped by half", "kind": "nl", "relevant": [{"path": "17040", "grade": 3}]}
+{"qid": "W19168", "query": "How to send mass email and not get treated as spam", "kind": "nl", "relevant": [{"path": "54805", "grade": 3}]}
+{"qid": "W19176", "query": "Does google always downrank pages with hidden texts", "kind": "nl", "relevant": [{"path": "22143", "grade": 3}]}
+{"qid": "W19275", "query": "How long it takes for google to refresh the page information? How can I achieve to make it faster?", "kind": "nl", "relevant": [{"path": "7391", "grade": 3}]}
+{"qid": "W19362", "query": "What is deleteme.xxxxxxxx.php", "kind": "nl", "relevant": [{"path": "60046", "grade": 3}]}
+{"qid": "W19406", "query": "Is the meta tag for keywords not useful anymore?", "kind": "nl", "relevant": [{"path": "14223", "grade": 3}, {"path": "29263", "grade": 3}, {"path": "29899", "grade": 3}, {"path": "6", "grade": 3}, {"path": "65519", "grade": 3}, {"path": "7296", "grade": 3}]}
+{"qid": "W19517", "query": "Google Analytics underestimating pageviews and visitors", "kind": "nl", "relevant": [{"path": "16074", "grade": 3}]}
+{"qid": "W19559", "query": "Applying domain name to a subfolder/path", "kind": "nl", "relevant": [{"path": "48312", "grade": 3}]}
+{"qid": "W19576", "query": "Is there any way to find out how often a certain query is sent to a search engine?", "kind": "nl", "relevant": [{"path": "19626", "grade": 3}]}
+{"qid": "W19637", "query": "How can I point a subdomain at another server?", "kind": "nl", "relevant": [{"path": "15035", "grade": 3}]}
+{"qid": "W19714", "query": "Shared Web Hosting provider for video or social networking sites", "kind": "nl", "relevant": [{"path": "10200", "grade": 3}, {"path": "10236", "grade": 3}, {"path": "10571", "grade": 3}, {"path": "10711", "grade": 3}, {"path": "10772", "grade": 3}, {"path": "10867", "grade": 3}, {"path": "10951", "grade": 3}, {"path": "10980", "grade": 3}, {"path": "11112", "grade": 3}, {"path": "11182", "grade": 3}, {"path": "11248", "grade": 3}, {"path": "11356", "grade": 3}, {"path": "11460", "grade": 3}, {"path": "11815", "grade": 3}, {"path": "1217", "grade": 3}, {"path": "12391", "grade": 3}, {"path": "12421", "grade": 3}, {"path": "12576", "grade": 3}, {"path": "12740", "grade": 3}, {"path": "12743", "grade": 3}, {"path": "12889", "grade": 3}, {"path": "12897", "grade": 3}, {"path": "13058", "grade": 3}, {"path": "13364", "grade": 3}, {"path": "13367", "grade": 3}, {"path": "13537", "grade": 3}, {"path": "13713", "grade": 3}, {"path": "13757", "grade": 3}, {"path": "14251", "grade": 3}, {"path": "14802", "grade": 3}, {"path": "14982", "grade": 3}, {"path": "14995", "grade": 3}, {"path": "15141", "grade": 3}, {"path": "15378", "grade": 3}, {"path": "154", "grade": 3}, {"path": "15454", "grade": 3}, {"path": "15501", "grade": 3}, {"path": "16050", "grade": 3}, {"path": "16119", "grade": 3}, {"path": "16564", "grade": 3}, {"path": "16856", "grade": 3}, {"path": "17142", "grade": 3}, {"path": "17588", "grade": 3}, {"path": "17810", "grade": 3}, {"path": "17848", "grade": 3}, {"path": "18297", "grade": 3}, {"path": "18389", "grade": 3}, {"path": "18480", "grade": 3}, {"path": "18497", "grade": 3}, {"path": "18671", "grade": 3}, {"path": "18677", "grade": 3}, {"path": "18678", "grade": 3}, {"path": "18892", "grade": 3}, {"path": "19416", "grade": 3}, {"path": "19439", "grade": 3}, {"path": "19585", "grade": 3}, {"path": "19630", "grade": 3}, {"path": "19636", "grade": 3}, {"path": "19653", "grade": 3}, {"path": "19851", "grade": 3}, {"path": "20086", "grade": 3}, {"path": "20325", "grade": 3}, {"path": "20452", "grade": 3}, {"path": "20570", "grade": 3}, {"path": "20782", "grade": 3}, {"path": "20838", "grade": 3}, {"path": "20856", "grade": 3}, {"path": "21275", "grade": 3}, {"path": "22023", "grade": 3}, {"path": "22141", "grade": 3}, {"path": "22585", "grade": 3}, {"path": "22855", "grade": 3}, {"path": "2344", "grade": 3}, {"path": "23521", "grade": 3}, {"path": "23668", "grade": 3}, {"path": "23806", "grade": 3}, {"path": "23819", "grade": 3}, {"path": "23942", "grade": 3}, {"path": "25112", "grade": 3}, {"path": "25124", "grade": 3}, {"path": "25362", "grade": 3}, {"path": "25648", "grade": 3}, {"path": "25675", "grade": 3}, {"path": "26135", "grade": 3}, {"path": "26667", "grade": 3}, {"path": "26774", "grade": 3}, {"path": "27139", "grade": 3}, {"path": "27644", "grade": 3}, {"path": "27728", "grade": 3}, {"path": "27735", "grade": 3}, {"path": "28320", "grade": 3}, {"path": "28381", "grade": 3}, {"path": "29384", "grade": 3}, {"path": "29615", "grade": 3}, {"path": "29823", "grade": 3}, {"path": "29935", "grade": 3}, {"path": "30180", "grade": 3}, {"path": "30523", "grade": 3}, {"path": "30709", "grade": 3}, {"path": "31022", "grade": 3}, {"path": "31739", "grade": 3}, {"path": "33087", "grade": 3}, {"path": "33887", "grade": 3}, {"path": "34227", "grade": 3}, {"path": "34591", "grade": 3}, {"path": "34722", "grade": 3}, {"path": "3504", "grade": 3}, {"path": "3505", "grade": 3}, {"path": "3524", "grade": 3}, {"path": "36180", "grade": 3}, {"path": "38316", "grade": 3}, {"path": "3857", "grade": 3}, {"path": "39357", "grade": 3}, {"path": "3972", "grade": 3}, {"path": "39898", "grade": 3}, {"path": "42175", "grade": 3}, {"path": "42528", "grade": 3}, {"path": "43177", "grade": 3}, {"path": "43924", "grade": 3}, {"path": "44720", "grade": 3}, {"path": "45214", "grade": 3}, {"path": "45334", "grade": 3}, {"path": "45335", "grade": 3}, {"path": "46884", "grade": 3}, {"path": "47162", "grade": 3}, {"path": "47363", "grade": 3}, {"path": "47836", "grade": 3}, {"path": "47948", "grade": 3}, {"path": "47986", "grade": 3}, {"path": "47993", "grade": 3}, {"path": "48242", "grade": 3}, {"path": "4882", "grade": 3}, {"path": "4908", "grade": 3}, {"path": "49303", "grade": 3}, {"path": "5001", "grade": 3}, {"path": "50401", "grade": 3}, {"path": "5098", "grade": 3}, {"path": "51878", "grade": 3}, {"path": "52302", "grade": 3}, {"path": "5306", "grade": 3}, {"path": "53588", "grade": 3}, {"path": "53829", "grade": 3}, {"path": "53866", "grade": 3}, {"path": "54020", "grade": 3}, {"path": "54034", "grade": 3}, {"path": "54095", "grade": 3}, {"path": "5441", "grade": 3}, {"path": "54455", "grade": 3}, {"path": "54756", "grade": 3}, {"path": "54962", "grade": 3}, {"path": "55792", "grade": 3}, {"path": "55997", "grade": 3}, {"path": "56206", "grade": 3}, {"path": "56341", "grade": 3}, {"path": "5641", "grade": 3}, {"path": "56412", "grade": 3}, {"path": "5643", "grade": 3}, {"path": "56975", "grade": 3}, {"path": "57282", "grade": 3}, {"path": "57417", "grade": 3}, {"path": "57486", "grade": 3}, {"path": "58945", "grade": 3}, {"path": "59229", "grade": 3}, {"path": "59231", "grade": 3}, {"path": "59602", "grade": 3}, {"path": "59732", "grade": 3}, {"path": "59974", "grade": 3}, {"path": "61384", "grade": 3}, {"path": "61463", "grade": 3}, {"path": "6155", "grade": 3}, {"path": "6203", "grade": 3}, {"path": "62955", "grade": 3}, {"path": "6310", "grade": 3}, {"path": "63115", "grade": 3}, {"path": "6339", "grade": 3}, {"path": "63513", "grade": 3}, {"path": "6425", "grade": 3}, {"path": "64663", "grade": 3}, {"path": "64672", "grade": 3}, {"path": "6495", "grade": 3}, {"path": "65568", "grade": 3}, {"path": "66947", "grade": 3}, {"path": "67467", "grade": 3}, {"path": "67525", "grade": 3}, {"path": "67933", "grade": 3}, {"path": "6815", "grade": 3}, {"path": "6829", "grade": 3}, {"path": "68689", "grade": 3}, {"path": "6938", "grade": 3}, {"path": "7200", "grade": 3}, {"path": "7525", "grade": 3}, {"path": "7606", "grade": 3}, {"path": "7660", "grade": 3}, {"path": "7712", "grade": 3}, {"path": "7815", "grade": 3}, {"path": "8365", "grade": 3}, {"path": "8463", "grade": 3}, {"path": "9010", "grade": 3}, {"path": "9061", "grade": 3}, {"path": "9170", "grade": 3}, {"path": "921", "grade": 3}, {"path": "9308", "grade": 3}, {"path": "9422", "grade": 3}, {"path": "9427", "grade": 3}, {"path": "9541", "grade": 3}, {"path": "9880", "grade": 3}, {"path": "9945", "grade": 3}]}
+{"qid": "W19742", "query": "Google Analytics unable to validate my site during setup", "kind": "nl", "relevant": [{"path": "19772", "grade": 3}]}
+{"qid": "W19813", "query": "Adding <description> metadata in php / html for google results page", "kind": "nl", "relevant": [{"path": "15973", "grade": 3}, {"path": "20971", "grade": 3}, {"path": "26261", "grade": 3}, {"path": "35780", "grade": 3}, {"path": "3923", "grade": 3}, {"path": "68804", "grade": 3}]}
+{"qid": "W19906", "query": "Duplicate meta description", "kind": "nl", "relevant": [{"path": "51383", "grade": 3}]}
+{"qid": "W19978", "query": "How do I setup 301 redirects in Google Apps site?", "kind": "nl", "relevant": [{"path": "53577", "grade": 3}]}
+{"qid": "W20078", "query": "new domain, old links are 301'd from old domain to new, how will this affect my rankings?", "kind": "nl", "relevant": [{"path": "56565", "grade": 3}]}
+{"qid": "W20093", "query": "Why treat these as URLs with different path capitalization and trailing slash as different?", "kind": "nl", "relevant": [{"path": "2498", "grade": 3}, {"path": "27714", "grade": 3}]}
+{"qid": "W20143", "query": "What are pitfalls in SEO when internationalizing a website?", "kind": "nl", "relevant": [{"path": "15927", "grade": 3}]}
+{"qid": "W20161", "query": "Thousands of 404 errors in Google Webmaster Tools", "kind": "nl", "relevant": [{"path": "15662", "grade": 3}, {"path": "44477", "grade": 3}]}
+{"qid": "W20252", "query": "Do search engines index a new domain that just redirect to the main site?", "kind": "nl", "relevant": [{"path": "12592", "grade": 3}, {"path": "19386", "grade": 3}, {"path": "24026", "grade": 3}, {"path": "25367", "grade": 3}, {"path": "30929", "grade": 3}, {"path": "3777", "grade": 3}, {"path": "39412", "grade": 3}, {"path": "47709", "grade": 3}, {"path": "50680", "grade": 3}, {"path": "57052", "grade": 3}, {"path": "59005", "grade": 3}, {"path": "60166", "grade": 3}]}
+{"qid": "W20257", "query": "Defense against rude web crawlers", "kind": "nl", "relevant": [{"path": "20206", "grade": 3}]}
+{"qid": "W20424", "query": "blogger multiple custom domains?", "kind": "nl", "relevant": [{"path": "31666", "grade": 3}]}
+{"qid": "W20827", "query": "Business Website Fraudulently Copied; What Can We Do to Get Fraudulent Chinese Site Taken Down", "kind": "nl", "relevant": [{"path": "9861", "grade": 3}]}
+{"qid": "W20933", "query": "Which mobile browsers for testing?", "kind": "nl", "relevant": [{"path": "21098", "grade": 3}]}
+{"qid": "W20992", "query": "Reducing the number of js or css files downloaded?", "kind": "nl", "relevant": [{"path": "18329", "grade": 3}]}
+{"qid": "W21110", "query": "List of phones that support media queries?", "kind": "nl", "relevant": [{"path": "19531", "grade": 3}]}
+{"qid": "W21183", "query": "What happens when a domain name reached it's expiration date?", "kind": "nl", "relevant": [{"path": "20309", "grade": 3}]}
+{"qid": "W21377", "query": "W3C Compliance v SEO", "kind": "nl", "relevant": [{"path": "20446", "grade": 3}, {"path": "23917", "grade": 3}, {"path": "39509", "grade": 3}]}
+{"qid": "W21423", "query": "How to make my page load faster?", "kind": "nl", "relevant": [{"path": "15380", "grade": 3}, {"path": "41139", "grade": 3}, {"path": "56090", "grade": 3}, {"path": "67353", "grade": 3}]}
+{"qid": "W21427", "query": "Are there any programs that i can use to test my website against hacks?", "kind": "nl", "relevant": [{"path": "244", "grade": 3}, {"path": "25999", "grade": 3}]}
+{"qid": "W21633", "query": "How did this website get a custom search bar listed under their search results?", "kind": "nl", "relevant": [{"path": "53436", "grade": 3}]}
+{"qid": "W21636", "query": "Favicon Best Practices", "kind": "nl", "relevant": [{"path": "2010", "grade": 3}]}
+{"qid": "W21768", "query": "Connecting +1s on a Google+ Business Page and a webpage", "kind": "nl", "relevant": [{"path": "30139", "grade": 3}]}
+{"qid": "W22301", "query": "How does Google's Traffic Estimator calculate the \"Estimated Avg. CPC\"?", "kind": "nl", "relevant": [{"path": "22413", "grade": 3}]}
+{"qid": "W22392", "query": "A script that would create snapshots of web pages", "kind": "nl", "relevant": [{"path": "5943", "grade": 3}]}
+{"qid": "W22483", "query": "Does adding google analytics improve google ranking", "kind": "nl", "relevant": [{"path": "15909", "grade": 3}]}
+{"qid": "W22495", "query": "Google analytics - drop in traffic", "kind": "nl", "relevant": [{"path": "22470", "grade": 3}]}
+{"qid": "W22618", "query": "To change URL to user friendly URL", "kind": "nl", "relevant": [{"path": "53804", "grade": 3}]}
+{"qid": "W22658", "query": "My site disappeared from Google search, how long does it take to get back?", "kind": "nl", "relevant": [{"path": "26807", "grade": 3}]}
+{"qid": "W22684", "query": "Titles in Google results contain spammy prefixes", "kind": "nl", "relevant": [{"path": "32151", "grade": 3}]}
+{"qid": "W22877", "query": "SEO: Where do I start?", "kind": "nl", "relevant": [{"path": "10265", "grade": 3}, {"path": "10281", "grade": 3}, {"path": "10533", "grade": 3}, {"path": "10546", "grade": 3}, {"path": "10548", "grade": 3}, {"path": "11623", "grade": 3}, {"path": "13081", "grade": 3}, {"path": "15568", "grade": 3}, {"path": "16288", "grade": 3}, {"path": "16873", "grade": 3}, {"path": "16885", "grade": 3}, {"path": "17791", "grade": 3}, {"path": "18730", "grade": 3}, {"path": "19356", "grade": 3}, {"path": "2", "grade": 3}, {"path": "20407", "grade": 3}, {"path": "217", "grade": 3}, {"path": "21845", "grade": 3}, {"path": "21976", "grade": 3}, {"path": "22017", "grade": 3}, {"path": "22086", "grade": 3}, {"path": "22837", "grade": 3}, {"path": "23501", "grade": 3}, {"path": "237", "grade": 3}, {"path": "23798", "grade": 3}, {"path": "24206", "grade": 3}, {"path": "25210", "grade": 3}, {"path": "25417", "grade": 3}, {"path": "25585", "grade": 3}, {"path": "25656", "grade": 3}, {"path": "25950", "grade": 3}, {"path": "26485", "grade": 3}, {"path": "28884", "grade": 3}, {"path": "29530", "grade": 3}, {"path": "29653", "grade": 3}, {"path": "30320", "grade": 3}, {"path": "30451", "grade": 3}, {"path": "30485", "grade": 3}, {"path": "30725", "grade": 3}, {"path": "30798", "grade": 3}, {"path": "30892", "grade": 3}, {"path": "30915", "grade": 3}, {"path": "30919", "grade": 3}, {"path": "32823", "grade": 3}, {"path": "33343", "grade": 3}, {"path": "33344", "grade": 3}, {"path": "33544", "grade": 3}, {"path": "34151", "grade": 3}, {"path": "3472", "grade": 3}, {"path": "3486", "grade": 3}, {"path": "35284", "grade": 3}, {"path": "35517", "grade": 3}, {"path": "36109", "grade": 3}, {"path": "37599", "grade": 3}, {"path": "38471", "grade": 3}, {"path": "39529", "grade": 3}, {"path": "43350", "grade": 3}, {"path": "43356", "grade": 3}, {"path": "43973", "grade": 3}, {"path": "47142", "grade": 3}, {"path": "47193", "grade": 3}, {"path": "47231", "grade": 3}, {"path": "47309", "grade": 3}, {"path": "47766", "grade": 3}, {"path": "47854", "grade": 3}, {"path": "47923", "grade": 3}, {"path": "48303", "grade": 3}, {"path": "48919", "grade": 3}, {"path": "49377", "grade": 3}, {"path": "49394", "grade": 3}, {"path": "50023", "grade": 3}, {"path": "52102", "grade": 3}, {"path": "52140", "grade": 3}, {"path": "52634", "grade": 3}, {"path": "52834", "grade": 3}, {"path": "53102", "grade": 3}, {"path": "53145", "grade": 3}, {"path": "53206", "grade": 3}, {"path": "53354", "grade": 3}, {"path": "53591", "grade": 3}, {"path": "53822", "grade": 3}, {"path": "54052", "grade": 3}, {"path": "54482", "grade": 3}, {"path": "54522", "grade": 3}, {"path": "54559", "grade": 3}, {"path": "55014", "grade": 3}, {"path": "55223", "grade": 3}, {"path": "55612", "grade": 3}, {"path": "55804", "grade": 3}, {"path": "56520", "grade": 3}, {"path": "56674", "grade": 3}, {"path": "57425", "grade": 3}, {"path": "57786", "grade": 3}, {"path": "58594", "grade": 3}, {"path": "58603", "grade": 3}, {"path": "58939", "grade": 3}, {"path": "59515", "grade": 3}, {"path": "59733", "grade": 3}, {"path": "59876", "grade": 3}, {"path": "61673", "grade": 3}, {"path": "61792", "grade": 3}, {"path": "63362", "grade": 3}, {"path": "6351", "grade": 3}, {"path": "64784", "grade": 3}, {"path": "65336", "grade": 3}, {"path": "65402", "grade": 3}, {"path": "67140", "grade": 3}, {"path": "67687", "grade": 3}, {"path": "68513", "grade": 3}, {"path": "68954", "grade": 3}, {"path": "7587", "grade": 3}, {"path": "8507", "grade": 3}]}
+{"qid": "W23382", "query": "How to remove trailing slashes from URL with .htaccess?", "kind": "nl", "relevant": [{"path": "45267", "grade": 3}, {"path": "57546", "grade": 3}]}
+{"qid": "W23532", "query": "Browser vesions I should consider when testing compatibility (besides IE)?", "kind": "nl", "relevant": [{"path": "1786", "grade": 3}]}
+{"qid": "W23546", "query": "What's the best way to create your own website?", "kind": "nl", "relevant": [{"path": "23541", "grade": 3}]}
+{"qid": "W23954", "query": "Adaptive websites - considered keyword stuffing by Googlebot?", "kind": "nl", "relevant": [{"path": "24038", "grade": 3}]}
+{"qid": "W23993", "query": "complex heading tags: should I avoid them?", "kind": "nl", "relevant": [{"path": "22303", "grade": 3}]}
+{"qid": "W24083", "query": "Ideal word count per web page?", "kind": "nl", "relevant": [{"path": "27808", "grade": 3}]}
+{"qid": "W24298", "query": "Old content, new URL's, how to keep the old URL's still working? 301 redirects?", "kind": "nl", "relevant": [{"path": "15688", "grade": 3}, {"path": "57059", "grade": 3}, {"path": "63311", "grade": 3}]}
+{"qid": "W24427", "query": "What do you know about how google/search engines see's/crawls PDF files?", "kind": "nl", "relevant": [{"path": "1431", "grade": 3}, {"path": "36328", "grade": 3}]}
+{"qid": "W24550", "query": "Self hosted PHP shopping cart with no storefront?", "kind": "nl", "relevant": [{"path": "10643", "grade": 3}, {"path": "11472", "grade": 3}, {"path": "11590", "grade": 3}, {"path": "12096", "grade": 3}, {"path": "1625", "grade": 3}, {"path": "16665", "grade": 3}, {"path": "17438", "grade": 3}, {"path": "18100", "grade": 3}, {"path": "18776", "grade": 3}, {"path": "21335", "grade": 3}, {"path": "21559", "grade": 3}, {"path": "21659", "grade": 3}, {"path": "2182", "grade": 3}, {"path": "22094", "grade": 3}, {"path": "26859", "grade": 3}, {"path": "28139", "grade": 3}, {"path": "30150", "grade": 3}, {"path": "50300", "grade": 3}, {"path": "53175", "grade": 3}, {"path": "5753", "grade": 3}, {"path": "8656", "grade": 3}, {"path": "8867", "grade": 3}, {"path": "9376", "grade": 3}]}
+{"qid": "W24749", "query": "Stopping Apache from serving requests for content from other sites", "kind": "nl", "relevant": [{"path": "67659", "grade": 3}]}
+{"qid": "W24888", "query": "How to get Google Page Rank for a site hosted Blog", "kind": "nl", "relevant": [{"path": "15", "grade": 3}]}
+{"qid": "W24997", "query": "Website falsely blocked because of spam. Does anyone know how we should proceed?", "kind": "nl", "relevant": [{"path": "42500", "grade": 3}]}
+{"qid": "W25062", "query": "Any other web Analytics tool other than Google Analytics", "kind": "nl", "relevant": [{"path": "19", "grade": 3}, {"path": "45570", "grade": 3}]}
+{"qid": "W25189", "query": "Users often say my website is infected, but can't find any evidence of this?", "kind": "nl", "relevant": [{"path": "30556", "grade": 3}]}
+{"qid": "W25315", "query": "Hotlinking: what is it, and why shouldn't people do it?", "kind": "nl", "relevant": [{"path": "36001", "grade": 3}]}
+{"qid": "W25434", "query": "need help with making seo friendly links", "kind": "nl", "relevant": [{"path": "3887", "grade": 3}]}
+{"qid": "W25470", "query": "Is minifying id and class names a bad SEO practice?", "kind": "nl", "relevant": [{"path": "32304", "grade": 3}]}
+{"qid": "W25752", "query": "Dev site indexed by Google", "kind": "nl", "relevant": [{"path": "54145", "grade": 3}]}
+{"qid": "W25869", "query": "Managing Client's Hosting and Domain Services", "kind": "nl", "relevant": [{"path": "10046", "grade": 3}]}
+{"qid": "W26060", "query": "How to overcome browser-specific font rendering differences?", "kind": "nl", "relevant": [{"path": "9972", "grade": 3}]}
+{"qid": "W26080", "query": "Redirect domain address to host address with cloaking", "kind": "nl", "relevant": [{"path": "11584", "grade": 3}]}
+{"qid": "W26132", "query": "Is it a bad idea for my homepage to be in a sub-folder?", "kind": "nl", "relevant": [{"path": "25994", "grade": 3}]}
+{"qid": "W26181", "query": "Displaying a \"coming soon\" image to users whilst I work on website redevelopment", "kind": "nl", "relevant": [{"path": "4926", "grade": 3}]}
+{"qid": "W26206", "query": "Is \"robots.txt\" necessarily needed?", "kind": "nl", "relevant": [{"path": "20068", "grade": 3}]}
+{"qid": "W26240", "query": "Why would Google Rich Snippets work for one site author but not another?", "kind": "nl", "relevant": [{"path": "37628", "grade": 3}]}
+{"qid": "W26361", "query": "Are shorter URIs better from an SEO perspective?", "kind": "nl", "relevant": [{"path": "4221", "grade": 3}]}
+{"qid": "W26386", "query": "Can google crawl an URL (say some static HTML file) that has no pointing link?", "kind": "nl", "relevant": [{"path": "21499", "grade": 3}]}
+{"qid": "W26573", "query": "Link error checking tool for linux", "kind": "nl", "relevant": [{"path": "209", "grade": 3}]}
+{"qid": "W26849", "query": "Which symbol should I use in Meta Title: \"|\" or \"-\"?", "kind": "nl", "relevant": [{"path": "45150", "grade": 3}]}
+{"qid": "W27087", "query": "Best practice for SEO \"special characters\" in products pages", "kind": "nl", "relevant": [{"path": "66972", "grade": 3}]}
+{"qid": "W27237", "query": "What Does Local SEO Consist of and How Does it Differ From Website SEO?", "kind": "nl", "relevant": [{"path": "12700", "grade": 3}, {"path": "45248", "grade": 3}, {"path": "53256", "grade": 3}, {"path": "5531", "grade": 3}, {"path": "60986", "grade": 3}]}
+{"qid": "W27520", "query": "I'm using a CNAME to send www. traffic to domain without www. Will this hurt my SEO?", "kind": "nl", "relevant": [{"path": "15620", "grade": 3}]}
+{"qid": "W27720", "query": "SEO Reseller Programs", "kind": "nl", "relevant": [{"path": "4384", "grade": 3}]}
+{"qid": "W27802", "query": "Hiding a particulat page from search engines not to index", "kind": "nl", "relevant": [{"path": "23814", "grade": 3}, {"path": "8005", "grade": 3}]}
+{"qid": "W27860", "query": "Frequency to submit sitemap to search engines", "kind": "nl", "relevant": [{"path": "56390", "grade": 3}]}
+{"qid": "W28094", "query": "What are the best SMS APIs out there?", "kind": "nl", "relevant": [{"path": "12747", "grade": 3}]}
+{"qid": "W28144", "query": "How do I deal with content scrapers?", "kind": "nl", "relevant": [{"path": "13764", "grade": 3}]}
+{"qid": "W28205", "query": "How to improve a single-paged site search result", "kind": "nl", "relevant": [{"path": "23169", "grade": 3}, {"path": "24327", "grade": 3}, {"path": "33780", "grade": 3}, {"path": "44136", "grade": 3}, {"path": "50687", "grade": 3}]}
+{"qid": "W28266", "query": "URL length and content optimised for SEO", "kind": "nl", "relevant": [{"path": "31954", "grade": 3}, {"path": "33832", "grade": 3}, {"path": "38713", "grade": 3}, {"path": "48266", "grade": 3}, {"path": "53701", "grade": 3}, {"path": "58733", "grade": 3}, {"path": "58878", "grade": 3}, {"path": "6073", "grade": 3}, {"path": "63417", "grade": 3}, {"path": "64765", "grade": 3}, {"path": "65754", "grade": 3}, {"path": "67990", "grade": 3}, {"path": "68856", "grade": 3}, {"path": "68897", "grade": 3}]}
+{"qid": "W28367", "query": "Loading another domain's content in a modal iframe - acceptable?", "kind": "nl", "relevant": [{"path": "31131", "grade": 3}]}
+{"qid": "W28653", "query": "Can I invoke Google to check my robots.txt?", "kind": "nl", "relevant": [{"path": "29944", "grade": 3}]}
+{"qid": "W28757", "query": "Collapsible menu and amount of links in a web page", "kind": "nl", "relevant": [{"path": "28684", "grade": 3}]}
+{"qid": "W28825", "query": "DNS takes too long to resolve", "kind": "nl", "relevant": [{"path": "29693", "grade": 3}]}
+{"qid": "W28961", "query": "How to find unsecured content on a webpage", "kind": "nl", "relevant": [{"path": "13107", "grade": 3}, {"path": "2043", "grade": 3}]}
+{"qid": "W28978", "query": "Googlebot crawler is indexing and giving value to useless words", "kind": "nl", "relevant": [{"path": "17028", "grade": 3}, {"path": "17387", "grade": 3}]}
+{"qid": "W28994", "query": "Someone else is using our Google Analytics Tracking code number. What do we do?", "kind": "nl", "relevant": [{"path": "53865", "grade": 3}]}
+{"qid": "W29030", "query": "Does adding a description to menu links have any SEO value?", "kind": "nl", "relevant": [{"path": "1005", "grade": 3}, {"path": "25978", "grade": 3}]}
+{"qid": "W29238", "query": "Should i host the country specific website in the server at same country?", "kind": "nl", "relevant": [{"path": "27286", "grade": 3}]}
+{"qid": "W29762", "query": "Do URL shorteners such as bit.ly affect SEO", "kind": "nl", "relevant": [{"path": "22540", "grade": 3}, {"path": "59417", "grade": 3}, {"path": "66914", "grade": 3}]}
+{"qid": "W29766", "query": "What methods are effective/necessary to quickly remove URLs from the Google index?", "kind": "nl", "relevant": [{"path": "32289", "grade": 3}, {"path": "60612", "grade": 3}, {"path": "8487", "grade": 3}]}
+{"qid": "W29800", "query": "Tool to view currently used CSS definitions", "kind": "nl", "relevant": [{"path": "26467", "grade": 3}]}
+{"qid": "W29829", "query": "Make Google +1 button +1 a specific URL rather than the URL it's on?", "kind": "nl", "relevant": [{"path": "31545", "grade": 3}]}
+{"qid": "W30213", "query": "Does searchbots index content in iframe", "kind": "nl", "relevant": [{"path": "12384", "grade": 3}, {"path": "13640", "grade": 3}, {"path": "2267", "grade": 3}, {"path": "33515", "grade": 3}, {"path": "53538", "grade": 3}, {"path": "56957", "grade": 3}, {"path": "58360", "grade": 3}, {"path": "59389", "grade": 3}, {"path": "60331", "grade": 3}, {"path": "60340", "grade": 3}, {"path": "65474", "grade": 3}]}
+{"qid": "W30214", "query": "How do I make sure my website is live all the time?", "kind": "nl", "relevant": [{"path": "27754", "grade": 3}, {"path": "63", "grade": 3}]}
+{"qid": "W30379", "query": "Google search results", "kind": "nl", "relevant": [{"path": "33091", "grade": 3}, {"path": "443", "grade": 3}, {"path": "52121", "grade": 3}]}
+{"qid": "W30412", "query": "What are some good services for brainstorming domain name ideas?", "kind": "nl", "relevant": [{"path": "29386", "grade": 3}]}
+{"qid": "W30548", "query": "Prevent virtual host on same server interact on apache", "kind": "nl", "relevant": [{"path": "30508", "grade": 3}]}
+{"qid": "W30685", "query": "Proper caching method with .htaccess", "kind": "nl", "relevant": [{"path": "28606", "grade": 3}]}
+{"qid": "W30705", "query": "Redirecting from blogger to custom domain", "kind": "nl", "relevant": [{"path": "3466", "grade": 3}]}
+{"qid": "W30776", "query": "Google Analytics - Traffic Source - Search engine - (Not Provided)", "kind": "nl", "relevant": [{"path": "55697", "grade": 3}]}
+{"qid": "W30908", "query": "How do I prevent access to an add-on domain's root directory from main hosting domain name", "kind": "nl", "relevant": [{"path": "31393", "grade": 3}]}
+{"qid": "W30938", "query": "SEO and multiple domains to same site", "kind": "nl", "relevant": [{"path": "35772", "grade": 3}]}
+{"qid": "W31008", "query": "Is an xml sitemap good or bad", "kind": "nl", "relevant": [{"path": "30186", "grade": 3}]}
+{"qid": "W31056", "query": "How long usually it takes to effect google ranking after revise contents?", "kind": "nl", "relevant": [{"path": "25663", "grade": 3}]}
+{"qid": "W31089", "query": "How many days would update if I modify page meta:title and meta:description?", "kind": "nl", "relevant": [{"path": "49227", "grade": 3}]}
+{"qid": "W31203", "query": "Preview content on website linking to full page, SEO strikes for duplicate content?", "kind": "nl", "relevant": [{"path": "8758", "grade": 3}]}
+{"qid": "W31354", "query": "SEO and Spelling mistakes in keyword", "kind": "nl", "relevant": [{"path": "25028", "grade": 3}]}
+{"qid": "W31629", "query": "Google reverse an analytic", "kind": "nl", "relevant": [{"path": "29448", "grade": 3}]}
+{"qid": "W31724", "query": "Impact of +1 on blogpost for the rootsite", "kind": "nl", "relevant": [{"path": "18965", "grade": 3}]}
+{"qid": "W32276", "query": "Having either www.domainname.com or domainname.com is really required?", "kind": "nl", "relevant": [{"path": "22213", "grade": 3}]}
+{"qid": "W32347", "query": "Could crosslinking using very general anchor texts be a reason for a drop in rankings?", "kind": "nl", "relevant": [{"path": "58246", "grade": 3}]}
+{"qid": "W32352", "query": "Where is Google getting the title of my page from?", "kind": "nl", "relevant": [{"path": "14415", "grade": 3}, {"path": "37759", "grade": 3}, {"path": "63423", "grade": 3}]}
+{"qid": "W32360", "query": "Does the stop keywords matter?", "kind": "nl", "relevant": [{"path": "4546", "grade": 3}]}
+{"qid": "W32459", "query": "Finding estimated traffic to a website", "kind": "nl", "relevant": [{"path": "7338", "grade": 3}]}
+{"qid": "W32519", "query": "How to redirect an old url to a new url via htaccess? Website uses Wordpress", "kind": "nl", "relevant": [{"path": "29607", "grade": 3}]}
+{"qid": "W32659", "query": "Joomla Sites hacked by DR-MTMRD", "kind": "nl", "relevant": [{"path": "22395", "grade": 3}]}
+{"qid": "W32703", "query": "How Does Amazon have so much information in a tweet?", "kind": "nl", "relevant": [{"path": "21508", "grade": 3}]}
+{"qid": "W33178", "query": "How to make a sub-domain an alias of other domain when a wilcard exist to that level in the dns server", "kind": "nl", "relevant": [{"path": "33093", "grade": 3}]}
+{"qid": "W33415", "query": "Is it possible to stop Chrome and other browsers from pre-fetching/rendering my site?", "kind": "nl", "relevant": [{"path": "67163", "grade": 3}]}
+{"qid": "W33561", "query": "What is the name for landing pages that are one long page?", "kind": "nl", "relevant": [{"path": "23825", "grade": 3}]}
+{"qid": "W33627", "query": "Is there any way to discover the traffic of a site I don't control?", "kind": "nl", "relevant": [{"path": "38229", "grade": 3}]}
+{"qid": "W34173", "query": "Subdomains vs. subdirectory \u2013 status as of 2012.", "kind": "nl", "relevant": [{"path": "49117", "grade": 3}]}
+{"qid": "W34375", "query": "When will my old page stop appearing on Google?", "kind": "nl", "relevant": [{"path": "14553", "grade": 3}]}
+{"qid": "W34481", "query": "I want to host clients' websites, but not their email. What's the easiest way to handle this?", "kind": "nl", "relevant": [{"path": "14824", "grade": 3}, {"path": "25396", "grade": 3}, {"path": "31975", "grade": 3}, {"path": "39497", "grade": 3}, {"path": "43057", "grade": 3}, {"path": "45056", "grade": 3}, {"path": "48170", "grade": 3}, {"path": "67456", "grade": 3}]}
+{"qid": "W34492", "query": "Pointing .com and .ca domain names", "kind": "nl", "relevant": [{"path": "21812", "grade": 3}, {"path": "2330", "grade": 3}, {"path": "25873", "grade": 3}, {"path": "29725", "grade": 3}, {"path": "34636", "grade": 3}, {"path": "34735", "grade": 3}, {"path": "34763", "grade": 3}, {"path": "53050", "grade": 3}, {"path": "7535", "grade": 3}]}
+{"qid": "W34510", "query": "How can I simulate a website loading slowly?", "kind": "nl", "relevant": [{"path": "38780", "grade": 3}, {"path": "861", "grade": 3}]}
+{"qid": "W34525", "query": "Google Places seo?", "kind": "nl", "relevant": [{"path": "11772", "grade": 3}]}
+{"qid": "W34605", "query": "How can I see what Wikipedia pages link to my website?", "kind": "nl", "relevant": [{"path": "13809", "grade": 3}]}
+{"qid": "W34810", "query": "Title of the page in search results and title of google's cached version are different. Why?", "kind": "nl", "relevant": [{"path": "53065", "grade": 3}, {"path": "53960", "grade": 3}, {"path": "56524", "grade": 3}, {"path": "56920", "grade": 3}, {"path": "57280", "grade": 3}]}
+{"qid": "W34871", "query": "How to hide download file from bots?", "kind": "nl", "relevant": [{"path": "13485", "grade": 3}, {"path": "15838", "grade": 3}, {"path": "25853", "grade": 3}]}
+{"qid": "W34882", "query": "Mobile site robots.txt", "kind": "nl", "relevant": [{"path": "12045", "grade": 3}]}
+{"qid": "W34903", "query": "How to overcome politics of the net (Google translate code refuses to work from a specific region)", "kind": "nl", "relevant": [{"path": "35042", "grade": 3}]}
+{"qid": "W34986", "query": "How to register a .er domain?", "kind": "nl", "relevant": [{"path": "13064", "grade": 3}]}
+{"qid": "W35073", "query": "Validation Meta tag for Bing", "kind": "nl", "relevant": [{"path": "22080", "grade": 3}, {"path": "31974", "grade": 3}]}
+{"qid": "W35212", "query": "Does google see the output of document.write?", "kind": "nl", "relevant": [{"path": "34718", "grade": 3}]}
+{"qid": "W35272", "query": "Does text size and placement on page have an effect on SEO", "kind": "nl", "relevant": [{"path": "58710", "grade": 3}]}
+{"qid": "W35768", "query": "Is this Anti-Scraping technique viable with Crawl-Delay?", "kind": "nl", "relevant": [{"path": "3588", "grade": 3}]}
+{"qid": "W35933", "query": "How to serve WAMP website over internet?", "kind": "nl", "relevant": [{"path": "16723", "grade": 3}]}
+{"qid": "W35939", "query": "Is hidden content (display: none;) -indexed- by search engines?", "kind": "nl", "relevant": [{"path": "13408", "grade": 3}, {"path": "1377", "grade": 3}, {"path": "17666", "grade": 3}, {"path": "18385", "grade": 3}, {"path": "33577", "grade": 3}, {"path": "43926", "grade": 3}, {"path": "45356", "grade": 3}, {"path": "49139", "grade": 3}, {"path": "53616", "grade": 3}, {"path": "64649", "grade": 3}, {"path": "65065", "grade": 3}, {"path": "68241", "grade": 3}, {"path": "68245", "grade": 3}]}
+{"qid": "W36278", "query": "What is the SEO impact of moving my domain to another IP address and what is the right way of doing this?", "kind": "nl", "relevant": [{"path": "53025", "grade": 3}]}
+{"qid": "W36434", "query": "What should filenames and URLs of images contain for SEO benefit?", "kind": "nl", "relevant": [{"path": "47498", "grade": 3}]}
+{"qid": "W37723", "query": "Why are my backlinks not showing on google on this asp.net website with all I've done?", "kind": "nl", "relevant": [{"path": "37702", "grade": 3}]}
+{"qid": "W37727", "query": "How to solve \"Login Only\" rejection?", "kind": "nl", "relevant": [{"path": "67861", "grade": 3}]}
+{"qid": "W38014", "query": "Is having a 'home' navigation item on the home page negative to your sites SEO?", "kind": "nl", "relevant": [{"path": "35563", "grade": 3}]}
+{"qid": "W38139", "query": "Redirect non-www to www while preserving protocol", "kind": "nl", "relevant": [{"path": "43437", "grade": 3}]}
+{"qid": "W38155", "query": "Add a record in my panel route my domain from host.com to www.host.com in dot net panel", "kind": "nl", "relevant": [{"path": "31330", "grade": 3}]}
+{"qid": "W38562", "query": "SEO - folder or file", "kind": "nl", "relevant": [{"path": "3079", "grade": 3}, {"path": "42210", "grade": 3}, {"path": "65298", "grade": 3}, {"path": "7168", "grade": 3}, {"path": "7797", "grade": 3}]}
+{"qid": "W38693", "query": "Chrome says my website is Serbian...how do I \"force\" chrome to use english?", "kind": "nl", "relevant": [{"path": "5043", "grade": 3}]}
+{"qid": "W38838", "query": "Concerns about moving media files to a CDN and impact on SEO", "kind": "nl", "relevant": [{"path": "49191", "grade": 3}, {"path": "60621", "grade": 3}]}
+{"qid": "W38994", "query": "Is there a general rule of thumb for which browsers to optimize your site for?", "kind": "nl", "relevant": [{"path": "6391", "grade": 3}]}
+{"qid": "W39092", "query": "Do WordPress websites get indexed quicker by search engines than a regular website?", "kind": "nl", "relevant": [{"path": "39144", "grade": 3}]}
+{"qid": "W39250", "query": "Which keyword should I use: colors or colours or a combination of both?", "kind": "nl", "relevant": [{"path": "54792", "grade": 3}]}
+{"qid": "W41035", "query": "Should I send my content to other websites by RSS Feed?", "kind": "nl", "relevant": [{"path": "9915", "grade": 3}]}
+{"qid": "W41061", "query": "Should you rel=\"nofollow\" on links which go to non-canonical pages", "kind": "nl", "relevant": [{"path": "26274", "grade": 3}]}
+{"qid": "W41118", "query": "Do online webhosting accounts allow the customers to install and run webservers like node.js?", "kind": "nl", "relevant": [{"path": "29227", "grade": 3}]}
+{"qid": "W42190", "query": "Connection speed for a website from UK to Australia", "kind": "nl", "relevant": [{"path": "56993", "grade": 3}]}
+{"qid": "W42564", "query": "Changing default date range in Google Analyics?", "kind": "nl", "relevant": [{"path": "62875", "grade": 3}]}
+{"qid": "W42576", "query": "Is it a good idea to register multiple domains pointing to a single website", "kind": "nl", "relevant": [{"path": "45562", "grade": 3}]}
+{"qid": "W42860", "query": "https:// search results appearing on Google for purely http:// site", "kind": "nl", "relevant": [{"path": "54279", "grade": 3}]}
+{"qid": "W42884", "query": "Pagination for product listing, what to use? \"canonical\" or \"rel-prev-next\" or do nothing?", "kind": "nl", "relevant": [{"path": "65793", "grade": 3}]}
+{"qid": "W43228", "query": "URL re-write for indexed pages", "kind": "nl", "relevant": [{"path": "13891", "grade": 3}]}
+{"qid": "W43468", "query": "How to view website from different locations", "kind": "nl", "relevant": [{"path": "43077", "grade": 3}]}
+{"qid": "W43494", "query": "Search Rankings and new website", "kind": "nl", "relevant": [{"path": "43387", "grade": 3}, {"path": "60860", "grade": 3}]}
+{"qid": "W44049", "query": "What is the maximum number of DNS A-records you can use on one domain?", "kind": "nl", "relevant": [{"path": "44875", "grade": 3}]}
+{"qid": "W44070", "query": "Website that allows users to interact via SMS (at a charge)", "kind": "nl", "relevant": [{"path": "5214", "grade": 3}]}
+{"qid": "W44071", "query": "Can I hide an embedded YouTube video or is that against the terms of use?", "kind": "nl", "relevant": [{"path": "38917", "grade": 3}]}
+{"qid": "W44240", "query": "Redirection transparent to Google and other SE", "kind": "nl", "relevant": [{"path": "44155", "grade": 3}]}
+{"qid": "W44420", "query": "How to do SEO for a one page web application?", "kind": "nl", "relevant": [{"path": "14031", "grade": 3}, {"path": "34774", "grade": 3}, {"path": "56953", "grade": 3}]}
+{"qid": "W44440", "query": "google search index what is fresh content", "kind": "nl", "relevant": [{"path": "57731", "grade": 3}]}
+{"qid": "W44629", "query": "SEO handling of ever changing portion of site", "kind": "nl", "relevant": [{"path": "44634", "grade": 3}]}
+{"qid": "W44782", "query": "Can we use a copyrighted material if there is no copyright information and there is no way to contact the author", "kind": "nl", "relevant": [{"path": "19822", "grade": 3}]}
+{"qid": "W44798", "query": "google removed links from the index", "kind": "nl", "relevant": [{"path": "28322", "grade": 3}]}
+{"qid": "W44936", "query": "change the static IP address to domain name", "kind": "nl", "relevant": [{"path": "52434", "grade": 3}]}
+{"qid": "W45147", "query": "website won't work without www. on 123-reg", "kind": "nl", "relevant": [{"path": "34332", "grade": 3}]}
+{"qid": "W45395", "query": "How to direct https requests to http while SSL cert expired?", "kind": "nl", "relevant": [{"path": "8857", "grade": 3}]}
+{"qid": "W45402", "query": "Site Indexed in Yahoo and Bing but not Google", "kind": "nl", "relevant": [{"path": "14254", "grade": 3}, {"path": "1574", "grade": 3}, {"path": "17266", "grade": 3}, {"path": "18651", "grade": 3}, {"path": "22336", "grade": 3}, {"path": "22613", "grade": 3}, {"path": "2402", "grade": 3}, {"path": "34231", "grade": 3}, {"path": "38773", "grade": 3}, {"path": "45239", "grade": 3}, {"path": "45264", "grade": 3}, {"path": "45545", "grade": 3}, {"path": "47312", "grade": 3}, {"path": "47824", "grade": 3}, {"path": "50957", "grade": 3}, {"path": "54433", "grade": 3}, {"path": "56066", "grade": 3}, {"path": "56544", "grade": 3}, {"path": "56613", "grade": 3}, {"path": "63019", "grade": 3}, {"path": "68551", "grade": 3}, {"path": "68947", "grade": 3}]}
+{"qid": "W45465", "query": "Is it a bad idea to use a domain hack for my personal website name?", "kind": "nl", "relevant": [{"path": "47352", "grade": 3}]}
+{"qid": "W47031", "query": "Removing GA from Sites", "kind": "nl", "relevant": [{"path": "46631", "grade": 3}]}
+{"qid": "W47040", "query": "Will Google penalize my site for switching content upon page load?", "kind": "nl", "relevant": [{"path": "24070", "grade": 3}]}
+{"qid": "W47071", "query": "What does the keyword 'clicks' mean or constitute in web analytics", "kind": "nl", "relevant": [{"path": "10018", "grade": 3}]}
+{"qid": "W47083", "query": "How to know if certain IP is blocked in china?", "kind": "nl", "relevant": [{"path": "55183", "grade": 3}]}
+{"qid": "W47088", "query": "Request change of address for non-root level domain name", "kind": "nl", "relevant": [{"path": "30806", "grade": 3}]}
+{"qid": "W47270", "query": "What are the most commonly used and basic Apache htaccess redirects?", "kind": "nl", "relevant": [{"path": "45517", "grade": 3}, {"path": "47969", "grade": 3}, {"path": "48298", "grade": 3}, {"path": "5349", "grade": 3}, {"path": "53872", "grade": 3}, {"path": "53877", "grade": 3}, {"path": "54012", "grade": 3}, {"path": "54041", "grade": 3}, {"path": "61598", "grade": 3}, {"path": "62897", "grade": 3}, {"path": "68633", "grade": 3}]}
+{"qid": "W47342", "query": "Are keywords in URLs good SEO or needlessly redundant?", "kind": "nl", "relevant": [{"path": "61053", "grade": 3}, {"path": "67592", "grade": 3}]}
+{"qid": "W47349", "query": "Is Google ok with multiple rel=\"author\" links?", "kind": "nl", "relevant": [{"path": "25140", "grade": 3}]}
+{"qid": "W47577", "query": "Google Pagerank (PR) History and Next Upcoming Updates", "kind": "nl", "relevant": [{"path": "65590", "grade": 3}]}
+{"qid": "W47771", "query": "Is it good to index category in search engines?", "kind": "nl", "relevant": [{"path": "44171", "grade": 3}]}
+{"qid": "W47772", "query": "is it good for SEO to hierarchy the site links?", "kind": "nl", "relevant": [{"path": "12966", "grade": 3}, {"path": "28402", "grade": 3}]}
+{"qid": "W47811", "query": "Googlebot craw rate is too slow for a huge site", "kind": "nl", "relevant": [{"path": "64889", "grade": 3}]}
+{"qid": "W47931", "query": "Subdomain or domain?", "kind": "nl", "relevant": [{"path": "58370", "grade": 3}]}
+{"qid": "W47970", "query": "Best links architecture for items under sections and categories?", "kind": "nl", "relevant": [{"path": "2105", "grade": 3}]}
+{"qid": "W48094", "query": "Could globally applying rel=\"nofollow\" to external links have a negative SEO impact", "kind": "nl", "relevant": [{"path": "63388", "grade": 3}]}
+{"qid": "W48136", "query": "Get rank for non english keyword in a english site", "kind": "nl", "relevant": [{"path": "45354", "grade": 3}, {"path": "53451", "grade": 3}]}
+{"qid": "W48200", "query": "Tell Google to ignore parts of website", "kind": "nl", "relevant": [{"path": "194", "grade": 3}, {"path": "22892", "grade": 3}, {"path": "24960", "grade": 3}, {"path": "25373", "grade": 3}, {"path": "25586", "grade": 3}, {"path": "25803", "grade": 3}, {"path": "28225", "grade": 3}, {"path": "4202", "grade": 3}, {"path": "47995", "grade": 3}, {"path": "53823", "grade": 3}, {"path": "56558", "grade": 3}, {"path": "719", "grade": 3}, {"path": "8046", "grade": 3}]}
+{"qid": "W48366", "query": "Site blocked by content filter", "kind": "nl", "relevant": [{"path": "59396", "grade": 3}]}
+{"qid": "W48692", "query": "If a website has no backlinks, would it ever get listed in Google?", "kind": "nl", "relevant": [{"path": "22285", "grade": 3}, {"path": "49895", "grade": 3}]}
+{"qid": "W48699", "query": "Changing host bad for SEO ranking?", "kind": "nl", "relevant": [{"path": "4495", "grade": 3}, {"path": "45568", "grade": 3}, {"path": "67508", "grade": 3}]}
+{"qid": "W48716", "query": "How to avoid page views from an adult site in my blog?", "kind": "nl", "relevant": [{"path": "28935", "grade": 3}]}
+{"qid": "W49067", "query": "Will moving Images to CDN effect Google Image search results?", "kind": "nl", "relevant": [{"path": "25603", "grade": 3}]}
+{"qid": "W49088", "query": "Which is good to target, singular or plural keyword?", "kind": "nl", "relevant": [{"path": "59074", "grade": 3}]}
+{"qid": "W49400", "query": "Restoring a site (SEO) after 6 months of downtime", "kind": "nl", "relevant": [{"path": "49130", "grade": 3}]}
+{"qid": "W49618", "query": "Browser compatibility issues", "kind": "nl", "relevant": [{"path": "12393", "grade": 3}, {"path": "21", "grade": 3}]}
+{"qid": "W49736", "query": "What are the SEO Benefits of adding a Tumblr feed to a website?", "kind": "nl", "relevant": [{"path": "50287", "grade": 3}]}
+{"qid": "W49751", "query": "Effect of redirection on ranking", "kind": "nl", "relevant": [{"path": "49726", "grade": 3}]}
+{"qid": "W49781", "query": "Benefit of date in URL segments", "kind": "nl", "relevant": [{"path": "57986", "grade": 3}]}
+{"qid": "W49794", "query": "How to move a single page of content to a new domain", "kind": "nl", "relevant": [{"path": "61023", "grade": 3}, {"path": "61060", "grade": 3}]}
+{"qid": "W50224", "query": "Forwarding naked domain to www", "kind": "nl", "relevant": [{"path": "3708", "grade": 3}]}
+{"qid": "W50234", "query": "Best way to prevent Google from indexing a directory", "kind": "nl", "relevant": [{"path": "16090", "grade": 3}]}
+{"qid": "W50415", "query": "Best way to handle query string params no longer used", "kind": "nl", "relevant": [{"path": "3131", "grade": 3}]}
+{"qid": "W50428", "query": "If not H1 tags, what can be used?", "kind": "nl", "relevant": [{"path": "15895", "grade": 3}, {"path": "47315", "grade": 3}, {"path": "60518", "grade": 3}]}
+{"qid": "W50475", "query": "How to fix soft 404 errors in GWT?", "kind": "nl", "relevant": [{"path": "51287", "grade": 3}]}
+{"qid": "W50664", "query": "Web design company backlinking technique", "kind": "nl", "relevant": [{"path": "19590", "grade": 3}]}
+{"qid": "W50839", "query": "How to get business map location displayed in the right hand sidebar of the Google search results page?", "kind": "nl", "relevant": [{"path": "67804", "grade": 3}]}
+{"qid": "W50974", "query": "Issues with trailing slash vs no trailing slash and if I even need to redirect?", "kind": "nl", "relevant": [{"path": "31796", "grade": 3}]}
+{"qid": "W51011", "query": "Home Page plagiarism risks from a competitors", "kind": "nl", "relevant": [{"path": "50754", "grade": 3}]}
+{"qid": "W51099", "query": "With Robots.txt disallow all, why was my site still getting traffic?", "kind": "nl", "relevant": [{"path": "68269", "grade": 3}]}
+{"qid": "W51152", "query": "SEO: Redirecting an incoming link to a discontinued product to a very similar product", "kind": "nl", "relevant": [{"path": "56748", "grade": 3}]}
+{"qid": "W51198", "query": "Does Google cap impressions of my website?", "kind": "nl", "relevant": [{"path": "32813", "grade": 3}]}
+{"qid": "W51304", "query": "Multiple domains, same content", "kind": "nl", "relevant": [{"path": "53953", "grade": 3}]}
+{"qid": "W51528", "query": "Added new redirected domain with lots of visitors bouncing - is that bad for us?", "kind": "nl", "relevant": [{"path": "15607", "grade": 3}]}
+{"qid": "W51652", "query": "Redirecting all 404 pages in Wordpress is not good SEO, but what is?", "kind": "nl", "relevant": [{"path": "51657", "grade": 3}]}
+{"qid": "W51674", "query": "Someone is copying my blog content. Does it affect my blog\u2019s ranking on Google?", "kind": "nl", "relevant": [{"path": "29879", "grade": 3}, {"path": "65453", "grade": 3}, {"path": "65795", "grade": 3}]}
+{"qid": "W51823", "query": "What domain structure is best for a forum according to SEO?", "kind": "nl", "relevant": [{"path": "1198", "grade": 3}, {"path": "13586", "grade": 3}, {"path": "16468", "grade": 3}, {"path": "22756", "grade": 3}, {"path": "23733", "grade": 3}, {"path": "41003", "grade": 3}, {"path": "50269", "grade": 3}, {"path": "56182", "grade": 3}, {"path": "56492", "grade": 3}, {"path": "61729", "grade": 3}, {"path": "65539", "grade": 3}, {"path": "68593", "grade": 3}]}
+{"qid": "W51902", "query": "Using same Google Adsense units for web and mobile versions", "kind": "nl", "relevant": [{"path": "30855", "grade": 3}]}
+{"qid": "W52172", "query": "What are best SEO practices when deleting a webpage? What return code should I use?", "kind": "nl", "relevant": [{"path": "23326", "grade": 3}]}
+{"qid": "W52307", "query": "Changing web hosting companies", "kind": "nl", "relevant": [{"path": "54361", "grade": 3}]}
+{"qid": "W52395", "query": "How did Google find my unlinked newly created pages?", "kind": "nl", "relevant": [{"path": "68335", "grade": 3}]}
+{"qid": "W52624", "query": "How can I objectively check my search engine ranking?", "kind": "nl", "relevant": [{"path": "60049", "grade": 3}]}
+{"qid": "W52642", "query": "How is it possible that Google has indexed more URLs than a sitemap contains?", "kind": "nl", "relevant": [{"path": "4145", "grade": 3}]}
+{"qid": "W52683", "query": "How to dynamically change the host URL?", "kind": "nl", "relevant": [{"path": "52631", "grade": 3}]}
+{"qid": "W52812", "query": "How to prevent misattributed goal conversions to Facebook and accounts.google.com in Google Analytics?", "kind": "nl", "relevant": [{"path": "68979", "grade": 3}]}
+{"qid": "W53076", "query": "Adding http:// in internal links", "kind": "nl", "relevant": [{"path": "11657", "grade": 3}]}
+{"qid": "W53156", "query": "Google AdSense in my website", "kind": "nl", "relevant": [{"path": "43211", "grade": 3}]}
+{"qid": "W53305", "query": "Crawling problem with AJAX search result pages", "kind": "nl", "relevant": [{"path": "20155", "grade": 3}, {"path": "8429", "grade": 3}]}
+{"qid": "W53405", "query": "Google Analytics: How can 'Avg time on page' stat be larger than my 'Avg visit duration' stat?", "kind": "nl", "relevant": [{"path": "24344", "grade": 3}]}
+{"qid": "W53438", "query": "How to hide \u201call traffic\u201d when plotting rows in Google Analytics?", "kind": "nl", "relevant": [{"path": "53014", "grade": 3}]}
+{"qid": "W53468", "query": "Google webmaster Tool showing : 170 not found 404 errors!", "kind": "nl", "relevant": [{"path": "26364", "grade": 3}]}
+{"qid": "W53486", "query": "Warning in Google structured data: either price or review or availability needs to be present", "kind": "nl", "relevant": [{"path": "56791", "grade": 3}]}
+{"qid": "W53626", "query": "What to do with discontinued product pages?", "kind": "nl", "relevant": [{"path": "22627", "grade": 3}, {"path": "50294", "grade": 3}, {"path": "5392", "grade": 3}, {"path": "56913", "grade": 3}]}
+{"qid": "W53713", "query": "How to Recover Lost Website/ blog data with no backup?", "kind": "nl", "relevant": [{"path": "33346", "grade": 3}]}
+{"qid": "W53714", "query": "SEO for Google Maps applications?", "kind": "nl", "relevant": [{"path": "53323", "grade": 3}]}
+{"qid": "W53891", "query": "Why is Google reporting no authorship when I created the link?", "kind": "nl", "relevant": [{"path": "43975", "grade": 3}, {"path": "44002", "grade": 3}, {"path": "53954", "grade": 3}, {"path": "55972", "grade": 3}]}
+{"qid": "W54038", "query": "How do you find all the links to disavow for a Google reconsideration request?", "kind": "nl", "relevant": [{"path": "35809", "grade": 3}, {"path": "56576", "grade": 3}]}
+{"qid": "W54138", "query": "SEO and Mobile XML sitemap", "kind": "nl", "relevant": [{"path": "31220", "grade": 3}]}
+{"qid": "W54261", "query": "301 redirect www to non-www", "kind": "nl", "relevant": [{"path": "1734", "grade": 3}, {"path": "48848", "grade": 3}]}
+{"qid": "W54378", "query": "How to make DNS server propagate faster if you are a site owner?", "kind": "nl", "relevant": [{"path": "65156", "grade": 3}, {"path": "65398", "grade": 3}]}
+{"qid": "W54423", "query": "Foolproof way to ensure Google news pulls the correct image for its thumbnails?", "kind": "nl", "relevant": [{"path": "57788", "grade": 3}, {"path": "57795", "grade": 3}]}
+{"qid": "W54834", "query": "Duplicate content caused by HTTPS pages", "kind": "nl", "relevant": [{"path": "56902", "grade": 3}, {"path": "7887", "grade": 3}]}
+{"qid": "W54851", "query": "Business not showing up on right hand side of google search", "kind": "nl", "relevant": [{"path": "39954", "grade": 3}]}
+{"qid": "W54970", "query": "Creating sub domain on webmin", "kind": "nl", "relevant": [{"path": "39021", "grade": 3}]}
+{"qid": "W55000", "query": "Using the same keywords in many URLs", "kind": "nl", "relevant": [{"path": "48595", "grade": 3}]}
+{"qid": "W55220", "query": "SEO problem with mispelled domain", "kind": "nl", "relevant": [{"path": "54859", "grade": 3}]}
+{"qid": "W55225", "query": "Querystring case differences and duplicate content", "kind": "nl", "relevant": [{"path": "54790", "grade": 3}]}
+{"qid": "W55228", "query": "change of address to subdomain", "kind": "nl", "relevant": [{"path": "46666", "grade": 3}]}
+{"qid": "W55265", "query": "Use SSL on Heroku without paying Heroku for SSL?", "kind": "nl", "relevant": [{"path": "55458", "grade": 3}]}
+{"qid": "W55279", "query": "How can I rewrite URL without losing Facebook likes, tweets, etc", "kind": "nl", "relevant": [{"path": "5114", "grade": 3}]}
+{"qid": "W55334", "query": "How long for data highlighter mark up to appear in structured data tool?", "kind": "nl", "relevant": [{"path": "63493", "grade": 3}]}
+{"qid": "W55501", "query": "Main index redirect to sub folder (e.g. domain.com/site)", "kind": "nl", "relevant": [{"path": "34304", "grade": 3}, {"path": "64706", "grade": 3}]}
+{"qid": "W55509", "query": "Switching domain and hosting providers - questions about email", "kind": "nl", "relevant": [{"path": "53750", "grade": 3}, {"path": "6022", "grade": 3}]}
+{"qid": "W55780", "query": "Can a PHP generated main page be indexed by Google?", "kind": "nl", "relevant": [{"path": "16838", "grade": 3}]}
+{"qid": "W55898", "query": "Does text ad exchange or traffic exchange or auto surf websites good for google ranking?", "kind": "nl", "relevant": [{"path": "55379", "grade": 3}]}
+{"qid": "W55945", "query": "Adsense for my site was disapproved due to insufficient content", "kind": "nl", "relevant": [{"path": "49862", "grade": 3}]}
+{"qid": "W56018", "query": "Should I use HTTPS for my WordPress blog?", "kind": "nl", "relevant": [{"path": "3148", "grade": 3}]}
+{"qid": "W56074", "query": "What resolution does Google use while crawling a site with responsive/adaptive design?", "kind": "nl", "relevant": [{"path": "50542", "grade": 3}]}
+{"qid": "W56101", "query": "Why have the number of impressions reported by Google Webmaster Tools become so little?", "kind": "nl", "relevant": [{"path": "16941", "grade": 3}, {"path": "18884", "grade": 3}, {"path": "21136", "grade": 3}, {"path": "21153", "grade": 3}, {"path": "45305", "grade": 3}, {"path": "48258", "grade": 3}, {"path": "52282", "grade": 3}, {"path": "53281", "grade": 3}, {"path": "54278", "grade": 3}, {"path": "54341", "grade": 3}, {"path": "57830", "grade": 3}, {"path": "58481", "grade": 3}, {"path": "58628", "grade": 3}, {"path": "58825", "grade": 3}, {"path": "64634", "grade": 3}, {"path": "64748", "grade": 3}, {"path": "68431", "grade": 3}]}
+{"qid": "W56160", "query": "Choose the Google Sitelinks that are shown when somebody searches for my website", "kind": "nl", "relevant": [{"path": "59536", "grade": 3}]}
+{"qid": "W56418", "query": "Does it help if my tld contains words that describe the function of my business?", "kind": "nl", "relevant": [{"path": "53703", "grade": 3}, {"path": "62942", "grade": 3}]}
+{"qid": "W56600", "query": "Store name appears twice in meta titles while searching in Google?", "kind": "nl", "relevant": [{"path": "52656", "grade": 3}, {"path": "59922", "grade": 3}]}
+{"qid": "W56655", "query": "Lazy-loading content and SEO impact", "kind": "nl", "relevant": [{"path": "56070", "grade": 3}]}
+{"qid": "W56712", "query": "How do I get my website public?", "kind": "nl", "relevant": [{"path": "21971", "grade": 3}, {"path": "6157", "grade": 3}]}
+{"qid": "W56754", "query": "Keyword adding in footer tag in the website will it help for SEO?", "kind": "nl", "relevant": [{"path": "52611", "grade": 3}]}
+{"qid": "W56765", "query": "Sitelinks and domain name", "kind": "nl", "relevant": [{"path": "30024", "grade": 3}]}
+{"qid": "W56820", "query": "Sitemap.xml doesn't seem to be working properly", "kind": "nl", "relevant": [{"path": "4803", "grade": 3}, {"path": "49549", "grade": 3}, {"path": "56778", "grade": 3}, {"path": "58636", "grade": 3}]}
+{"qid": "W56853", "query": "When seeking to acquire a legacy domain from a site owner, what should I look for in the domain history?", "kind": "nl", "relevant": [{"path": "18967", "grade": 3}]}
+{"qid": "W56919", "query": "How to submit sitemap to google?", "kind": "nl", "relevant": [{"path": "45258", "grade": 3}]}
+{"qid": "W57028", "query": "Can competitors get your website penalized?", "kind": "nl", "relevant": [{"path": "55958", "grade": 3}]}
+{"qid": "W57073", "query": "How to find out why our website is blocked by Sophos and Websense?", "kind": "nl", "relevant": [{"path": "3804", "grade": 3}]}
+{"qid": "W57085", "query": "How do google bots work for sites that are database driven?", "kind": "nl", "relevant": [{"path": "22804", "grade": 3}, {"path": "25291", "grade": 3}, {"path": "52019", "grade": 3}, {"path": "5704", "grade": 3}, {"path": "57616", "grade": 3}, {"path": "65776", "grade": 3}]}
+{"qid": "W57102", "query": "Domains - real differences & advantages between .com | .org | .net", "kind": "nl", "relevant": [{"path": "26238", "grade": 3}]}
+{"qid": "W57273", "query": "Sudden decrease in number of pages indexed in Google", "kind": "nl", "relevant": [{"path": "18287", "grade": 3}, {"path": "23847", "grade": 3}]}
+{"qid": "W57582", "query": "Is there a limit to the number of web properties one can create in Google Analytics?", "kind": "nl", "relevant": [{"path": "65854", "grade": 3}]}
+{"qid": "W57768", "query": "Why use meta description, when we know, if we do not use meta description in a webpage, the Google will show the article text, in SERP?", "kind": "nl", "relevant": [{"path": "7574", "grade": 3}]}
+{"qid": "W57880", "query": "Page gone: 404, or other options?", "kind": "nl", "relevant": [{"path": "50666", "grade": 3}, {"path": "53392", "grade": 3}]}
+{"qid": "W57886", "query": "How to prevent Google (and others) from indexing the site under construction?", "kind": "nl", "relevant": [{"path": "20119", "grade": 3}]}
+{"qid": "W57894", "query": "Different URLs with duplicate content", "kind": "nl", "relevant": [{"path": "44335", "grade": 3}]}
+{"qid": "W57933", "query": "Domain Branding: Is Making A Word Plural Relevant?", "kind": "nl", "relevant": [{"path": "2601", "grade": 3}]}
+{"qid": "W58185", "query": "Will 404 pages hurt website page ranking?", "kind": "nl", "relevant": [{"path": "20211", "grade": 3}, {"path": "34771", "grade": 3}]}
+{"qid": "W58280", "query": "find-new/posts&recent=1 as homepage: what about SEO?", "kind": "nl", "relevant": [{"path": "15393", "grade": 3}, {"path": "28421", "grade": 3}, {"path": "35595", "grade": 3}, {"path": "38628", "grade": 3}, {"path": "49389", "grade": 3}, {"path": "65423", "grade": 3}, {"path": "67202", "grade": 3}]}
+{"qid": "W58382", "query": "Is it good ideo seo point of view- to give noindex or nofollow to labels and tags?", "kind": "nl", "relevant": [{"path": "47159", "grade": 3}]}
+{"qid": "W58535", "query": "Adding Disqus to wordpress effect SEO", "kind": "nl", "relevant": [{"path": "20504", "grade": 3}]}
+{"qid": "W58576", "query": "How can I rewrite to my .htaccess in PHP?", "kind": "nl", "relevant": [{"path": "139", "grade": 3}]}
+{"qid": "W58703", "query": "Bing Webmaster Tools missing www", "kind": "nl", "relevant": [{"path": "54468", "grade": 3}]}
+{"qid": "W58888", "query": "How to prevent Google from showing sub domain name as title in search result?", "kind": "nl", "relevant": [{"path": "44372", "grade": 3}]}
+{"qid": "W59029", "query": "Mobile and desktop SEO, double content", "kind": "nl", "relevant": [{"path": "26073", "grade": 3}, {"path": "28041", "grade": 3}]}
+{"qid": "W59293", "query": "Started out with a .co.uk site now want to go to .com", "kind": "nl", "relevant": [{"path": "16263", "grade": 3}, {"path": "3399", "grade": 3}, {"path": "37546", "grade": 3}, {"path": "37826", "grade": 3}, {"path": "38617", "grade": 3}, {"path": "54257", "grade": 3}, {"path": "54491", "grade": 3}]}
+{"qid": "W59326", "query": "Why would I use a robots.txt file?", "kind": "nl", "relevant": [{"path": "467", "grade": 3}]}
+{"qid": "W59568", "query": "Will the \"Geographic Target\" of my website negatively affect my search ranking?", "kind": "nl", "relevant": [{"path": "34418", "grade": 3}]}
+{"qid": "W59697", "query": "SEO: best way to deal with short lifetime URLs?", "kind": "nl", "relevant": [{"path": "61125", "grade": 3}, {"path": "61133", "grade": 3}]}
+{"qid": "W59788", "query": "How to protect a form from spam?", "kind": "nl", "relevant": [{"path": "16324", "grade": 3}, {"path": "20636", "grade": 3}, {"path": "3544", "grade": 3}, {"path": "9785", "grade": 3}]}
+{"qid": "W59891", "query": "Why our mails go to spam box in Gmail?", "kind": "nl", "relevant": [{"path": "12493", "grade": 3}, {"path": "27287", "grade": 3}, {"path": "27585", "grade": 3}, {"path": "28300", "grade": 3}, {"path": "28332", "grade": 3}, {"path": "29826", "grade": 3}, {"path": "31788", "grade": 3}, {"path": "3728", "grade": 3}, {"path": "49571", "grade": 3}, {"path": "54578", "grade": 3}, {"path": "56652", "grade": 3}, {"path": "57133", "grade": 3}, {"path": "57420", "grade": 3}, {"path": "58166", "grade": 3}]}
+{"qid": "W59898", "query": "Linking to my website from my clients sites", "kind": "nl", "relevant": [{"path": "50245", "grade": 3}]}
+{"qid": "W60423", "query": "Should Good Content Strategy Possibly Create Multiple Domains?", "kind": "nl", "relevant": [{"path": "51798", "grade": 3}]}
+{"qid": "W60617", "query": "How to combine GZip + CDN for faster page loads?", "kind": "nl", "relevant": [{"path": "44815", "grade": 3}]}
+{"qid": "W61080", "query": "What's the quickest way to do a \"clean\" google search?", "kind": "nl", "relevant": [{"path": "13264", "grade": 3}]}
+{"qid": "W61084", "query": "Rating for website page", "kind": "nl", "relevant": [{"path": "7139", "grade": 3}]}
+{"qid": "W61201", "query": "What is the correct and better language code format in URL and hreflang?", "kind": "nl", "relevant": [{"path": "11773", "grade": 3}, {"path": "374", "grade": 3}, {"path": "49958", "grade": 3}]}
+{"qid": "W61272", "query": "Setting up Nginx Load Balancing", "kind": "nl", "relevant": [{"path": "61289", "grade": 3}]}
+{"qid": "W61375", "query": "Website maintenance - SEO - 503", "kind": "nl", "relevant": [{"path": "61241", "grade": 3}]}
+{"qid": "W61507", "query": "Redirecting entire old domain to new domain", "kind": "nl", "relevant": [{"path": "30266", "grade": 3}, {"path": "61188", "grade": 3}]}
+{"qid": "W61737", "query": "Using directories vs http get?", "kind": "nl", "relevant": [{"path": "51", "grade": 3}]}
+{"qid": "W61798", "query": "Is buying a localized domain and redirecting it to my main site a good idea for SEO?", "kind": "nl", "relevant": [{"path": "38556", "grade": 3}]}
+{"qid": "W62996", "query": "link:www.example.com returns 0 results", "kind": "nl", "relevant": [{"path": "55934", "grade": 3}]}
+{"qid": "W63070", "query": "Does having a dynamic URL for all pages in my blog put me at disadvantage SEO wise?", "kind": "nl", "relevant": [{"path": "20914", "grade": 3}]}
+{"qid": "W63152", "query": "Google indexing pages very slowly", "kind": "nl", "relevant": [{"path": "60509", "grade": 3}]}
+{"qid": "W63489", "query": "SEO-meta description crawling issue", "kind": "nl", "relevant": [{"path": "26071", "grade": 3}]}
+{"qid": "W63508", "query": "New TLDs and Their Impact on SEO", "kind": "nl", "relevant": [{"path": "60387", "grade": 3}]}
+{"qid": "W63582", "query": "Should paginated content have unique meta tags?", "kind": "nl", "relevant": [{"path": "63587", "grade": 3}]}
+{"qid": "W63591", "query": "Why are the stats for HTML Improvements in Google Webmaster Tools not decreasing?", "kind": "nl", "relevant": [{"path": "53472", "grade": 3}]}
+{"qid": "W64632", "query": "How many back links should be created within 7 days?", "kind": "nl", "relevant": [{"path": "4941", "grade": 3}, {"path": "55979", "grade": 3}, {"path": "64625", "grade": 3}]}
+{"qid": "W64708", "query": "separate domains vs subdomains", "kind": "nl", "relevant": [{"path": "45505", "grade": 3}]}
+{"qid": "W64858", "query": "Does paid traffic improve SEO?", "kind": "nl", "relevant": [{"path": "35755", "grade": 3}]}
+{"qid": "W64907", "query": "Blocked URLS in My webmater Tools", "kind": "nl", "relevant": [{"path": "28544", "grade": 3}]}
+{"qid": "W64909", "query": "Subdomains for UK and USA", "kind": "nl", "relevant": [{"path": "1833", "grade": 3}, {"path": "27723", "grade": 3}, {"path": "28399", "grade": 3}, {"path": "28895", "grade": 3}, {"path": "30339", "grade": 3}, {"path": "33068", "grade": 3}, {"path": "34185", "grade": 3}, {"path": "403", "grade": 3}, {"path": "53771", "grade": 3}, {"path": "55352", "grade": 3}, {"path": "55629", "grade": 3}, {"path": "55821", "grade": 3}, {"path": "56702", "grade": 3}, {"path": "58797", "grade": 3}, {"path": "63111", "grade": 3}]}
+{"qid": "W64944", "query": "How rel=\"next\" and rel=\"prev\" helps in SEO if used for pagination?", "kind": "nl", "relevant": [{"path": "67538", "grade": 3}]}
+{"qid": "W64967", "query": "Best way to get improve SEO ranking for image-based site", "kind": "nl", "relevant": [{"path": "67251", "grade": 3}]}
+{"qid": "W65130", "query": "Using microdata for SEO will help to increase SERP Position?", "kind": "nl", "relevant": [{"path": "26218", "grade": 3}]}
+{"qid": "W65395", "query": "Split domain name between two hosts (separate webmail and webhost)", "kind": "nl", "relevant": [{"path": "23218", "grade": 3}]}
+{"qid": "W65733", "query": "Does removing ID from url improve SEO?", "kind": "nl", "relevant": [{"path": "65118", "grade": 3}]}
+{"qid": "W65804", "query": "Social media logos and their bg", "kind": "nl", "relevant": [{"path": "27623", "grade": 3}, {"path": "54499", "grade": 3}, {"path": "57309", "grade": 3}]}
+{"qid": "W66976", "query": "Only Allowing My IP with .htaccess for Maintenance Mode", "kind": "nl", "relevant": [{"path": "55635", "grade": 3}]}
+{"qid": "W66979", "query": "How to organize this site?", "kind": "nl", "relevant": [{"path": "1326", "grade": 3}]}
+{"qid": "W67085", "query": "Moving site new domain web.config IIS8.5 page level", "kind": "nl", "relevant": [{"path": "22966", "grade": 3}]}
+{"qid": "W67155", "query": "Establishing Authorship", "kind": "nl", "relevant": [{"path": "53595", "grade": 3}]}
+{"qid": "W67266", "query": "Website logo text - best tag for SEO purposes?", "kind": "nl", "relevant": [{"path": "67344", "grade": 3}]}
+{"qid": "W67512", "query": "Transferred hosting and website not online for 2 weeks during transition - will this affect search results?", "kind": "nl", "relevant": [{"path": "13914", "grade": 3}, {"path": "15059", "grade": 3}, {"path": "19373", "grade": 3}]}
+{"qid": "W67720", "query": "Do my blog page views help my main site's page ranking, if they are on the same domain?", "kind": "nl", "relevant": [{"path": "67420", "grade": 3}]}
+{"qid": "W67970", "query": "Create a Google Information Panel", "kind": "nl", "relevant": [{"path": "61824", "grade": 3}, {"path": "67867", "grade": 3}, {"path": "67903", "grade": 3}]}
+{"qid": "W68063", "query": "How to remove external backlinks?", "kind": "nl", "relevant": [{"path": "45076", "grade": 3}, {"path": "49646", "grade": 3}]}
+{"qid": "W68094", "query": "HTTP to only HTTPS Google wmtools", "kind": "nl", "relevant": [{"path": "47636", "grade": 3}, {"path": "53977", "grade": 3}, {"path": "67212", "grade": 3}, {"path": "67866", "grade": 3}]}
+{"qid": "W68299", "query": "phpBB - Reducing Spam", "kind": "nl", "relevant": [{"path": "22545", "grade": 3}]}
+{"qid": "W68349", "query": "google analytics - calculate peak concurrent users for a given hour", "kind": "nl", "relevant": [{"path": "39917", "grade": 3}]}
+{"qid": "W68455", "query": "Which technique is useful for image SEO, when images is coming from CSS?", "kind": "nl", "relevant": [{"path": "47261", "grade": 3}]}
+{"qid": "W68635", "query": "negative seo myth or reality", "kind": "nl", "relevant": [{"path": "65011", "grade": 3}]}

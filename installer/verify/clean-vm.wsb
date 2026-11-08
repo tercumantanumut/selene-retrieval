@@ -1,0 +1,33 @@
+<!--
+  Windows Sandbox config for the Selene Retrieval clean-machine checks (M2-I).
+  Before opening: run `cargo xtask package`, then edit the two HostFolder paths below to your
+  checkout (use %CARGO_TARGET_DIR%\package for the first one if you set CARGO_TARGET_DIR).
+  Double-click this file (Windows 10/11 Pro/Enterprise with the "Windows Sandbox" feature on).
+  The logon command runs the round trip automatically and leaves results in
+  C:\sr\verify\results (mapped back to the host, writable).
+  Networking is OFF: the product must install and search fully offline (bundled model).
+  vGPU is ON so DirectML can be exercised; set it to Disable for the "no GPU" run.
+-->
+<Configuration>
+  <VGpu>Enable</VGpu>
+  <Networking>Disable</Networking>
+  <ClipboardRedirection>Disable</ClipboardRedirection>
+  <PrinterRedirection>Disable</PrinterRedirection>
+  <ProtectedClient>Enable</ProtectedClient>
+  <MemoryInMB>8192</MemoryInMB>
+  <MappedFolders>
+    <MappedFolder>
+      <HostFolder>C:\path\to\selene-retrieval\target\package</HostFolder>
+      <SandboxFolder>C:\sr\package</SandboxFolder>
+      <ReadOnly>true</ReadOnly>
+    </MappedFolder>
+    <MappedFolder>
+      <HostFolder>C:\path\to\selene-retrieval\installer\verify</HostFolder>
+      <SandboxFolder>C:\sr\verify</SandboxFolder>
+      <ReadOnly>false</ReadOnly>
+    </MappedFolder>
+  </MappedFolders>
+  <LogonCommand>
+    <Command>powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "&amp; { $i = Get-ChildItem C:\sr\package\SeleneRetrieval-*-setup.exe | Select-Object -First 1; &amp; C:\sr\verify\roundtrip.ps1 -Installer $i.FullName -Out C:\sr\verify\results -SkipGuards; Get-ChildItem C:\Windows\System32\vcruntime140*.dll,C:\Windows\System32\msvcp140*.dll -ErrorAction SilentlyContinue | Out-File C:\sr\verify\results\system32-vcruntime.txt }"</Command>
+  </LogonCommand>
+</Configuration>

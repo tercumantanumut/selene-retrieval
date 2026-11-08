@@ -1,0 +1,55 @@
+[package]
+name = "sr-mcp-server"
+description = "MCP tools and resources over the engine; the sr-daemon binary (pipe server, admin CLI)"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[features]
+default = ["local"]
+local = ["sr-engine/local"]
+
+[dependencies]
+sr-common = { workspace = true }
+sr-engine = { workspace = true }
+sr-client = { workspace = true }
+sr-providers = { workspace = true }   # dml::harden_dll_search (first statement of main)
+rmcp = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+schemars = { workspace = true }
+tokio = { workspace = true }
+tokio-util = { workspace = true }
+futures = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+tracing-appender = { workspace = true }
+# Amendment 3.13: exactly one rustls crypto provider (ring), installed at process start. Pin and
+# features live in the root [workspace.dependencies].
+rustls = { workspace = true }
+# M4-E: opt-in streamable HTTP (rmcp's StreamableHttpService, already compiled in, served by a
+# hyper http1 server on 127.0.0.1 only). Pins and features live in the root [workspace.dependencies] (D7).
+hyper = { workspace = true }
+hyper-util = { workspace = true }
+http = { workspace = true }
+http-body-util = { workspace = true }
+bytes = { workspace = true }
+tower-service = { workspace = true }
+
+[build-dependencies]
+sr-providers = { workspace = true }   # DELAYLOAD_ARGS only
+
+[dev-dependencies]
+tempfile = { workspace = true }
+sr-extract-client = { workspace = true }   # per-test sandbox profile cleanup (M2 tester)
+sr-catalog = { workspace = true }
+sr-core = { workspace = true }
+
+[lints]
+workspace = true
+
+[[bin]]
+name = "sr-daemon"
+path = "src/bin/sr-daemon.rs"

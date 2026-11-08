@@ -1,0 +1,26 @@
+Selene Retrieval
+Copyright 2026 tercumantanumut
+
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+Parts of the retrieval pipeline, the prompt enhancer and the provider list are
+ported from Selene (https://github.com/tercumantanumut/selene), MIT License,
+Copyright (c) 2026 tercumantanumut, by the same author.
+
+This repository also contains third-party material under its own license:
+
+- patches/lancedb-0.40.0: the lancedb 0.40.0 crate (https://github.com/lancedb/lancedb),
+  Apache License 2.0, Copyright The LanceDB Authors. One file (src/job.rs) is
+  modified; see patches/README.md.
+
+- crates/core/testdata/bge-small-tokenizer.json: the tokenizer of
+  bge-small-en-v1.5 (https://huggingface.co/BAAI/bge-small-en-v1.5), MIT License,
+  Copyright (c) 2022 staoxiao; see crates/core/testdata/README.md.
+
+- eval/golden/cqadupstack-webmasters.jsonl: question titles and relevance
+  labels from the CQADupStack webmasters set, Stack Exchange content by the
+  post authors on webmasters.stackexchange.com, Creative Commons
+  Attribution-ShareAlike 3.0 (CC BY-SA 3.0,
+  https://creativecommons.org/licenses/by-sa/3.0/; posts written before April
+  2011: CC BY-SA 2.5); attribution in
+  eval/corpora/cqadupstack-webmasters/README.md.

@@ -1,0 +1,102 @@
+{
+  "provider": "kimi",
+  "source": "Recorded shapes for contract tests (M3-P, 2026-10-19). Bodies follow each provider's public API reference; values are synthetic. No live capture: no real keys or network are used in tests.",
+  "chat_model": "kimi-k2-turbo-preview",
+  "validate": {
+    "status": 200,
+    "body": {
+      "object": "list",
+      "data": [
+        {
+          "id": "kimi-k2-turbo-preview",
+          "object": "model",
+          "created": 1760000000,
+          "owned_by": "test"
+        },
+        {
+          "id": "k3",
+          "object": "model",
+          "created": 1760000000,
+          "owned_by": "test"
+        }
+      ]
+    }
+  },
+  "chat": {
+    "status": 200,
+    "body": {
+      "id": "chatcmpl-test",
+      "object": "chat.completion",
+      "created": 1760000000,
+      "model": "kimi-k2-turbo-preview",
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "The answer is in notes.md."
+          },
+          "finish_reason": "stop"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 42,
+        "completion_tokens": 7,
+        "total_tokens": 49
+      }
+    }
+  },
+  "stream": [
+    "data: {\"id\":\"chatcmpl-test\",\"object\":\"chat.completion.chunk\",\"created\":1760000000,\"model\":\"kimi-k2-turbo-preview\",\"choices\":[{\"index\":0,\"delta\":{\"role\":\"assistant\",\"content\":\"\"},\"finish_reason\":null}]}",
+    "data: {\"id\":\"chatcmpl-test\",\"object\":\"chat.completion.chunk\",\"created\":1760000000,\"model\":\"kimi-k2-turbo-preview\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"The answer \"},\"finish_reason\":null}]}",
+    "data: {\"id\":\"chatcmpl-test\",\"object\":\"chat.completion.chunk\",\"created\":1760000000,\"model\":\"kimi-k2-turbo-preview\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"is in notes.md.\"},\"finish_reason\":null}]}",
+    "data: {\"id\":\"chatcmpl-test\",\"object\":\"chat.completion.chunk\",\"created\":1760000000,\"model\":\"kimi-k2-turbo-preview\",\"choices\":[{\"index\":0,\"delta\":{},\"finish_reason\":\"stop\"}]}",
+    "data: {\"id\":\"chatcmpl-test\",\"object\":\"chat.completion.chunk\",\"choices\":[],\"usage\":{\"prompt_tokens\":42,\"completion_tokens\":7,\"total_tokens\":49}}",
+    "data: [DONE]"
+  ],
+  "errors": {
+    "auth": {
+      "status": 401,
+      "body": {
+        "error": {
+          "message": "Invalid Authentication",
+          "type": "invalid_authentication_error"
+        }
+      },
+      "expect": "ProviderAuth"
+    },
+    "quota": {
+      "status": 429,
+      "body": {
+        "error": {
+          "message": "Your account is suspended, please check your plan and billing details",
+          "type": "exceeded_current_quota_error"
+        }
+      },
+      "expect": "ProviderQuota"
+    },
+    "rate": {
+      "status": 429,
+      "body": {
+        "error": {
+          "message": "Your account request reached organization max RPM: 3, please try again after 1 seconds",
+          "type": "rate_limit_reached_error"
+        }
+      },
+      "expect": "RateLimited",
+      "headers": {
+        "retry-after": "1"
+      }
+    },
+    "unavailable": {
+      "status": 503,
+      "body": {
+        "error": {
+          "message": "The engine is currently overloaded, please try again later",
+          "type": "engine_overloaded_error"
+        }
+      },
+      "expect": "ProviderUnavailable"
+    }
+  }
+}

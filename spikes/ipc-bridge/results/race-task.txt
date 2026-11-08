@@ -1,0 +1,45 @@
+﻿pipe present before race: false  sr-daemon before: []
+  bridge 0: initialize+tools/list(4 tools) in 1685 ms -> daemon pid 4532 (launched_by "task")
+  bridge 1: initialize+tools/list(4 tools) in 1676 ms -> daemon pid 4532 (launched_by "task")
+  bridge 2: initialize+tools/list(4 tools) in 1685 ms -> daemon pid 4532 (launched_by "task")
+  bridge 3: initialize+tools/list(4 tools) in 1685 ms -> daemon pid 4532 (launched_by "task")
+  bridge 4: initialize+tools/list(4 tools) in 1676 ms -> daemon pid 4532 (launched_by "task")
+race N=5: connected=5/5 distinct daemon pids={4532} sr-daemon processes now=[4532]
+  bridge.log: 1792254150893 pid=9132 launch task: task created + /run ok (1256 ms)
+  bridge.log: 1792254151114 pid=8168 attached client=race1 how=[after-spawn-lock wait=1145ms] total=1152.4ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":4532}
+  bridge.log: 1792254151115 pid=1896 attached client=race0 how=[after-spawn-lock wait=1144ms] total=1150.5ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":4532}
+  bridge.log: 1792254151115 pid=1732 attached client=race3 how=[after-spawn-lock wait=1139ms] total=1142.7ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":4532}
+  bridge.log: 1792254151115 pid=9132 attached client=race4 how=[spawned via task (task created + /run ok); pipe ready after 1476 ms] total=1508.2ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":4532}
+  bridge.log: 1792254151116 pid=21800 attached client=race2 how=[after-spawn-lock wait=1138ms] total=1142.1ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":4532}
+  daemon processes started during race: 1; of which created the pipe: 1
+RACE PASS (order=task,breakaway): 5/5 complete, 1 distinct daemon(s), 1 pipe owner(s), 1 spawning bridge(s), 1 daemon process start(s)
+pipe present before race: false  sr-daemon before: []
+  bridge 0: initialize+tools/list(4 tools) in 605 ms -> daemon pid 20864 (launched_by "task")
+  bridge 1: initialize+tools/list(4 tools) in 605 ms -> daemon pid 20864 (launched_by "task")
+  bridge 2: initialize+tools/list(4 tools) in 605 ms -> daemon pid 20864 (launched_by "task")
+  bridge 3: initialize+tools/list(4 tools) in 605 ms -> daemon pid 20864 (launched_by "task")
+  bridge 4: initialize+tools/list(4 tools) in 605 ms -> daemon pid 20864 (launched_by "task")
+race N=5: connected=5/5 distinct daemon pids={20864} sr-daemon processes now=[20864]
+  bridge.log: 1792254153473 pid=21224 launch task: task /run ok (298 ms)
+  bridge.log: 1792254153686 pid=23660 attached client=race3 how=[after-spawn-lock(busy) wait=423ms] total=448.4ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":20864}
+  bridge.log: 1792254153686 pid=20884 attached client=race4 how=[after-spawn-lock(busy) wait=424ms] total=448.4ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":20864}
+  bridge.log: 1792254153687 pid=21224 attached client=race1 how=[spawned via task (task /run ok); pipe ready after 511 ms] total=537.0ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":20864}
+  bridge.log: 1792254153687 pid=14624 attached client=race2 how=[after-spawn-lock wait=379ms] total=382.8ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":20864}
+  bridge.log: 1792254153695 pid=16612 attached client=race0 how=[after-spawn-lock(busy) wait=378ms] total=428.8ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":20864}
+  daemon processes started during race: 1; of which created the pipe: 1
+RACE PASS (order=task,breakaway): 5/5 complete, 1 distinct daemon(s), 1 pipe owner(s), 1 spawning bridge(s), 1 daemon process start(s)
+pipe present before race: false  sr-daemon before: []
+  bridge 0: initialize+tools/list(4 tools) in 867 ms -> daemon pid 10084 (launched_by "task")
+  bridge 1: initialize+tools/list(4 tools) in 874 ms -> daemon pid 10084 (launched_by "task")
+  bridge 2: initialize+tools/list(4 tools) in 837 ms -> daemon pid 10084 (launched_by "task")
+  bridge 3: initialize+tools/list(4 tools) in 961 ms -> daemon pid 10084 (launched_by "task")
+  bridge 4: initialize+tools/list(4 tools) in 961 ms -> daemon pid 10084 (launched_by "task")
+race N=5: connected=5/5 distinct daemon pids={10084} sr-daemon processes now=[10084]
+  bridge.log: 1792254158698 pid=6124 launch task: task /run ok (360 ms)
+  bridge.log: 1792254158885 pid=6124 attached client=race2 how=[spawned via task (task /run ok); pipe ready after 520 ms] total=757.4ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":10084}
+  bridge.log: 1792254158901 pid=22872 attached client=race0 how=[after-spawn-lock(busy) wait=433ms] total=568.3ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":10084}
+  bridge.log: 1792254158904 pid=2732 attached client=race1 how=[after-spawn-lock(busy) wait=415ms] total=462.0ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":10084}
+  bridge.log: 1792254158960 pid=4656 attached client=race3 how=[after-spawn-lock(busy) wait=464ms] total=832.8ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":10084}
+  bridge.log: 1792254158960 pid=18128 attached client=race4 how=[after-spawn-lock(busy) wait=422ms] total=525.8ms reply={"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":10084}
+  daemon processes started during race: 1; of which created the pipe: 1
+RACE PASS (order=task,breakaway): 5/5 complete, 1 distinct daemon(s), 1 pipe owner(s), 1 spawning bridge(s), 1 daemon process start(s)

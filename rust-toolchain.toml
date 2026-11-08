@@ -1,0 +1,7 @@
+# Pinned to the stable release installed and verified in M0 (rustc 1.99.1, 2026-10-13).
+# MSRV floor (workspace.package.rust-version) stays 1.95 (rusqlite_migration 2.6.0).
+[toolchain]
+channel = "1.99.1"
+components = ["rustfmt", "clippy"]
+targets = ["x86_64-pc-windows-msvc"]
+profile = "minimal"

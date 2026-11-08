@@ -1,0 +1,609 @@
+{
+  "schema": 1,
+  "generated_by": "cargo xtask sync-providers (do not edit by hand)",
+  "source_files": [
+    "lib/ai/provider-types.ts",
+    "lib/ai/providers.ts",
+    "lib/auth/claudecode-models.ts",
+    "lib/auth/codex-models.ts"
+  ],
+  "providers": [
+    {
+      "id": "anthropic",
+      "display_name": "Claude",
+      "order": 0,
+      "enabled": true,
+      "disabled_reason": null,
+      "auth_kind": "api_key",
+      "protocol": "anthropic",
+      "base_url": "https://api.anthropic.com/v1/",
+      "base_url_by_model": {},
+      "default_model": "claude-sonnet-4-6",
+      "utility_model": "claude-haiku-4-5-20251001",
+      "discovery": "registry",
+      "validation": "models",
+      "key_optional": false,
+      "embeddings": null,
+      "key_url": "https://console.anthropic.com/settings/keys"
+    },
+    {
+      "id": "codex",
+      "display_name": "Codex (sign in)",
+      "order": 1,
+      "enabled": true,
+      "disabled_reason": null,
+      "auth_kind": "oauth",
+      "protocol": "cli",
+      "base_url": null,
+      "base_url_by_model": {},
+      "default_model": "gpt-5.5",
+      "utility_model": "gpt-5.4-mini-low",
+      "models": [
+        {
+          "id": "gpt-6-astra",
+          "name": "GPT-6 Astra"
+        },
+        {
+          "id": "gpt-6-astra-low",
+          "name": "GPT-6 Astra (Low)"
+        },
+        {
+          "id": "gpt-6-astra-medium",
+          "name": "GPT-6 Astra (Medium)"
+        },
+        {
+          "id": "gpt-6-astra-high",
+          "name": "GPT-6 Astra (High)"
+        },
+        {
+          "id": "gpt-6-astra-xhigh",
+          "name": "GPT-6 Astra (Extra High)"
+        },
+        {
+          "id": "gpt-6-astra-max",
+          "name": "GPT-6 Astra (Max)"
+        },
+        {
+          "id": "gpt-6-astra-ultra",
+          "name": "GPT-6 Astra (Ultra)"
+        },
+        {
+          "id": "gpt-5.6-sol",
+          "name": "GPT-5.6 Sol"
+        },
+        {
+          "id": "gpt-5.6-sol-low",
+          "name": "GPT-5.6 Sol (Low)"
+        },
+        {
+          "id": "gpt-5.6-sol-medium",
+          "name": "GPT-5.6 Sol (Medium)"
+        },
+        {
+          "id": "gpt-5.6-sol-high",
+          "name": "GPT-5.6 Sol (High)"
+        },
+        {
+          "id": "gpt-5.6-sol-xhigh",
+          "name": "GPT-5.6 Sol (Extra High)"
+        },
+        {
+          "id": "gpt-5.6-sol-max",
+          "name": "GPT-5.6 Sol (Max)"
+        },
+        {
+          "id": "gpt-5.6-sol-ultra",
+          "name": "GPT-5.6 Sol (Ultra)"
+        },
+        {
+          "id": "gpt-5.6-terra",
+          "name": "GPT-5.6 Terra"
+        },
+        {
+          "id": "gpt-5.6-terra-low",
+          "name": "GPT-5.6 Terra (Low)"
+        },
+        {
+          "id": "gpt-5.6-terra-medium",
+          "name": "GPT-5.6 Terra (Medium)"
+        },
+        {
+          "id": "gpt-5.6-terra-high",
+          "name": "GPT-5.6 Terra (High)"
+        },
+        {
+          "id": "gpt-5.6-terra-xhigh",
+          "name": "GPT-5.6 Terra (Extra High)"
+        },
+        {
+          "id": "gpt-5.6-terra-max",
+          "name": "GPT-5.6 Terra (Max)"
+        },
+        {
+          "id": "gpt-5.6-terra-ultra",
+          "name": "GPT-5.6 Terra (Ultra)"
+        },
+        {
+          "id": "gpt-5.6-luna",
+          "name": "GPT-5.6 Luna"
+        },
+        {
+          "id": "gpt-5.6-luna-low",
+          "name": "GPT-5.6 Luna (Low)"
+        },
+        {
+          "id": "gpt-5.6-luna-medium",
+          "name": "GPT-5.6 Luna (Medium)"
+        },
+        {
+          "id": "gpt-5.6-luna-high",
+          "name": "GPT-5.6 Luna (High)"
+        },
+        {
+          "id": "gpt-5.6-luna-xhigh",
+          "name": "GPT-5.6 Luna (Extra High)"
+        },
+        {
+          "id": "gpt-5.6-luna-max",
+          "name": "GPT-5.6 Luna (Max)"
+        },
+        {
+          "id": "gpt-5.5",
+          "name": "GPT-5.5"
+        },
+        {
+          "id": "gpt-5.5-low",
+          "name": "GPT-5.5 (Low)"
+        },
+        {
+          "id": "gpt-5.5-medium",
+          "name": "GPT-5.5 (Medium)"
+        },
+        {
+          "id": "gpt-5.5-high",
+          "name": "GPT-5.5 (High)"
+        },
+        {
+          "id": "gpt-5.5-xhigh",
+          "name": "GPT-5.5 (Extra High)"
+        },
+        {
+          "id": "gpt-5.4",
+          "name": "GPT-5.4"
+        },
+        {
+          "id": "gpt-5.4-low",
+          "name": "GPT-5.4 (Low)"
+        },
+        {
+          "id": "gpt-5.4-medium",
+          "name": "GPT-5.4 (Medium)"
+        },
+        {
+          "id": "gpt-5.4-high",
+          "name": "GPT-5.4 (High)"
+        },
+        {
+          "id": "gpt-5.4-xhigh",
+          "name": "GPT-5.4 (Extra High)"
+        },
+        {
+          "id": "gpt-5.4-mini",
+          "name": "GPT-5.4 Mini"
+        },
+        {
+          "id": "gpt-5.4-mini-low",
+          "name": "GPT-5.4 Mini (Low)"
+        },
+        {
+          "id": "gpt-5.4-mini-medium",
+          "name": "GPT-5.4 Mini (Medium)"
+        },
+        {
+          "id": "gpt-5.4-mini-high",
+          "name": "GPT-5.4 Mini (High)"
+        },
+        {
+          "id": "gpt-5.4-mini-xhigh",
+          "name": "GPT-5.4 Mini (Extra High)"
+        },
+        {
+          "id": "gpt-5.3-codex",
+          "name": "GPT-5.3 Codex"
+        },
+        {
+          "id": "gpt-5.3-codex-low",
+          "name": "GPT-5.3 Codex (Low)"
+        },
+        {
+          "id": "gpt-5.3-codex-medium",
+          "name": "GPT-5.3 Codex (Medium)"
+        },
+        {
+          "id": "gpt-5.3-codex-high",
+          "name": "GPT-5.3 Codex (High)"
+        },
+        {
+          "id": "gpt-5.3-codex-xhigh",
+          "name": "GPT-5.3 Codex (Extra High)"
+        },
+        {
+          "id": "gpt-5.3-codex-spark",
+          "name": "GPT-5.3 Codex Spark"
+        },
+        {
+          "id": "gpt-5.3-codex-spark-low",
+          "name": "GPT-5.3 Codex Spark (Low)"
+        },
+        {
+          "id": "gpt-5.3-codex-spark-medium",
+          "name": "GPT-5.3 Codex Spark (Medium)"
+        },
+        {
+          "id": "gpt-5.3-codex-spark-high",
+          "name": "GPT-5.3 Codex Spark (High)"
+        },
+        {
+          "id": "gpt-5.3-codex-spark-xhigh",
+          "name": "GPT-5.3 Codex Spark (Extra High)"
+        },
+        {
+          "id": "gpt-5.2",
+          "name": "GPT-5.2"
+        },
+        {
+          "id": "gpt-5.2-none",
+          "name": "GPT-5.2 (None)"
+        },
+        {
+          "id": "gpt-5.2-low",
+          "name": "GPT-5.2 (Low)"
+        },
+        {
+          "id": "gpt-5.2-medium",
+          "name": "GPT-5.2 (Medium)"
+        },
+        {
+          "id": "gpt-5.2-high",
+          "name": "GPT-5.2 (High)"
+        },
+        {
+          "id": "gpt-5.2-xhigh",
+          "name": "GPT-5.2 (Extra High)"
+        },
+        {
+          "id": "gpt-5.2-codex",
+          "name": "GPT-5.2 Codex"
+        },
+        {
+          "id": "gpt-5.2-codex-low",
+          "name": "GPT-5.2 Codex (Low)"
+        },
+        {
+          "id": "gpt-5.2-codex-medium",
+          "name": "GPT-5.2 Codex (Medium)"
+        },
+        {
+          "id": "gpt-5.2-codex-high",
+          "name": "GPT-5.2 Codex (High)"
+        },
+        {
+          "id": "gpt-5.2-codex-xhigh",
+          "name": "GPT-5.2 Codex (Extra High)"
+        },
+        {
+          "id": "codex-auto-review",
+          "name": "Codex Auto Review"
+        },
+        {
+          "id": "codex-auto-review-low",
+          "name": "Codex Auto Review (Low)"
+        },
+        {
+          "id": "codex-auto-review-medium",
+          "name": "Codex Auto Review (Medium)"
+        },
+        {
+          "id": "codex-auto-review-high",
+          "name": "Codex Auto Review (High)"
+        },
+        {
+          "id": "codex-auto-review-xhigh",
+          "name": "Codex Auto Review (Extra High)"
+        },
+        {
+          "id": "gpt-5.1-codex-max",
+          "name": "GPT-5.1 Codex Max"
+        },
+        {
+          "id": "gpt-5.1-codex-max-low",
+          "name": "GPT-5.1 Codex Max (Low)"
+        },
+        {
+          "id": "gpt-5.1-codex-max-medium",
+          "name": "GPT-5.1 Codex Max (Medium)"
+        },
+        {
+          "id": "gpt-5.1-codex-max-high",
+          "name": "GPT-5.1 Codex Max (High)"
+        },
+        {
+          "id": "gpt-5.1-codex-max-xhigh",
+          "name": "GPT-5.1 Codex Max (Extra High)"
+        },
+        {
+          "id": "gpt-5.1-codex",
+          "name": "GPT-5.1 Codex"
+        },
+        {
+          "id": "gpt-5.1-codex-low",
+          "name": "GPT-5.1 Codex (Low)"
+        },
+        {
+          "id": "gpt-5.1-codex-medium",
+          "name": "GPT-5.1 Codex (Medium)"
+        },
+        {
+          "id": "gpt-5.1-codex-high",
+          "name": "GPT-5.1 Codex (High)"
+        },
+        {
+          "id": "gpt-5.1-codex-mini",
+          "name": "GPT-5.1 Codex Mini"
+        },
+        {
+          "id": "gpt-5.1-codex-mini-medium",
+          "name": "GPT-5.1 Codex Mini (Medium)"
+        },
+        {
+          "id": "gpt-5.1-codex-mini-high",
+          "name": "GPT-5.1 Codex Mini (High)"
+        },
+        {
+          "id": "gpt-5.1",
+          "name": "GPT-5.1"
+        },
+        {
+          "id": "gpt-5.1-none",
+          "name": "GPT-5.1 (None)"
+        },
+        {
+          "id": "gpt-5.1-low",
+          "name": "GPT-5.1 (Low)"
+        },
+        {
+          "id": "gpt-5.1-medium",
+          "name": "GPT-5.1 (Medium)"
+        },
+        {
+          "id": "gpt-5.1-high",
+          "name": "GPT-5.1 (High)"
+        }
+      ],
+      "discovery": "registry",
+      "validation": "cli_status",
+      "key_optional": false,
+      "embeddings": null,
+      "key_url": "https://developers.openai.com/codex/cli"
+    },
+    {
+      "id": "kimi",
+      "display_name": "Kimi",
+      "order": 2,
+      "enabled": true,
+      "disabled_reason": null,
+      "auth_kind": "api_key",
+      "protocol": "openai_compat",
+      "base_url": "https://api.moonshot.ai/v1/",
+      "base_url_by_model": {
+        "k3": "https://api.kimi.com/coding/v1/"
+      },
+      "default_model": "k3",
+      "utility_model": "kimi-k2-turbo-preview",
+      "discovery": "registry",
+      "validation": "models",
+      "key_optional": false,
+      "embeddings": null,
+      "key_url": "https://platform.moonshot.ai/console/api-keys"
+    },
+    {
+      "id": "deepseek",
+      "display_name": "DeepSeek",
+      "order": 3,
+      "enabled": true,
+      "disabled_reason": null,
+      "auth_kind": "api_key",
+      "protocol": "openai_compat",
+      "base_url": "https://api.deepseek.com/",
+      "base_url_by_model": {},
+      "default_model": "deepseek-v4-pro",
+      "utility_model": "deepseek-v4-flash",
+      "discovery": "registry",
+      "validation": "models",
+      "key_optional": false,
+      "embeddings": null,
+      "key_url": "https://platform.deepseek.com/api_keys"
+    },
+    {
+      "id": "openrouter",
+      "display_name": "OpenRouter",
+      "order": 4,
+      "enabled": true,
+      "disabled_reason": null,
+      "auth_kind": "api_key",
+      "protocol": "openai_compat",
+      "base_url": "https://openrouter.ai/api/v1/",
+      "base_url_by_model": {},
+      "default_model": "openrouter/auto",
+      "utility_model": "google/gemini-2.5-flash",
+      "discovery": "live",
+      "validation": "openrouter_key",
+      "key_optional": false,
+      "embeddings": {
+        "default_model": "qwen/qwen3-embedding-4b",
+        "discovery": "registry"
+      },
+      "key_url": "https://openrouter.ai/settings/keys"
+    },
+    {
+      "id": "antigravity",
+      "display_name": "Antigravity",
+      "order": 5,
+      "enabled": false,
+      "disabled_reason": "not_allowed_by_vendor",
+      "auth_kind": "api_key",
+      "protocol": "oauth",
+      "base_url": null,
+      "base_url_by_model": {},
+      "default_model": "claude-sonnet-4-6",
+      "utility_model": "gemini-3-flash",
+      "discovery": "registry",
+      "validation": null,
+      "key_optional": false,
+      "embeddings": null,
+      "key_url": null
+    },
+    {
+      "id": "ollama",
+      "display_name": "Ollama",
+      "order": 6,
+      "enabled": true,
+      "disabled_reason": null,
+      "auth_kind": "none_local",
+      "protocol": "openai_compat",
+      "base_url": "http://localhost:11434/v1/",
+      "base_url_by_model": {},
+      "default_model": "llama3.1:8b",
+      "utility_model": "llama3.1:8b",
+      "discovery": "live",
+      "validation": "models",
+      "key_optional": true,
+      "embeddings": {
+        "default_model": null,
+        "discovery": "live"
+      },
+      "key_url": "https://ollama.com/download"
+    },
+    {
+      "id": "claudecode",
+      "display_name": "Claude (sign in)",
+      "order": 7,
+      "enabled": true,
+      "disabled_reason": null,
+      "auth_kind": "oauth",
+      "protocol": "cli",
+      "base_url": null,
+      "base_url_by_model": {},
+      "default_model": "claude-sonnet-5-5",
+      "utility_model": "claude-haiku-4-5-20251001",
+      "models": [
+        {
+          "id": "claude-fable-5-1",
+          "name": "Claude Fable 5.1"
+        },
+        {
+          "id": "claude-opus-5-5",
+          "name": "Claude Opus 5.5"
+        },
+        {
+          "id": "claude-opus-5",
+          "name": "Claude Opus 5"
+        },
+        {
+          "id": "claude-opus-4-8",
+          "name": "Claude Opus 4.8"
+        },
+        {
+          "id": "claude-opus-4-7",
+          "name": "Claude Opus 4.7"
+        },
+        {
+          "id": "claude-opus-4-6",
+          "name": "Claude Opus 4.6"
+        },
+        {
+          "id": "claude-sonnet-5-5",
+          "name": "Claude Sonnet 5.5"
+        },
+        {
+          "id": "claude-sonnet-4-6",
+          "name": "Claude Sonnet 4.6"
+        },
+        {
+          "id": "claude-sonnet-4-5-20250929",
+          "name": "Claude Sonnet 4.5"
+        },
+        {
+          "id": "claude-haiku-4-5-20251001",
+          "name": "Claude Haiku 4.5"
+        },
+        {
+          "id": "claude-fable-5",
+          "name": "Claude Fable 5"
+        }
+      ],
+      "discovery": "registry",
+      "validation": "cli_status",
+      "key_optional": false,
+      "embeddings": null,
+      "key_url": "https://claude.com/claude-code"
+    },
+    {
+      "id": "minimax",
+      "display_name": "MiniMax",
+      "order": 8,
+      "enabled": true,
+      "disabled_reason": null,
+      "auth_kind": "api_key",
+      "protocol": "openai_compat",
+      "base_url": "https://api.minimax.chat/v1/",
+      "base_url_by_model": {},
+      "default_model": "MiniMax-M2.1",
+      "utility_model": "MiniMax-M2.1-lightning",
+      "discovery": "registry",
+      "validation": "chat_probe",
+      "key_optional": false,
+      "embeddings": null,
+      "key_url": "https://platform.minimax.io/user-center/basic-information/interface-key"
+    },
+    {
+      "id": "blackboxai",
+      "display_name": "BlackBox AI",
+      "order": 9,
+      "enabled": true,
+      "disabled_reason": null,
+      "auth_kind": "api_key",
+      "protocol": "openai_compat",
+      "base_url": "https://api.blackbox.ai/",
+      "base_url_by_model": {},
+      "default_model": "claude-sonnet-4.5",
+      "utility_model": "gpt-4o-mini",
+      "discovery": "registry",
+      "validation": "chat_probe",
+      "key_optional": false,
+      "embeddings": null,
+      "key_url": "https://docs.blackbox.ai/api-reference/authentication"
+    },
+    {
+      "id": "vllm",
+      "display_name": "vLLM",
+      "order": 10,
+      "enabled": true,
+      "disabled_reason": null,
+      "auth_kind": "none_local",
+      "protocol": "openai_compat",
+      "base_url": "http://localhost:8000/v1/",
+      "base_url_by_model": {},
+      "default_model": null,
+      "utility_model": null,
+      "discovery": "live",
+      "validation": "models",
+      "key_optional": true,
+      "embeddings": {
+        "default_model": null,
+        "discovery": "live"
+      },
+      "key_url": "https://docs.vllm.ai/en/latest/getting_started/installation/"
+    }
+  ]
+}

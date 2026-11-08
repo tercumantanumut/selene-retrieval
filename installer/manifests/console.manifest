@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  Application manifest of the windowless Selene Retrieval exes (M5-I): sr-bridge, sr-launch,
+  sr-extract, sr-daemon and sr-setup. Embedded by installer/manifests/embed.rs (link.exe
+  /MANIFEST:EMBED /MANIFESTINPUT, /MANIFESTUAC:NO because trustInfo is declared here).
+  `cargo xtask check-manifest` verifies every shipped exe carries these settings.
+
+  * asInvoker: never an elevation prompt (per-user product, README P1.7).
+  * supportedOS Windows 10/11: no compatibility shims (the product supports Windows 10 and later).
+  * longPathAware: file APIs accept paths longer than 260 characters once the machine policy
+    LongPathsEnabled is on. This is for the user's folders (watch, scan, read_file). The data
+    directory is still short and plain (Amendment 3.12, LanceDB) and is enforced in code.
+  * dpiAwareness PerMonitorV2: these exes show no window; declared so that any system dialog a
+    helper might raise is never bitmap-stretched, and so every shipped exe has the same settings.
+-->
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+  <trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">
+    <security>
+      <requestedPrivileges>
+        <requestedExecutionLevel level="asInvoker" uiAccess="false"/>
+      </requestedPrivileges>
+    </security>
+  </trustInfo>
+  <compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1">
+    <application>
+      <!-- Windows 10 and Windows 11 -->
+      <supportedOS Id="{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"/>
+    </application>
+  </compatibility>
+  <application xmlns="urn:schemas-microsoft-com:asm.v3">
+    <windowsSettings>
+      <longPathAware xmlns="http://schemas.microsoft.com/SMI/2016/WindowsSettings">true</longPathAware>
+      <dpiAware xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">true/pm</dpiAware>
+      <dpiAwareness xmlns="http://schemas.microsoft.com/SMI/2016/WindowsSettings">PerMonitorV2, PerMonitor</dpiAwareness>
+    </windowsSettings>
+  </application>
+</assembly>

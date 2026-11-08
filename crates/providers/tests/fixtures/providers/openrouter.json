@@ -1,0 +1,158 @@
+{
+  "provider": "openrouter",
+  "source": "Recorded shapes for contract tests (M3-P, 2026-10-19). Bodies follow each provider's public API reference; values are synthetic. No live capture: no real keys or network are used in tests.",
+  "chat_model": "openrouter/auto",
+  "validate": {
+    "status": 200,
+    "body": {
+      "data": {
+        "label": "sr-test",
+        "usage": 0.12,
+        "limit": null,
+        "is_free_tier": false,
+        "rate_limit": {
+          "requests": 10,
+          "interval": "10s"
+        }
+      }
+    }
+  },
+  "models": {
+    "status": 200,
+    "body": {
+      "data": [
+        {
+          "id": "openrouter/auto",
+          "name": "Auto Router",
+          "context_length": 2000000
+        },
+        {
+          "id": "google/gemini-2.5-flash",
+          "name": "Google: Gemini 2.5 Flash",
+          "context_length": 1048576
+        },
+        {
+          "id": "anthropic/claude-sonnet-4.6",
+          "name": "Anthropic: Claude Sonnet 4.6",
+          "context_length": 1000000
+        }
+      ]
+    },
+    "expect_ids": [
+      "openrouter/auto",
+      "google/gemini-2.5-flash",
+      "anthropic/claude-sonnet-4.6"
+    ]
+  },
+  "chat": {
+    "status": 200,
+    "body": {
+      "id": "chatcmpl-test",
+      "object": "chat.completion",
+      "created": 1760000000,
+      "model": "openrouter/auto",
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "The answer is in notes.md."
+          },
+          "finish_reason": "stop"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 42,
+        "completion_tokens": 7,
+        "total_tokens": 49
+      }
+    }
+  },
+  "stream": [
+    "data: {\"id\":\"chatcmpl-test\",\"object\":\"chat.completion.chunk\",\"created\":1760000000,\"model\":\"openrouter/auto\",\"choices\":[{\"index\":0,\"delta\":{\"role\":\"assistant\",\"content\":\"\"},\"finish_reason\":null}]}",
+    "data: {\"id\":\"chatcmpl-test\",\"object\":\"chat.completion.chunk\",\"created\":1760000000,\"model\":\"openrouter/auto\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"The answer \"},\"finish_reason\":null}]}",
+    "data: {\"id\":\"chatcmpl-test\",\"object\":\"chat.completion.chunk\",\"created\":1760000000,\"model\":\"openrouter/auto\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"is in notes.md.\"},\"finish_reason\":null}]}",
+    "data: {\"id\":\"chatcmpl-test\",\"object\":\"chat.completion.chunk\",\"created\":1760000000,\"model\":\"openrouter/auto\",\"choices\":[{\"index\":0,\"delta\":{},\"finish_reason\":\"stop\"}]}",
+    "data: {\"id\":\"chatcmpl-test\",\"object\":\"chat.completion.chunk\",\"choices\":[],\"usage\":{\"prompt_tokens\":42,\"completion_tokens\":7,\"total_tokens\":49}}",
+    "data: [DONE]"
+  ],
+  "embeddings": {
+    "model": "qwen/qwen3-embedding-4b",
+    "status": 200,
+    "body": {
+      "object": "list",
+      "model": "qwen/qwen3-embedding-4b",
+      "data": [
+        {
+          "object": "embedding",
+          "index": 1,
+          "embedding": [
+            0.0,
+            3.0,
+            0.0,
+            4.0
+          ]
+        },
+        {
+          "object": "embedding",
+          "index": 0,
+          "embedding": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 8,
+        "total_tokens": 8
+      }
+    }
+  },
+  "errors": {
+    "auth": {
+      "status": 401,
+      "body": {
+        "error": {
+          "message": "No auth credentials found",
+          "code": 401
+        }
+      },
+      "expect": "ProviderAuth"
+    },
+    "quota": {
+      "status": 402,
+      "body": {
+        "error": {
+          "message": "Insufficient credits. Add more using https://openrouter.ai/settings/credits",
+          "code": 402
+        }
+      },
+      "expect": "ProviderQuota"
+    },
+    "rate": {
+      "status": 429,
+      "body": {
+        "error": {
+          "message": "Rate limit exceeded: limit_rpm/openrouter/auto",
+          "code": 429
+        }
+      },
+      "expect": "RateLimited",
+      "headers": {
+        "retry-after": "2"
+      }
+    },
+    "unavailable": {
+      "status": 502,
+      "body": {
+        "error": {
+          "message": "Provider returned error",
+          "code": 502
+        }
+      },
+      "expect": "ProviderUnavailable"
+    }
+  }
+}

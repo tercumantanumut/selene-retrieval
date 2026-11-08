@@ -1,0 +1,32 @@
+[package]
+name = "sr-common"
+description = "Shared config schema, error model, events, ids, protocol and path sandbox"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[features]
+default = []
+# Multithreaded + memory-mapped blake3 (`Hasher::update_mmap_rayon`) for large-file content
+# hashing. Daemon side only (sr-engine enables it); off by default so sr-bridge / sr-launch /
+# sr-app do not link rayon-core or memmap2 (wave-2 decision, m1-wave2-integration-notes.md).
+parallel-hash = ["blake3/rayon", "blake3/mmap"]
+
+[dependencies]
+blake3                = { workspace = true }
+schemars              = { workspace = true }
+serde                 = { workspace = true }
+serde_json            = { workspace = true }
+toml                  = { workspace = true }
+tracing               = { workspace = true }
+ulid                  = { workspace = true }
+unicode-normalization = { workspace = true }
+dunce                 = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }
+
+[lints]
+workspace = true

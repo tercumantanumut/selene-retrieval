@@ -1,0 +1,11 @@
+{"a":"arctic-m_model_onnx_cpu.bin","b":"arctic-m_model_onnx_dml.bin","dim":768,"cos_mean":1.00000,"cos_min":1.00000,"top10_overlap":1.000}
+{"a":"arctic-m_model_onnx_cpu.bin","b":"arctic-m_model_fp16_onnx_dml.bin","dim":768,"cos_mean":1.00000,"cos_min":1.00000,"top10_overlap":0.997}
+{"a":"arctic-m_model_onnx_cpu.bin","b":"arctic-m_model_fp16_onnx_cpu.bin","dim":768,"cos_mean":1.00000,"cos_min":1.00000,"top10_overlap":0.998}
+{"a":"arctic-m_model_onnx_cpu.bin","b":"arctic-m_model_int8_onnx_cpu.bin","dim":768,"cos_mean":0.96330,"cos_min":0.94985,"top10_overlap":0.909}
+{"a":"arctic-m_model_int8_onnx_cpu.bin","b":"arctic-m_model_int8_onnx_dml.bin","dim":768,"cos_mean":0.99066,"cos_min":0.98739,"top10_overlap":0.938}
+{"a":"arctic-l_model_fp16_onnx_cpu.bin","b":"arctic-l_model_fp16_onnx_dml.bin","dim":1024,"cos_mean":0.99999,"cos_min":0.99998,"top10_overlap":1.000}
+{"a":"arctic-l_model_fp16_onnx_cpu.bin","b":"arctic-l_model_int8_onnx_cpu.bin","dim":1024,"cos_mean":0.99565,"cos_min":0.99220,"top10_overlap":0.963}
+{"a":"gte-large_model_fp16_onnx_cpu.bin","b":"gte-large_model_fp16_onnx_dml.bin","dim":1024,"cos_mean":0.99999,"cos_min":0.99994,"top10_overlap":0.997}
+{"a":"gte-large_model_fp16_onnx_cpu.bin","b":"gte-large_model_int8_onnx_cpu.bin","dim":1024,"cos_mean":0.75280,"cos_min":0.63150,"top10_overlap":0.670}
+{"a":"bge-small_model_int8_onnx_cpu.bin","b":"bge-small_model_int8_onnx_dml.bin","dim":384,"cos_mean":0.99682,"cos_min":0.99375,"top10_overlap":0.941}
+{"a":"bge-small_model_onnx_cpu.bin","b":"bge-small-q_model_optimized_onnx_cpu.bin","dim":384,"cos_mean":1.00000,"cos_min":1.00000,"top10_overlap":0.998}

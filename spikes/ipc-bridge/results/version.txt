@@ -1,0 +1,10 @@
+﻿  [ok] direct proto=3 kind=mcp: {"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":12556} -> MCP initialize ok ("2025-11-25")
+  [ok] direct proto=2 kind=mcp: {"ok":true,"proto":3,"build":"0.0.1-m0d","daemon_pid":12556} -> MCP initialize ok ("2025-11-25")
+  [ok] direct proto=1 kind=mcp: {"build":"0.0.1-m0d","code":"Unavailable","message":"Selene Retrieval was updated and this connector is out of date. Restart your AI app to reconnect.","min_proto":2,"ok":false,"proto":3,"reason":"upgrade_client"}
+  [ok] direct proto=0 kind=mcp: {"build":"0.0.1-m0d","code":"Unavailable","message":"Selene Retrieval was updated and this connector is out of date. Restart your AI app to reconnect.","min_proto":2,"ok":false,"proto":3,"reason":"upgrade_client"}
+  [ok] direct proto=4 kind=mcp: {"build":"0.0.1-m0d","code":"Unavailable","message":"Selene Retrieval is finishing an update. Wait a few seconds, then restart your AI app.","min_proto":2,"ok":false,"proto":3,"reason":"upgrade_daemon"}
+  [ok] direct proto=3 kind=bogus: {"build":"0.0.1-m0d","code":"InvalidRequest","message":"Unknown client type.","min_proto":2,"ok":false,"proto":3,"reason":"bad_client_kind"}
+  [ok] old bridge (proto 1) initialize => Some("initialize error: {\"code\":-32002,\"message\":\"Selene Retrieval was updated and this connector is out of date. Restart your AI app to reconnect.\"}"); exit=Some(1); stderr=sr-bridge: Selene Retrieval was updated and this connector is out of date. Restart your AI app to reconnect.
+sr-bridge: handshake refused: Selene Retrieval was updated and this connector is out of date. Restart your AI app to reconnect.
+  daemon unaffected: pid 12556 sessions 1
+VERSION PASS

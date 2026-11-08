@@ -1,0 +1,26 @@
+# Selene Retrieval rules for this repository (gitignore syntax; docs/06 change 5, decision 8).
+# Lines are applied in order; the last matching line wins.
+
+# M0 spike copies of the workspace patch (exact duplicates of patches/lancedb-0.40.0).
+spikes/*/patches/
+
+# Eval result dumps (also caught by the built-in long-line JSON data rule).
+eval/baselines/
+
+# Spike measurement output (docs/08 §4): machine-written result dumps (model detection, bench and
+# tier runs as .txt / .jsonl, raw vector .bin files). They matched broad questions about the
+# engine without explaining anything. Repo-only: a built-in "results/" rule would also hide a
+# user's own lab or survey results.
+spikes/*/results/
+
+# Vendored Microsoft STL source (link shim for the M0 GPU spike; docs/08 §2): 12,700 lines of
+# third-party C++ that took up to 6 of 15 answer passages for "How does vector indexing work?".
+spikes/*/stlshim/
+
+# Vendored upstream lancedb 0.40.0: its code competed with ours in search (decision 8 revisited
+# 2026-10-19). Exclude the contents with /** (not the directory itself) ...
+patches/lancedb-0.40.0/**
+# ... keep its directories walkable, so a file below them can be re-included ...
+!patches/lancedb-0.40.0/**/
+# ... and re-include only what we patched (diff against the crates.io release: src/job.rs).
+!patches/lancedb-0.40.0/src/job.rs

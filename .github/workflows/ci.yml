@@ -1,0 +1,347 @@
+# Selene Retrieval CI (docs/04-roadmap.md; docs/02-architecture.md §2.6 "Supply chain").
+#
+# Every step runs from the repository root. Selene is a separate public repository; only the
+# provider-manifest check reads it, from a sparse read-only checkout in _selene/ pinned to a commit.
+# Every action is pinned to a full commit SHA (the comment names the release); Dependabot bumps them.
+#
+# Jobs
+#   check           windows-2022  fmt, clippy, model fetch, tests (SR_REQUIRE_MODELS=1), binary
+#                                 guards (check-bridge-deps, check-crt, check-delayload), provider
+#                                 manifest sync (sync-providers --check), cargo-deny
+#   ui              windows-latest  npm ci, lint, tests (a11y, contrast, product rules), build
+#   gpu             self-hosted   DirectML tests (SR_REQUIRE_DML=1). Manual runs only, in this
+#                                 repository only, and only with the repository variable
+#                                 SR_GPU_RUNNER=true; otherwise skipped (never queued).
+#   installer-smoke windows-2022  pushes to main and manual runs only: builds the UNSIGNED installer,
+#                                 installs it silently per-user on a fresh hosted VM, runs
+#                                 installer/verify (round trip + zero-config first run with a
+#                                 network-endpoint watch) and uploads a 7-day test build + logs.
+#   advisories      windows-latest  weekly and manual: cargo deny advisories for the root and the two
+#                                 installer workspaces (new RustSec advisories between pushes).
+#
+# Rust jobs run on windows-2022: Visual Studio 2022 17.14 ships MSVC 14.44, the toolset this
+# project is verified with.
+name: selene-retrieval
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "17 3 * * 1"   # weekly advisories (Mondays 03:17 UTC)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: selene-retrieval-${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
+  # A running main build is never cancelled; a newer push replaces only one that is still queued.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: "0"
+  RUST_BACKTRACE: "1"
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  check:
+    name: fmt, clippy, test, guards, deny (windows-2022)
+    if: github.event_name != 'schedule'
+    runs-on: windows-2022
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # rustup is preinstalled on the hosted image. With no argument, `rustup toolchain install`
+      # (rustup >= 1.28) installs the channel, components and target from rust-toolchain.toml.
+      - name: Install pinned toolchain
+        run: |
+          rustup toolchain install
+          rustc --version
+
+      # Amendment 3.2: prebuilt ORT needs MSVC 14.44+ (symbols missing in 14.41 and older).
+      - name: Require MSVC toolset >= 14.44
+        run: |
+          VSWHERE="/c/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe"
+          VS=$("$VSWHERE" -latest -products '*' \
+                 -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath)
+          VER=$(tr -d '\r\n ' < "$VS/VC/Auxiliary/Build/Microsoft.VCToolsVersion.default.txt")
+          echo "MSVC toolset: $VER"
+          MINOR=$(echo "$VER" | cut -d. -f2)
+          [ "$(echo "$VER" | cut -d. -f1)" -eq 14 ] && [ "$MINOR" -ge 44 ] \
+            || { echo "::error::MSVC $VER < 14.44 (Amendment 3.2)"; exit 1; }
+
+      # LanceDB's lance-* crates compile .proto files in build.rs and need protoc. The action's
+      # manifest pins protoc 25.1 (protoc@3.25.1) with a checksum.
+      - uses: taiki-e/install-action@3a3daafd3b7f23b8f65d9f5ba2db203fb59b79e2 # v2.90.2
+        with:
+          tool: protoc@3.25.1
+
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        with:
+          save-if: ${{ github.ref == 'refs/heads/main' }}
+
+      - name: rustfmt
+        run: cargo fmt --all --check
+
+      - name: clippy
+        run: cargo clippy --workspace --all-targets --locked -- -D warnings
+
+      # The five pinned bundled-model files (model_optimized.onnx + 4 tokenizer files) and, with
+      # --all, the Standard / High files the tier-model tests load (about 1.3 GB, cached).
+      # Pins (repo, revision, sha256) come from sr_common::tier / sr_providers::models; the cache
+      # key follows those two source files so a re-pin refetches.
+      - name: Cache pinned model files
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: crates/providers/models
+          key: sr-models-${{ hashFiles('crates/common/src/tier.rs', 'crates/providers/src/models.rs') }}
+
+      - name: Fetch pinned model files (sha256-verified)
+        run: cargo xtask fetch-models --all
+
+      # The sr-extract tests load pdfium.dll; a fresh checkout has none (vendor-bin/ is not
+      # committed), so fetch the pinned build and point the tests at it.
+      - name: Fetch pinned pdfium (sha256-verified)
+        run: cargo xtask fetch-pdfium
+
+      # SR_REQUIRE_MODELS=1: a model-backed test that would SKIP fails instead. No GPU here, so
+      # DirectML tests skip (SR_REQUIRE_DML is set only in the gpu job). --no-fail-fast: one
+      # failing test binary doesn't hide the results of the others.
+      - name: test
+        env:
+          SR_REQUIRE_MODELS: "1"
+          SR_PDFIUM_DLL: ${{ github.workspace }}/vendor-bin/pdfium-7881/pdfium.dll
+        run: cargo test --workspace --locked --no-fail-fast
+
+      - name: sr-bridge must not link the native stack (nor rayon-core/memmap2)
+        run: cargo xtask check-bridge-deps
+
+      # The provider manifest is generated from Selene's registry (lib/ai/provider-types.ts,
+      # lib/ai/providers.ts and the model lists in lib/auth/, read-only). Fails if
+      # crates/providers/data/selene-providers.json is stale; fix with `cargo xtask sync-providers`
+      # against a Selene checkout next to this repository.
+      - name: Check out Selene's provider registry (read-only)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: tercumantanumut/selene
+          # The Selene commit crates/providers/data/selene-providers.json was generated from.
+          # Update the two together.
+          ref: e09802592ccb61e1764e1f0c2c1ffbb3e8de25d4
+          path: _selene
+          persist-credentials: false
+          sparse-checkout: |
+            lib/ai
+            lib/auth
+
+      - name: provider manifest in sync with Selene's registry
+        run: cargo xtask sync-providers --check --selene _selene
+
+      # Amendment 4.1: sr-bridge, sr-launch, sr-extract, sr-app import no VC++ runtime DLL.
+      # Built with the `ci` profile (release codegen, no LTO) in one invocation without sr-daemon.
+      - name: check-crt (static-CRT exes import no VC++ runtime DLL)
+        run: cargo xtask check-crt --profile ci
+
+      # Amendments 3.3 / 4.8: sr-daemon imports DirectML/d3d12/dxgi only as delay-load.
+      - name: check-delayload (sr-daemon)
+        run: cargo xtask check-delayload --profile ci
+
+      - uses: taiki-e/install-action@3a3daafd3b7f23b8f65d9f5ba2db203fb59b79e2 # v2.90.2
+        with:
+          tool: cargo-deny@0.20.2
+
+      - name: cargo-deny (advisories, licences, bans, sources)
+        run: cargo deny --locked check
+
+      # installer/sr-setup is a nested workspace (own Cargo.lock): the root commands above don't
+      # cover it. It compiles the app's Claude writer verbatim, so its tests run those too.
+      - name: sr-setup (nested workspace) fmt, clippy, test
+        run: |
+          cargo fmt --manifest-path installer/sr-setup/Cargo.toml --check
+          cargo clippy --manifest-path installer/sr-setup/Cargo.toml --all-targets --locked -- -D warnings
+          cargo test --manifest-path installer/sr-setup/Cargo.toml --locked
+
+      # installer/sr-setup and installer/msi-ca are nested workspaces with their own Cargo.lock,
+      # which the root `cargo deny` above never reads. Same deny.toml (found upward from each
+      # manifest), no extra exceptions.
+      - name: cargo-deny (nested installer workspaces sr-setup, msi-ca)
+        run: |
+          cargo deny --manifest-path installer/sr-setup/Cargo.toml --locked check
+          cargo deny --manifest-path installer/msi-ca/Cargo.toml --locked check
+
+  ui:
+    name: UI lint, test, build
+    if: github.event_name != 'schedule'
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: ui/.nvmrc
+          cache: npm
+          cache-dependency-path: ui/package-lock.json
+
+      # No package in the lockfile needs an install script on Windows (only the macOS-only
+      # optional fsevents declares one).
+      - name: npm ci
+        working-directory: ui
+        run: npm ci --ignore-scripts
+
+      - name: lint
+        working-directory: ui
+        run: npm run lint
+
+      - name: test
+        working-directory: ui
+        run: npm test
+
+      # `build` runs the TypeScript check first.
+      - name: build
+        working-directory: ui
+        run: npm run build
+
+  gpu:
+    name: DirectML tests (GPU runner)
+    needs: check
+    # The job runs on a self-hosted runner with a DirectX 12 GPU (hosted runners have none). In a
+    # public repository anyone can open a pull request, and a self-hosted runner would execute that
+    # code on the runner's machine. So it never runs on pull_request or push: only manual runs, only
+    # in this repository, and only once the repository variable SR_GPU_RUNNER is 'true'.
+    if: >-
+      github.event_name == 'workflow_dispatch' &&
+      github.repository == 'tercumantanumut/selene-retrieval' &&
+      vars.SR_GPU_RUNNER == 'true'
+    runs-on: [self-hosted, windows, gpu]
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install pinned toolchain
+        run: rustup toolchain install
+      - uses: taiki-e/install-action@3a3daafd3b7f23b8f65d9f5ba2db203fb59b79e2 # v2.90.2
+        with:
+          tool: protoc@3.25.1
+      # --all: the Standard / High tier-model tests run here too (SR_REQUIRE_MODELS=1).
+      - name: Fetch pinned model files (sha256-verified)
+        run: cargo xtask fetch-models --all
+      # SR_REQUIRE_DML=1: DirectML tests fail instead of skipping without a GPU / DirectML.dll.
+      # Set SR_TEST_DXGI_INDEX in the runner environment if the GPU is not adapter 0.
+      - name: sr-providers DirectML + CPU model tests
+        env:
+          SR_REQUIRE_MODELS: "1"
+          SR_REQUIRE_DML: "1"
+        run: cargo test -p sr-providers --locked
+
+  # The clean-machine checks on a GitHub-hosted Windows runner, which is a fresh VM per run with a
+  # different user and no prior app state. It installs the UNSIGNED setup silently per-user (no
+  # admin), runs installer/verify: install -> scheduled task -> MCP round trip through sr-bridge ->
+  # uninstall keeping / deleting the index -> nothing left behind, then a zero-config first run (no
+  # settings file, stripped environment) with a network-endpoint watch.
+  # Not on pull requests: a PR must not be able to publish a downloadable installer built from its
+  # own code. The artifact is a 7-day test build named after the commit, not a release.
+  # LIMITATION: hosted runners already carry the VC++ runtime in System32, so this job can't prove
+  # "no runtime needed"; that proof stays `check-crt` and the app-local DLL import checks
+  # (Amendments 3.1 and 4.1). Pristine Win10/Win11, MSIX Claude Desktop, Cursor and a second user
+  # need a clean VM (installer/verify/clean-vm.wsb).
+  installer-smoke:
+    name: installer smoke (fresh hosted VM, unsigned)
+    needs: check
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      github.event_name == 'workflow_dispatch'
+    runs-on: windows-2022
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install pinned toolchain
+        run: |
+          rustup toolchain install
+          rustc --version
+
+      - uses: taiki-e/install-action@3a3daafd3b7f23b8f65d9f5ba2db203fb59b79e2 # v2.90.2
+        with:
+          tool: protoc@3.25.1
+
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        with:
+          key: installer-smoke
+          save-if: ${{ github.ref == 'refs/heads/main' }}
+
+      # The app's UI is embedded at build time (ui/dist is not committed).
+      - name: Build the app UI
+        working-directory: ui
+        run: |
+          npm ci --ignore-scripts
+          npm run build
+
+      - name: Fetch pinned model files (sha256-verified)
+        run: cargo xtask fetch-models
+
+      # Signing is not set up: with no credentials the package is labelled UNSIGNED and that is
+      # not an error here. A release build sets SR_REQUIRE_SIGNING=1 instead.
+      - name: Build the installer (cargo xtask package, unsigned)
+        run: cargo xtask package
+
+      - name: Install, task, MCP round trip, uninstall keep/delete, nothing left
+        shell: pwsh
+        run: |
+          $setup = (Get-Item target/package/SeleneRetrieval-*-x64-setup.exe).FullName
+          ./installer/verify/roundtrip.ps1 -Installer $setup -Xtask (Resolve-Path target/debug/xtask.exe) -Out "$env:RUNNER_TEMP/sr-verify"
+
+      - name: Zero-config first run with a network-endpoint watch
+        shell: pwsh
+        run: |
+          $setup = (Get-Item target/package/SeleneRetrieval-*-x64-setup.exe).FullName
+          ./installer/verify/firstrun.ps1 -Installer $setup -Out "$env:RUNNER_TEMP/sr-firstrun"
+
+      - name: Upload the setup exe and verify logs (test build)
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: selene-retrieval-${{ github.sha }}-test-build-unsigned
+          retention-days: 7
+          if-no-files-found: warn
+          path: |
+            target/package/SeleneRetrieval-*-x64-setup.exe
+            target/package/package-report.json
+            target/package/SHA256SUMS.txt
+            ${{ runner.temp }}/sr-verify
+            ${{ runner.temp }}/sr-firstrun
+
+  advisories:
+    name: cargo deny advisories (weekly)
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install pinned toolchain
+        run: rustup toolchain install
+
+      - uses: taiki-e/install-action@3a3daafd3b7f23b8f65d9f5ba2db203fb59b79e2 # v2.90.2
+        with:
+          tool: cargo-deny@0.20.2
+
+      - name: cargo deny advisories (root and nested installer workspaces)
+        run: |
+          cargo deny --locked check advisories
+          cargo deny --manifest-path installer/sr-setup/Cargo.toml --locked check advisories
+          cargo deny --manifest-path installer/msi-ca/Cargo.toml --locked check advisories

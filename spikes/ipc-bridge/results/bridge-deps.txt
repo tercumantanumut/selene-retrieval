@@ -1,0 +1,16 @@
+bytes v1.12.1
+mio v1.2.4
+pin-project-lite v0.2.17
+proc-macro2 v1.0.107
+proc-macro2 v1.0.107 (*)
+quote v1.0.47
+quote v1.0.47 (*)
+socket2 v0.6.5
+sr-bridge v0.0.1 (<checkout>\spikes\ipc-bridge\bridge)
+syn v3.0.9
+tokio v1.53.3
+tokio-macros v2.7.2 (proc-macro)
+unicode-ident v1.0.27
+windows-link v0.2.1
+windows-sys v0.61.2
+windows-sys v0.61.2 (*)

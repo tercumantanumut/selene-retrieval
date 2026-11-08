@@ -1,0 +1,52 @@
+[package]
+name = "sr-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+# M1-E: sr-catalog (M1-A) and sr-providers (M1-D) are written concurrently. sr-core codes against
+# narrow traits (`index::source::{OutboxSource, ChunkSource}`, `index::Embedder`, `query::Reranker`)
+# that sr-engine adapts to the real catalog/providers, so this crate does not depend on them yet.
+[dependencies]
+sr-common = { workspace = true }
+sr-extract-client = { workspace = true }  # M1-B: ingest::extract_client (no pdfium)
+# M3-Q: answer / enhance / iterate code against `LlmProvider` (traits only: no default features).
+sr-providers = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+tokio = { workspace = true }
+tokio-util = { workspace = true }
+futures = { workspace = true }
+
+# vector / lexical
+lancedb = { workspace = true }
+arrow-array = { workspace = true }
+arrow-schema = { workspace = true }
+tantivy = { workspace = true }
+
+# chunking
+text-splitter = { workspace = true }
+tokenizers = { workspace = true }
+tree-sitter = { workspace = true }
+tree-sitter-rust = { workspace = true }
+tree-sitter-python = { workspace = true }
+tree-sitter-typescript = { workspace = true }
+tree-sitter-javascript = { workspace = true }
+tree-sitter-go = { workspace = true }
+tree-sitter-java = { workspace = true }
+tree-sitter-c-sharp = { workspace = true }
+tree-sitter-cpp = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }
+proptest = { workspace = true }
+
+[[bench]]
+name = "hybrid_1m"
+harness = false
+
+[lints]
+workspace = true

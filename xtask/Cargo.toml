@@ -1,0 +1,20 @@
+[package]
+name = "xtask"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+sr-common  = { workspace = true }
+sr-providers = { workspace = true }  # fetch-models: pins only (workspace entry has no ORT)
+serde_json = { workspace = true }
+schemars   = { workspace = true }
+serde      = { workspace = true }   # eval harness (golden/results JSON)
+
+[dev-dependencies]
+tempfile = { workspace = true }
+
+[lints]
+workspace = true

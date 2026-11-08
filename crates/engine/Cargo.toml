@@ -1,0 +1,64 @@
+[package]
+name = "sr-engine"
+description = "Composition root: startup order, stores, IndexWriter, ingest executor, search, files, event bus, pipe server"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[features]
+# `local` = the bundled ONNX embedder (sr-providers/local, static ORT). On by default: the daemon
+# needs it. `--no-default-features` builds the engine with the deterministic test embedder only.
+default = ["local", "remote"]
+local = ["sr-providers/local", "dep:fastembed"]
+# M3-Q: remote chat providers (M3-P's genai layer + Credential Manager keys) for answer /
+# enhance_prompt and the Providers & Keys app-RPC.
+remote = ["sr-providers/remote"]
+
+[dependencies]
+sr-common = { workspace = true }
+sr-catalog = { workspace = true }
+sr-providers = { workspace = true }
+sr-core = { workspace = true }
+sr-sync = { workspace = true }
+sr-extract-client = { workspace = true }
+# pipe server (M1-C): sr-client shares the pipe name, DACL and Win32 helpers with the clients.
+sr-client = { workspace = true }
+rusqlite = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+tokio-util = { workspace = true }
+futures = { workspace = true }
+tracing = { workspace = true }
+blake3 = { workspace = true }
+dunce = { workspace = true }
+cap-std = { workspace = true }
+ignore = { workspace = true }
+globset = { workspace = true }
+grep-searcher = { workspace = true }
+grep-regex = { workspace = true }
+encoding_rs = { workspace = true }
+moka = { workspace = true, features = ["sync"] }
+# M4-E: 256-bit HTTP tool tokens from the OS CSPRNG (pin in the root [workspace.dependencies], D7).
+getrandom = { workspace = true }
+lancedb = { workspace = true }
+# M3-Q: the local cross-encoder reranker (same pin and ORT build as sr-providers' embedder).
+fastembed = { workspace = true, optional = true }
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { workspace = true, features = [
+  "Win32_System_SystemInformation", "Win32_Storage_FileSystem", "Win32_System_Console",
+  # M5-E: machine policy (`%ProgramData%` known folder, HKLM/HKCU Policies values).
+  "Win32_UI_Shell", "Win32_System_Com", "Win32_System_Registry",
+] }
+
+[build-dependencies]
+sr-providers = { workspace = true }   # DELAYLOAD_ARGS only (no ORT in the build script)
+
+[dev-dependencies]
+tempfile = { workspace = true }
+
+[lints]
+workspace = true

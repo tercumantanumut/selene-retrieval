@@ -1,0 +1,110 @@
+{
+  "provider": "deepseek",
+  "source": "Recorded shapes for contract tests (M3-P, 2026-10-19). Bodies follow each provider's public API reference; values are synthetic. No live capture: no real keys or network are used in tests.",
+  "chat_model": "deepseek-v4-pro",
+  "validate": {
+    "status": 200,
+    "body": {
+      "object": "list",
+      "data": [
+        {
+          "id": "deepseek-v4-pro",
+          "object": "model",
+          "created": 1760000000,
+          "owned_by": "test"
+        },
+        {
+          "id": "deepseek-v4-flash",
+          "object": "model",
+          "created": 1760000000,
+          "owned_by": "test"
+        }
+      ]
+    }
+  },
+  "chat": {
+    "status": 200,
+    "body": {
+      "id": "chatcmpl-test",
+      "object": "chat.completion",
+      "created": 1760000000,
+      "model": "deepseek-v4-pro",
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "The answer is in notes.md."
+          },
+          "finish_reason": "stop"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 42,
+        "completion_tokens": 7,
+        "total_tokens": 49
+      }
+    }
+  },
+  "stream": [
+    "data: {\"id\":\"chatcmpl-test\",\"object\":\"chat.completion.chunk\",\"created\":1760000000,\"model\":\"deepseek-v4-pro\",\"choices\":[{\"index\":0,\"delta\":{\"role\":\"assistant\",\"content\":\"\"},\"finish_reason\":null}]}",
+    "data: {\"id\":\"chatcmpl-test\",\"object\":\"chat.completion.chunk\",\"created\":1760000000,\"model\":\"deepseek-v4-pro\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"The answer \"},\"finish_reason\":null}]}",
+    "data: {\"id\":\"chatcmpl-test\",\"object\":\"chat.completion.chunk\",\"created\":1760000000,\"model\":\"deepseek-v4-pro\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"is in notes.md.\"},\"finish_reason\":null}]}",
+    "data: {\"id\":\"chatcmpl-test\",\"object\":\"chat.completion.chunk\",\"created\":1760000000,\"model\":\"deepseek-v4-pro\",\"choices\":[{\"index\":0,\"delta\":{},\"finish_reason\":\"stop\"}]}",
+    "data: {\"id\":\"chatcmpl-test\",\"object\":\"chat.completion.chunk\",\"choices\":[],\"usage\":{\"prompt_tokens\":42,\"completion_tokens\":7,\"total_tokens\":49}}",
+    "data: [DONE]"
+  ],
+  "errors": {
+    "auth": {
+      "status": 401,
+      "body": {
+        "error": {
+          "message": "Authentication Fails, Your api key: ****1234 is invalid",
+          "type": "authentication_error",
+          "param": null,
+          "code": "invalid_request_error"
+        }
+      },
+      "expect": "ProviderAuth"
+    },
+    "quota": {
+      "status": 402,
+      "body": {
+        "error": {
+          "message": "Insufficient Balance",
+          "type": "unknown_error",
+          "param": null,
+          "code": "invalid_request_error"
+        }
+      },
+      "expect": "ProviderQuota"
+    },
+    "rate": {
+      "status": 429,
+      "body": {
+        "error": {
+          "message": "Rate Limit Reached",
+          "type": "rate_limit_error",
+          "param": null,
+          "code": "rate_limit_reached"
+        }
+      },
+      "expect": "RateLimited",
+      "headers": {
+        "retry-after": "5"
+      }
+    },
+    "unavailable": {
+      "status": 503,
+      "body": {
+        "error": {
+          "message": "Server Overloaded",
+          "type": "server_error",
+          "param": null,
+          "code": "server_overloaded"
+        }
+      },
+      "expect": "ProviderUnavailable"
+    }
+  }
+}

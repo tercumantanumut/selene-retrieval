@@ -1,0 +1,46 @@
+﻿### mode breakaway-ok
+job[breakaway-ok] flags=0x2800 BREAKAWAY_OK|KILL_ON_JOB_CLOSE bridge pid=22820 in_job=Some(true) order=breakaway,task
+  attached in 1102 ms; daemon pid=2856 launched_by="breakaway" parent="22820 sr-bridge.exe" daemon_in_any_job=false daemon_in_client_job=Some(false)
+  job closed -> bridge exited after 23 ms (exit Some(Some(0)))
+  RESULT daemon alive after job close: true; new client served: yes (pid 2856)
+  leftover sr procs after mode: 0
+### mode no-breakaway
+job[no-breakaway] flags=0x2000 KILL_ON_JOB_CLOSE bridge pid=16948 in_job=Some(true) order=breakaway,task
+  attached in 1542 ms; daemon pid=18908 launched_by="task" parent="2332 svchost.exe" daemon_in_any_job=true daemon_in_client_job=Some(false)
+  job closed -> bridge exited after 7 ms (exit Some(Some(0)))
+  RESULT daemon alive after job close: true; new client served: yes (pid 18908)
+  leftover sr procs after mode: 0
+### mode task-first
+job[task-first] flags=0x2000 KILL_ON_JOB_CLOSE bridge pid=19896 in_job=Some(true) order=task,breakaway
+  attached in 1606 ms; daemon pid=21616 launched_by="task" parent="2332 svchost.exe" daemon_in_any_job=true daemon_in_client_job=Some(false)
+  job closed -> bridge exited after 7 ms (exit Some(Some(0)))
+  RESULT daemon alive after job close: true; new client served: yes (pid 21616)
+  leftover sr procs after mode: 0
+### mode injob
+job[injob] flags=0x2800 BREAKAWAY_OK|KILL_ON_JOB_CLOSE bridge pid=11732 in_job=Some(true) order=injob
+  attached in 895 ms; daemon pid=12080 launched_by="injob" parent="11732 sr-bridge.exe" daemon_in_any_job=true daemon_in_client_job=Some(true)
+  job closed -> bridge exited after 18 ms (exit Some(Some(0)))
+  RESULT daemon alive after job close: false; new client served: no (open \\.\pipe\sr-<sidhash>-<datadirhash>: The system cannot find the file specified. (os error 2))
+  leftover sr procs after mode: 0
+### mode libuv
+job[libuv] flags=0x3c00 DIE_ON_UNHANDLED_EXCEPTION|BREAKAWAY_OK|SILENT_BREAKAWAY_OK|KILL_ON_JOB_CLOSE bridge pid=2468 in_job=Some(true) order=injob
+  attached in 610 ms; daemon pid=17716 launched_by="injob" parent="2468 sr-bridge.exe" daemon_in_any_job=true daemon_in_client_job=Some(false)
+  job closed -> bridge exited after 7 ms (exit Some(Some(0)))
+  RESULT daemon alive after job close: true; new client served: yes (pid 17716)
+  leftover sr procs after mode: 0
+### mode nested
+job[nested] outer flags=0x2000 KILL_ON_JOB_CLOSE (no BREAKAWAY_OK)
+job[nested] flags=0x2800 BREAKAWAY_OK|KILL_ON_JOB_CLOSE bridge pid=21032 in_job=Some(true) order=breakaway,task
+  daemon in outer job: Some(true)
+  attached in 827 ms; daemon pid=20056 launched_by="breakaway" parent="21032 sr-bridge.exe" daemon_in_any_job=true daemon_in_client_job=Some(false)
+  job closed -> bridge exited after 15 ms (exit Some(Some(0)))
+  RESULT daemon alive after job close: false; new client served: no (open \\.\pipe\sr-<sidhash>-<datadirhash>: The system cannot find the file specified. (os error 2))
+  leftover sr procs after mode: 0
+### mode nested-task-first
+job[nested-task-first] outer flags=0x2000 KILL_ON_JOB_CLOSE (no BREAKAWAY_OK)
+job[nested-task-first] flags=0x2800 BREAKAWAY_OK|KILL_ON_JOB_CLOSE bridge pid=16172 in_job=Some(true) order=task,breakaway
+  daemon in outer job: Some(false)
+  attached in 2043 ms; daemon pid=23788 launched_by="task" parent="2332 svchost.exe" daemon_in_any_job=true daemon_in_client_job=Some(false)
+  job closed -> bridge exited after 35 ms (exit Some(Some(0)))
+  RESULT daemon alive after job close: true; new client served: yes (pid 23788)
+  leftover sr procs after mode: 0

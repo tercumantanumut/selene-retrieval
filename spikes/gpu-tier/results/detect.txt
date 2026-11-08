@@ -1,0 +1,84 @@
+{
+  "total_ram": 51539607552,
+  "physical_cores": 6,
+  "logical_cores": 12,
+  "avx2": true,
+  "avx512_vnni": true,
+  "free_disk": 253608112128,
+  "gpus": [
+    {
+      "name": "NVIDIA GeForce RTX 5090",
+      "vendor_id": 4318,
+      "device_id": 11141,
+      "dedicated_vram": 33749467136,
+      "shared_mem": 34090987520,
+      "is_software": false,
+      "d3d12_fl11": true,
+      "uma": false,
+      "dxgi_index": 0
+    },
+    {
+      "name": "Microsoft Basic Render Driver",
+      "vendor_id": 5140,
+      "device_id": 140,
+      "dedicated_vram": 0,
+      "shared_mem": 34090987520,
+      "is_software": true,
+      "d3d12_fl11": true,
+      "uma": true,
+      "dxgi_index": 1
+    }
+  ]
+}
+detect_ms=163.6
+decision={
+  "tier": "High",
+  "ep": {
+    "DirectMl": {
+      "dxgi_index": 0
+    }
+  },
+  "gpu_class": "Dedicated",
+  "reasons": [
+    "graphics card 'NVIDIA GeForce RTX 5090' (32186 MiB) will be used",
+    "High qualifies"
+  ]
+}
+profile={
+  "tier": "High",
+  "model_id": "Snowflake/snowflake-arctic-embed-l",
+  "dims": 1024,
+  "pooling": "cls",
+  "query_prefix": "Represent this sentence for searching relevant passages: ",
+  "max_seq_tokens": 512,
+  "gpu_file": {
+    "hf_repo": "Snowflake/snowflake-arctic-embed-l",
+    "hf_revision": "d8fb21ca8d905d2832ee8b96c894d3298964346b",
+    "path": "onnx/model_fp16.onnx",
+    "bytes": 668828773,
+    "precision": "Fp16",
+    "sha256": "8ca24235754e5553234266fba529a7eec363e8d565d3f21761ada22841f5f3c8"
+  },
+  "cpu_file": {
+    "hf_repo": "Snowflake/snowflake-arctic-embed-l",
+    "hf_revision": "d8fb21ca8d905d2832ee8b96c894d3298964346b",
+    "path": "onnx/model_int8.onnx",
+    "bytes": 336984086,
+    "precision": "Int8",
+    "sha256": "ab802115224b05d283e2042cf889b5490c476e19d28ce93e2073a57476b95541"
+  },
+  "batch_gpu": 32,
+  "batch_cpu": 8,
+  "concurrency_gpu": 2,
+  "concurrency_cpu": 1,
+  "ann": {
+    "min_rows": 50000,
+    "partitions_per_sqrt_rows": 1.0,
+    "hnsw_m": 24,
+    "hnsw_ef_construction": 200,
+    "nprobes": 32,
+    "refine_factor": 10
+  },
+  "rerank": true,
+  "rerank_top_n": 50
+}

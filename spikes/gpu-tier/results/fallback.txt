@@ -1,0 +1,11 @@
+case 1: DirectML on a DXGI adapter index that does not exist (99), error_on_failure
+  active=Cpu reason=Some("DirectML registration failed: E:\\_work\\1\\s\\onnxruntime\\core\\providers\\dml\\dml_provider_factory.cc(513)\\onnxruntime.dll!00007FFAE33EB148: (caller: 00007FFAE33EB46A) Exception(1) tid(5ee4) 887A0002 The object was not found. If calling IDXGIFactory::EnumAdaptes, there is no adapter with the specified ordinal.\r\n") dims=384 ok_in=1949 ms
+case 2: same, but WITHOUT error_on_failure (ort's own behaviour)
+[1;31m2026-10-17 21:17:24.2935705 [E:onnxruntime:, inference_session.cc:2620 onnxruntime::InferenceSession::Initialize::<lambda_94b0028bb73d8e4d8db6aa58a988e056>::operator ()] Exception during initialization: E:\_work\1\s\onnxruntime\core\graph\graph_utils.cc:30 onnxruntime::graph_utils::GetIndexFromName itr != node_args.end() was false. Attempting to get index by a name which does not exist:InsertedPrecisionFreeCast_/encoder/layer.3/attention/output/LayerNorm/Constant_output_0for node: /embeddings/LayerNorm/Mul/SimplifiedLayerNormFusion/
+[m
+  commit error: Exception during initialization: E:\_work\1\s\onnxruntime\core\graph\graph_utils.cc:30 onnxruntime::graph_utils::GetIndexFromName itr != node_args.end() was false. Attempting to get index by a name which does not exist:InsertedPrecisionFreeCast_/encoder/layer.3/attention/output/LayerNorm/Constant_output_0for node: /embeddings/LayerNorm/Mul/SimplifiedLayerNormFusion/
+
+case 3: real adapter; SR_FORCE_GPU_FAIL set => canary fails after DML init (driver-fault simulation)
+  active=Dml(0) reason=None dims=384 ok_in=696 ms
+case 3: real adapter; SR_FORCE_GPU_FAIL set => canary fails after DML init (driver-fault simulation)
+  active=Cpu reason=Some("forced GPU failure (SR_FORCE_GPU_FAIL)") dims=384 ok_in=2624 ms

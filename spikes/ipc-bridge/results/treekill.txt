@@ -1,0 +1,10 @@
+﻿[breakaway] bridge=17168 alive=True daemon=16748 daemon_ppid=17168 ppid_alive=True
+  taskkill: SUCCESS: The process with PID 16748 (child process of PID 17168) has been terminated. | SUCCESS: The process with PID 17168 (child process of PID 20096) has been terminated.
+  daemon alive after taskkill /T /F: False
+[trampoline] bridge=15044 alive=True daemon=18612 daemon_ppid=16352 ppid_alive=False
+  taskkill: SUCCESS: The process with PID 15044 (child process of PID 20096) has been terminated.
+  daemon alive after taskkill /T /F: True
+[task] bridge=9756 alive=True daemon=21072 daemon_ppid=2332 ppid_alive=True
+  taskkill: SUCCESS: The process with PID 9756 (child process of PID 20096) has been terminated.
+  daemon alive after taskkill /T /F: True
+leftover: 0

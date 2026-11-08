@@ -1,0 +1,15 @@
+[package]
+name = "m0c-combo"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[workspace]
+
+[dependencies]
+pdfium-render = { version = "=0.9.4", default-features = false, features = ["pdfium_7881", "thread_safe"] }
+fastembed = { version = "=7.1.1", default-features = false, features = ["ort-download-binaries-rustls-tls"] }
+anyhow = "1"
+
+[profile.release]
+panic = "unwind"

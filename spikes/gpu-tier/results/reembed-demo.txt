@@ -1,0 +1,18 @@
+{"type":"model.download.progress","model_id":"Snowflake/snowflake-arctic-embed-m-v1.5","bytes":250000,"total":1000000}
+{"type":"model.download.progress","model_id":"Snowflake/snowflake-arctic-embed-m-v1.5","bytes":500000,"total":1000000}
+{"type":"model.download.progress","model_id":"Snowflake/snowflake-arctic-embed-m-v1.5","bytes":600000,"total":1000000}
+{"type":"model.download.failed","model_id":"Snowflake/snowflake-arctic-embed-m-v1.5","code":"ModelDownloadFailed","resumable":true}
+# attempt 1: DownloadFailed(Network { have: 600000 }); active=Some("01-minimum")
+{"type":"model.download.progress","model_id":"Snowflake/snowflake-arctic-embed-m-v1.5","bytes":850000,"total":1000000}
+{"type":"model.download.progress","model_id":"Snowflake/snowflake-arctic-embed-m-v1.5","bytes":1000000,"total":1000000}
+{"type":"model.download.completed","model_id":"Snowflake/snowflake-arctic-embed-m-v1.5"}
+{"type":"reembed.started","index_id":"02-standard","model_id":"Snowflake/snowflake-arctic-embed-m-v1.5","dims":768,"total":64,"resumed_from":0}
+{"type":"reembed.progress","index_id":"02-standard","done":16,"total":64}
+{"type":"reembed.progress","index_id":"02-standard","done":32,"total":64}
+{"type":"reembed.failed","index_id":"02-standard","code":"Interrupted","resumable":true}
+# attempt 2: Interrupted { index_id: "02-standard", done: 32 }; active=Some("01-minimum")
+{"type":"reembed.started","index_id":"02-standard","model_id":"Snowflake/snowflake-arctic-embed-m-v1.5","dims":768,"total":64,"resumed_from":32}
+{"type":"reembed.progress","index_id":"02-standard","done":48,"total":64}
+{"type":"reembed.progress","index_id":"02-standard","done":64,"total":64}
+{"type":"index.swapped","old_index_id":"01-minimum","new_index_id":"02-standard","model_id":"Snowflake/snowflake-arctic-embed-m-v1.5","dims":768}
+# attempt 3: Swapped { new_index_id: "02-standard" }; active=Some("02-standard")

@@ -1,0 +1,48 @@
+[package]
+name = "sr-extract"
+description = "Sandboxed parser worker: file bytes in over a pipe, text out (PDF, OOXML, HTML, text)"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+build = "build.rs"
+
+# The library holds the parsers (unit- and property-tested in-process); the binary is the worker
+# loop. Nothing else may depend on this package: pdfium lives only here (docs/02 §2.1). The daemon
+# talks to the worker through `sr-extract-client`, which has no parser dependencies.
+[lib]
+name = "sr_extract"
+path = "src/lib.rs"
+
+[[bin]]
+name = "sr-extract"
+path = "src/main.rs"
+
+[features]
+# Test-only misbehaviour probes in the worker binary (timeouts, crashes, protocol violations,
+# sandbox denials). Never enabled for release builds.
+test-probes = []
+
+[dependencies]
+sr-common     = { workspace = true }
+serde         = { workspace = true }
+serde_json    = { workspace = true }
+pdfium-render = { workspace = true, features = ["pdfium_7881", "thread_safe"] }
+zip           = { workspace = true }
+quick-xml     = { workspace = true }
+encoding_rs   = { workspace = true }
+chardetng     = { workspace = true }
+memchr        = { workspace = true }
+windows-sys   = { workspace = true, features = ["Win32_System_Console", "Win32_System_Diagnostics_Debug"] }
+
+[dev-dependencies]
+sr-extract-client = { workspace = true }
+tokio     = { workspace = true }
+proptest  = { workspace = true }
+tempfile  = { workspace = true }
+flate2    = { workspace = true }
+windows-sys = { workspace = true, features = ["Win32_Security_Authorization", "Win32_System_SystemServices"] }
+
+[lints]
+workspace = true

@@ -1,0 +1,40 @@
+name: Feature request
+description: Suggest an idea or an improvement.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the idea. Selene Retrieval is built for people who never read documentation, so every change is checked against one question: "Can an average user use this without documentation?" See [the Product Principles](https://github.com/tercumantanumut/selene-retrieval/blob/main/docs/product-principles.md).
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Describe what you are trying to do and what gets in the way.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What do you propose?
+      description: How should it work, as a user would see it?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered
+      description: Other ways to solve the problem, including workarounds you use today.
+    validations:
+      required: false
+
+  - type: textarea
+    id: average-user
+    attributes:
+      label: Can an average user use this without documentation?
+      description: How would someone who never reads instructions find and use it? Should it be on by default, or under Advanced?
+    validations:
+      required: true

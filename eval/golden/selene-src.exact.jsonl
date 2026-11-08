@@ -1,0 +1,23 @@
+{"qid": "E001", "query": "135000", "kind": "number", "relevant": [{"path": "lib/ai/prompt-enhancement-v2.ts", "grade": 3, "spans": [[78, 82]], "label": "exact:135000"}]}
+{"qid": "E002", "query": "15000", "kind": "number", "relevant": [{"path": "lib/vectordb/file-watcher.ts", "grade": 3, "spans": [[146, 150]], "label": "exact:15000"}]}
+{"qid": "E003", "query": "45000", "kind": "number", "relevant": [{"path": "lib/ai/vector-search/synthesizer.ts", "grade": 3, "spans": [[42, 46]], "label": "exact:45000"}]}
+{"qid": "E004", "query": "372000", "kind": "number", "relevant": [{"path": "lib/context-window/provider-limits.ts", "grade": 3, "spans": [[251, 263]], "label": "exact:372000"}]}
+{"qid": "E005", "query": "20250219", "kind": "number", "relevant": [{"path": "lib/config/model-catalog.ts", "grade": 3, "spans": [[100, 104], [482, 486]], "label": "exact:20250219"}]}
+{"qid": "E006", "query": "140000", "kind": "number", "relevant": [{"path": "lib/context-window/compaction-service.ts", "grade": 3, "spans": [[1063, 1067]], "label": "exact:140000"}]}
+{"qid": "E007", "query": "36742", "kind": "number", "relevant": [{"path": "lib/auth/antigravity-auth.ts", "grade": 3, "spans": [[69, 73]], "label": "exact:36742"}]}
+{"qid": "E008", "query": "65536", "kind": "number", "relevant": [{"path": "lib/ai/providers/cliproxy/config.ts", "grade": 3, "spans": [[71, 75]], "label": "exact:65536"}, {"path": "lib/ai/providers/dario/config.ts", "grade": 3, "spans": [[57, 61]], "label": "exact:65536"}]}
+{"qid": "E009", "query": "1071006060591", "kind": "number", "relevant": [{"path": "lib/auth/antigravity-auth.ts", "grade": 3, "spans": [[37, 41]], "label": "exact:1071006060591"}]}
+{"qid": "E010", "query": "276_000", "kind": "number", "relevant": [{"path": "lib/context-window/provider-limits.ts", "grade": 3, "spans": [[83, 87]], "label": "exact:276_000"}]}
+{"qid": "E011", "query": "887a0005", "kind": "exact_identifier", "relevant": [{"path": "lib/ai/transformer-device.ts", "grade": 3, "spans": [[62, 66]], "label": "exact:887a0005"}]}
+{"qid": "E012", "query": "o200k_base", "kind": "exact_identifier", "relevant": [{"path": "lib/documents/v2/tokenizer-runtime.ts", "grade": 3, "spans": [[24, 28], [41, 45]], "label": "exact:o200k_base"}]}
+{"qid": "E013", "query": "isGpt54", "kind": "exact_identifier", "relevant": [{"path": "lib/auth/codex-request.ts", "grade": 3, "spans": [[61, 65], [94, 98], [108, 112]], "label": "exact:isGpt54"}]}
+{"qid": "E014", "query": "ensureV2SchemaCompatibility", "kind": "exact_identifier", "relevant": [{"path": "lib/vectordb/collections.ts", "grade": 3, "spans": [[54, 58], [127, 131], [169, 173]], "label": "exact:ensureV2SchemaCompatibility"}]}
+{"qid": "E015", "query": "decodeBase64Url", "kind": "exact_identifier", "relevant": [{"path": "lib/auth/codex-auth.ts", "grade": 3, "spans": [[57, 61], [74, 78]], "label": "exact:decodeBase64Url"}]}
+{"qid": "E016", "query": "gpt_5_2_prompt", "kind": "exact_identifier", "relevant": [{"path": "lib/auth/codex-instructions.ts", "grade": 3, "spans": [[38, 42]], "label": "exact:gpt_5_2_prompt"}]}
+{"qid": "E017", "query": "Wan22VideoResult", "kind": "exact_identifier", "relevant": [{"path": "lib/ai/wan22-video-client.ts", "grade": 3, "spans": [[55, 62], [76, 80]], "label": "exact:Wan22VideoResult"}]}
+{"qid": "E018", "query": "callWan22Video", "kind": "exact_identifier", "relevant": [{"path": "lib/ai/wan22-video-client.ts", "grade": 3, "spans": [[73, 77]], "label": "exact:callWan22Video"}]}
+{"qid": "E019", "query": "claude-3-7-sonnet-20250219", "kind": "exact_identifier", "relevant": [{"path": "lib/config/model-catalog.ts", "grade": 3, "spans": [[100, 104], [482, 486]], "label": "exact:claude-3-7-sonnet-20250219"}]}
+{"qid": "E020", "query": "which timeout is set to 135000", "kind": "number_phrase", "relevant": [{"path": "lib/ai/prompt-enhancement-v2.ts", "grade": 3, "spans": [[78, 82]], "label": "exact:135000"}]}
+{"qid": "E021", "query": "oauth callback port 36742", "kind": "number_phrase", "relevant": [{"path": "lib/auth/antigravity-auth.ts", "grade": 3, "spans": [[69, 73]], "label": "exact:36742"}]}
+{"qid": "E022", "query": "887A0005 device removed error", "kind": "number_phrase", "relevant": [{"path": "lib/ai/transformer-device.ts", "grade": 3, "spans": [[62, 66]], "label": "exact:887a0005"}]}
+{"qid": "E023", "query": "token threshold 140000 for compaction", "kind": "number_phrase", "relevant": [{"path": "lib/context-window/compaction-service.ts", "grade": 3, "spans": [[1063, 1067]], "label": "exact:140000"}]}

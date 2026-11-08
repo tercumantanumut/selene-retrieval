@@ -1,0 +1,9 @@
+﻿first daemon pid=19448
+second daemon [normal (host.lock)] exit=Some(0) after 81 ms
+second daemon [--skip-host-lock (FIRST_PIPE_INSTANCE only)] exit=Some(0) after 191 ms
+  log: 1792254289323 pid=23008 start launched_by=second in_job=Some(true) own_job_flags=0x800 BREAKAWAY_OK package=None parent=Some(Proc { pid: 5468, ppid: 3148, name: "sr-harness.exe" }) exe=Some("<checkout>\\spikes\\ipc-bridge\\target\\release\\sr-daemon.exe")
+  log: 1792254289324 pid=23008 host.lock held by another daemon (The process cannot access the file because another process has locked a portion of the file. (os error 33)); exiting cleanly
+  log: 1792254289409 pid=21384 start launched_by=second in_job=Some(true) own_job_flags=0x800 BREAKAWAY_OK package=None parent=Some(Proc { pid: 5468, ppid: 3148, name: "sr-harness.exe" }) exe=Some("<checkout>\\spikes\\ipc-bridge\\target\\release\\sr-daemon.exe")
+  log: 1792254289409 pid=21384 host.lock skipped (--skip-host-lock test mode)
+  log: 1792254289413 pid=21384 pipe create failed (FIRST_PIPE_INSTANCE) \\.\pipe\sr-<sidhash>-<datadirhash>: Access is denied. (os error 5); exiting cleanly
+first daemon still serving: pid=19448 sessions=1 sr-daemon processes=[19448]

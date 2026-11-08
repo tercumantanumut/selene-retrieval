@@ -1,0 +1,71 @@
+[package]
+name = "sr-providers"
+description = "The one provider interface: embeddings (local ORT + DirectML, remote), rerankers, LLMs (genai), Resilient wrapper, EmbedBatcher, keyring secrets, egress gate"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[features]
+# `local` = fastembed on a statically linked ONNX Runtime (pyke build, always contains the DirectML EP
+# on Windows). The workspace entry disables default features so crates that only need the traits
+# (sr-core) don't link ORT; the composition root (sr-engine / sr-daemon) enables `local`.
+default = ["local", "remote"]
+# `local` also brings the model downloader (`download`) and the DXGI/metered-network probes (`dxgi`):
+# only the daemon needs them, and sr-core keeps building without TLS or COM.
+local = ["dep:fastembed", "dep:ort", "fastembed/directml", "ort/directml", "ort/half", "dep:half", "download", "gpu-detect"]
+download = ["dep:reqwest", "dep:rustls", "dep:windows"]
+gpu-detect = ["dep:windows"]
+# M3-P: remote chat + embedding providers (genai over our ring-only reqwest client), live key
+# validation and model discovery, the system proxy resolver and Credential Manager secrets.
+# sr-engine must enable it next to `local` (request in docs/research/m3-p-progress.md).
+remote = ["dep:genai", "dep:reqwest", "dep:rustls", "dep:getrandom", "keyring"]
+# Windows Credential Manager `SecretStore` only (no TLS, no genai): usable by small tools.
+keyring = ["dep:keyring-core", "dep:windows-native-keyring-store"]
+
+[dependencies]
+futures    = { workspace = true }
+serde      = { workspace = true }
+serde_json = { workspace = true }   # provider manifest (registry), remote request/response bodies
+sha2       = { workspace = true }
+sr-common  = { workspace = true }
+tokio      = { workspace = true }
+tokio-util = { workspace = true }
+tracing    = { workspace = true }
+
+fastembed = { workspace = true, optional = true }
+ort       = { workspace = true, optional = true, features = ["std"] }
+half      = { version = "2.7.1", optional = true }   # f16 model outputs (O3); same version ort uses
+reqwest   = { workspace = true, optional = true }
+rustls    = { workspace = true, optional = true }   # ring provider only (3.13)
+genai     = { workspace = true, optional = true }   # no default features: no aws-lc, our reqwest client
+getrandom = { workspace = true, optional = true }   # M5-C: unique temp folder names for CLI runs
+keyring-core = { workspace = true, optional = true }
+windows-native-keyring-store = { workspace = true, optional = true, features = ["search"] }
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { workspace = true, features = [
+  "Win32_Security_WinTrust", "Win32_Security_Cryptography", "Win32_Security_Cryptography_Catalog",
+  "Win32_Security_Cryptography_Sip", "Win32_System_SystemInformation", "Win32_UI_Shell",
+  "Win32_Networking_WinHttp",
+] }
+windows = { workspace = true, optional = true, features = [
+  "Win32_Foundation", "Win32_Graphics_Dxgi", "Win32_Graphics_Dxgi_Common", "Win32_Graphics_Direct3D",
+  "Win32_Graphics_Direct3D12", "Win32_System_Com", "Win32_Networking_NetworkListManager",
+] }
+
+[[example]]
+name = "throughput"
+required-features = ["local"]
+
+[[example]]
+name = "fetch_model"
+required-features = ["download"]
+
+[dev-dependencies]
+tempfile   = { workspace = true }
+tokio      = { workspace = true, features = ["test-util"] }
+
+[lints]
+workspace = true

@@ -1,0 +1,55 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 3
+
+  # The root workspace and the two nested installer workspaces (each has its own Cargo.lock).
+  - package-ecosystem: cargo
+    directories:
+      - /
+      - /installer/sr-setup
+      - /installer/msi-ca
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 3
+    groups:
+      cargo-minor-and-patch:
+        patterns: ["*"]
+        update-types: [minor, patch]
+    # Bumped by hand, together: lancedb is patched (patches/README.md), and the native stack is
+    # pinned with `=` in Cargo.toml (lancedb, fastembed, ort, genai, specta, tauri-specta). The
+    # lance, arrow and datafusion crates must match the lancedb release. These coupled crates get
+    # no Dependabot PRs; Dependabot alerts and the weekly `advisories` job in ci.yml still report
+    # their security advisories. rustls is not ignored: TLS updates arrive as PRs.
+    ignore:
+      - dependency-name: lancedb
+      - dependency-name: "lance*"
+      - dependency-name: "arrow*"
+      - dependency-name: "datafusion*"
+      - dependency-name: "ort*"
+      - dependency-name: fastembed
+      - dependency-name: genai
+      - dependency-name: "specta*"
+      - dependency-name: tauri-specta
+
+  - package-ecosystem: npm
+    directory: /ui
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 3
+    groups:
+      npm-production:
+        dependency-type: production
+        update-types: [minor, patch]
+      npm-development:
+        dependency-type: development
+        update-types: [minor, patch]

@@ -1,0 +1,21 @@
+{
+ "corpus": "cqadupstack-webmasters",
+ "source": "https://huggingface.co/datasets/mteb/cqadupstack-webmasters",
+ "revision": "c691d4af16c19a79df7ee93bfbd12cc186a5bc92",
+ "licence": "Apache-2.0 (BEIR/MTEB packaging); text is StackExchange content, CC BY-SA",
+ "doc_text": "title + \"\\n\\n\" + text, ingested via Selene's raw-text path",
+ "files": {
+  "corpus.jsonl": {
+   "sha256": "a9a6805b080fbee8d0b42d4a351db22dedd8e4dec33dc2ad70a293fa5d62155d",
+   "bytes": 13091333
+  },
+  "queries.jsonl": {
+   "sha256": "adcb482ace5bbae01d9199cb93cf411f99321274ef0408906128d35351bc26d4",
+   "bytes": 40914
+  },
+  "qrels/test.tsv": {
+   "sha256": "6b56b9ff5ee60346934d12453dab985648c01ad2b2c67abec1d225e08ecc28de",
+   "bytes": 20452
+  }
+ }
+}

@@ -1,0 +1,5 @@
+sr-bridge.exe size: 333312 bytes
+cold start (--version, process create->exit) n=30: min 34.1 median 155.2 p95 300.6 ms
+spawn bridge -> initialize result (warm daemon) n=30: min 17.9 median 55.1 p95 99.7 ms
+cold daemon via breakaway: bridge spawn -> initialize result 123 ms (launched_by="breakaway", parent="23328 sr-bridge.exe")
+cold daemon via task: bridge spawn -> initialize result 110 ms (launched_by="task", parent="2332 svchost.exe")
