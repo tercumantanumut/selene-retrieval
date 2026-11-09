@@ -10,6 +10,26 @@ Selene Retrieval is a Windows desktop app and MCP server. It indexes folders on 
 
 **Status: beta.** Installers will be published on the [Releases page](https://github.com/tercumantanumut/selene-retrieval/releases). They are not code-signed yet. Until the first release, build from source with [CONTRIBUTING.md](CONTRIBUTING.md).
 
+## See it in action
+
+These clips search a copy of this repository. Some waits are shortened.
+
+**Search, then Ask.** Search finds matching passages on your PC. **Ask** writes a short answer with numbered sources.
+
+![The Search page. A question about the folder watcher is typed, and Search lists matching passages from the code. Ask then writes a short answer with numbered sources.](docs/media/search-ask.gif)
+
+**Prompt Enhancer.** Write a rough prompt and press **Improve prompt**. The app adds useful context from your folders.
+
+![The Prompt Enhancer page. A one-line prompt becomes a detailed prompt that names the files it is about.](docs/media/prompt-enhancer.gif)
+
+**Activity.** See what happened recently, and what was sent to an AI provider: when, what, how big and which app asked.
+
+![The Activity page. It lists recent activity, then a table of everything sent to AI providers with the time, provider, type of content, size and the app that asked.](docs/media/activity.gif)
+
+**An AI app using Selene Retrieval.** The [Pi](https://github.com/earendil-works/pi) coding agent calls `context_search`, then `context_answer`, and answers from your files.
+
+![A terminal running Pi. Pi calls the context_search and context_answer tools of Selene Retrieval, then replies with an answer that cites the source files.](docs/media/pi-mcp.gif)
+
 ## What it does
 
 - Finds passages by meaning and by exact words (hybrid search: a vector index plus keyword search).
