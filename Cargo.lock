@@ -8153,7 +8153,7 @@ dependencies = [
  "encoding_rs",
  "fastembed",
  "futures",
- "getrandom 0.3.4",
+ "getrandom 0.4.3",
  "globset",
  "grep-regex",
  "grep-searcher",
@@ -8248,7 +8248,7 @@ dependencies = [
  "fastembed",
  "futures",
  "genai",
- "getrandom 0.3.4",
+ "getrandom 0.4.3",
  "half",
  "keyring-core",
  "ort",
@@ -9143,7 +9143,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "32497e9a4c7b38532efcdebeef879707aa9f794296a4f0244f6f69e9bc8574bd"
 dependencies = [
  "fastrand",
- "getrandom 0.3.4",
+ "getrandom 0.4.3",
  "once_cell",
  "rustix",
  "windows-sys 0.61.2",

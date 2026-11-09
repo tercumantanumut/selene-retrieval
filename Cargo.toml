@@ -46,7 +46,7 @@ http           = "1"
 http-body-util = "0.1"
 tower-service  = "0.3"
 # M4-E: 256-bit HTTP tool tokens from the OS CSPRNG (sr-engine). 0.3.4 is the locked version.
-getrandom      = "0.3"
+getrandom      = "0.4"
 axum       = { version = "0.8.9", default-features = false, features = ["http1", "tokio", "json"] }
 tower      = { version = "0.5.3", features = ["timeout", "limit", "util"] }
 tower-http = { version = "0.7.1", features = ["trace", "timeout", "limit", "request-id"] }
