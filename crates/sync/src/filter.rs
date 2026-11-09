@@ -14,7 +14,9 @@
 //!    segment; no glob + slash → sub-path; glob → `**/`-prefixed unless anchored with `/`).
 //!    Case-insensitive, because Windows paths are.
 //! 4. **Include set** from `file_types_preset` / `include_extensions` (`custom` with an empty list
-//!    means "all files", as in Selene).
+//!    means "all files", as in Selene). **Code** also leaves data formats out (JSON that is not
+//!    project configuration, Godot `.tres`: [`is_code_data_file`]); a `.seleneignore` `!pattern`
+//!    keeps such a file.
 //!
 //! `.gitignore` / `.ignore` / `.seleneignore` files are honoured by the walker (the `ignore`
 //! crate), not here. Step 2 (the built-in defaults, including the docs/06 change 5 noise rules:
@@ -94,6 +96,9 @@ pub const DEFAULT_IGNORED_DIRS: &[&str] = &[
     ".nox",
     ".hypothesis",
     ".ipynb_checkpoints",
+    // 2026-11-09: Godot's editor caches (Godot 4 `.godot/`, Godot 3 `.import/`).
+    ".godot",
+    ".import",
 ];
 
 /// Names in [`DEFAULT_IGNORED_DIRS`] that are code, not output, inside a Cargo package's sources
@@ -133,13 +138,19 @@ pub const DEFAULT_IGNORED_GLOBS: &[&str] = &[
     "*.snap",
     "*.jsonl",
     "*.ndjson",
+    // 2026-11-09: the import settings and UID files Godot writes next to every asset and script.
+    "*.import",
+    "*.uid",
 ];
 
-/// Version of the built-in ignore defaults (lists above and the data-file rule). Raising it makes
-/// the next start rescan every folder once (`settings_change`), so newly ignored files are swept,
-/// newly included ones are indexed and indexed long-line JSON files are checked again (docs/06
-/// change 5). 2: [`CARGO_SOURCE_DIRS`] inside Cargo sources (e.g. `crates/x/build/*.rs`).
-pub const IGNORE_DEFAULTS_VERSION: u32 = 2;
+/// Version of the built-in defaults: the lists above, the data-file rule, the file types of the
+/// presets (`DocKind::from_extension`) and [`is_code_data_file`]. Raising it makes the next start
+/// rescan every folder once (`settings_change`), so newly ignored files are swept, newly included
+/// ones are indexed and indexed long-line JSON files are checked again (docs/06 change 5).
+/// 2: [`CARGO_SOURCE_DIRS`] inside Cargo sources (e.g. `crates/x/build/*.rs`). 3 (2026-11-09):
+/// GDScript and Godot's text formats, the other code types the audit added, Godot's caches and
+/// sidecars, and the Code preset's data rule.
+pub const IGNORE_DEFAULTS_VERSION: u32 = 3;
 
 /// `meta` key holding the [`IGNORE_DEFAULTS_VERSION`] the folders were last scanned with.
 pub const META_IGNORE_DEFAULTS_VERSION: &str = "ignore_defaults_version";
@@ -155,6 +166,92 @@ pub const DATA_FILE_MIN_AVG_LINE: u64 = 1000;
 /// count, plus one for an unterminated last line).
 pub fn is_data_dump(ext: &str, bytes: u64, lines: u64) -> bool {
     DATA_FILE_EXTS.contains(&ext) && bytes / lines.max(1) > DATA_FILE_MIN_AVG_LINE
+}
+
+/// Data formats a folder set to **Code** leaves out (2026-11-09): JSON that is not project
+/// configuration, and Godot `.tres` resources. Asset registries, reports, test dumps, animation
+/// data and sprite frames are not code; in a Godot project they filled every result of a code
+/// question. "Documents and code" and "All text files" still index them.
+pub const CODE_DATA_EXTS: &[&str] = &["json", "tres"];
+
+/// Well-known project configuration JSON (lower-case name without `.json`), kept by **Code**.
+const CONFIG_JSON_NAMES: &[&str] = &[
+    "package",
+    "composer",
+    "deno",
+    "angular",
+    "nx",
+    "project",
+    "turbo",
+    "lerna",
+    "vercel",
+    "now",
+    "netlify",
+    "railway",
+    "firebase",
+    "app",
+    "manifest",
+    "global",
+    "launch",
+    "tasks",
+    "extensions",
+    "devcontainer",
+    ".devcontainer",
+    "renovate",
+    "biome",
+    "components",
+    "mcp",
+    "wrangler",
+    "vcpkg",
+    "cdk",
+    "host",
+    "function",
+    "nodemon",
+    "typedoc",
+    "cspell",
+    ".cspell",
+    "tslint",
+    "openapi",
+    "swagger",
+];
+
+/// Words that make a JSON name configuration (`tsconfig.base.json`, `appsettings.Development.json`,
+/// `user.schema.json`).
+const CONFIG_JSON_WORDS: &[&str] = &["config", "settings", "schema"];
+
+/// Directories whose JSON is configuration (`web/config/voice.json`, `.github/...`).
+const CONFIG_JSON_DIRS: &[&str] = &[
+    "config",
+    "configs",
+    "conf",
+    "settings",
+    ".config",
+    ".github",
+    ".devcontainer",
+    ".vscode",
+];
+
+/// A file a folder set to **Code** leaves out as data ([`CODE_DATA_EXTS`]). JSON stays when it
+/// looks like project configuration: a well-known name (`package.json`, `vercel.json`, ...), a
+/// name with `config`, `settings` or `schema` in it, a dot-file ending in `rc`
+/// (`.eslintrc.json`), or a file in a `config` / `settings` directory. `dirs` are the path's
+/// directories, `name` its file name, `ext` its lower-case extension.
+pub fn is_code_data_file(dirs: &[&str], name: &str, ext: &str) -> bool {
+    if !CODE_DATA_EXTS.contains(&ext) {
+        return false;
+    }
+    if ext != "json" {
+        return true;
+    }
+    let lower = name.to_ascii_lowercase();
+    let stem = lower.strip_suffix(".json").unwrap_or(&lower);
+    let config = CONFIG_JSON_NAMES.contains(&stem)
+        || CONFIG_JSON_WORDS.iter().any(|w| stem.contains(w))
+        || (stem.len() > 3 && stem.starts_with('.') && stem.ends_with("rc"))
+        || dirs
+            .iter()
+            .any(|d| CONFIG_JSON_DIRS.contains(&d.to_ascii_lowercase().as_str()));
+    !config
 }
 
 const IMAGE_EXTS: &[&str] = &[
@@ -293,6 +390,8 @@ pub fn extension_of(name: &str) -> String {
 pub struct PathFilter {
     secrets: SecretFilter,
     include: Include,
+    /// The folder is set to **Code**: data formats stay out ([`is_code_data_file`]).
+    code_only: bool,
     /// Selene's asset pruning is off when the include set is "all files".
     prune_images: bool,
     prune_fonts: bool,
@@ -404,6 +503,7 @@ impl PathFilter {
         Self {
             secrets: SecretFilter::default(),
             include,
+            code_only: s.file_types_preset == FileTypesPreset::Code,
             prune_images,
             prune_fonts,
             default_globs: defaults.build().unwrap_or_else(|_| GlobSet::empty()),
@@ -513,6 +613,12 @@ impl PathFilter {
             return Err(Excluded::User);
         }
         if !self.includes_ext(&ext) {
+            return Err(Excluded::NotIncluded);
+        }
+        if self.code_only
+            && is_code_data_file(dirs, name, &ext)
+            && !rules.is_some_and(|r| r.reincluded(rel, false))
+        {
             return Err(Excluded::NotIncluded);
         }
         Ok(())
@@ -703,6 +809,76 @@ mod tests {
         assert_eq!(custom.check_dir("images"), Ok(()), "images not pruned");
         assert_eq!(custom.check_dir("fonts"), Err(Excluded::Default));
         assert_eq!(custom.check_file("a.txt"), Err(Excluded::NotIncluded));
+    }
+
+    /// 2026-11-09: a Godot project. GDScript, shaders, scenes and `project.godot` are code;
+    /// Godot's caches and sidecars are default ignores in every preset.
+    #[test]
+    fn godot_projects_are_code_without_their_caches() {
+        for preset in [FileTypesPreset::Code, FileTypesPreset::DocumentsAndCode] {
+            let p = f(preset, &[], &[]);
+            for file in [
+                "game/src/temple_maps.gd",
+                "game/shaders/water.gdshader",
+                "game/scenes/temple.tscn",
+                "game/project.godot",
+            ] {
+                assert_eq!(p.check_file(file), Ok(()), "{preset:?} {file}");
+            }
+            assert_eq!(p.check_dir("game/.godot"), Err(Excluded::Default));
+            assert_eq!(p.check_dir(".import"), Err(Excluded::Default));
+            for file in [
+                "game/.godot/editor/cached.gd",
+                "game/icon.png.import",
+                "game/src/temple_maps.gd.uid",
+            ] {
+                assert_eq!(p.check_file(file), Err(Excluded::Default), "{file}");
+            }
+        }
+        let docs = f(FileTypesPreset::Documents, &[], &[]);
+        assert_eq!(docs.check_file("a.gd"), Err(Excluded::NotIncluded));
+        let all = f(FileTypesPreset::AllText, &[], &[]);
+        assert_eq!(all.check_file("icon.png.import"), Err(Excluded::Default));
+    }
+
+    /// 2026-11-09: **Code** keeps project-configuration JSON and leaves data JSON and `.tres`
+    /// resources out; "Documents and code" keeps all of them; `.seleneignore` `!` keeps one.
+    #[test]
+    fn code_preset_leaves_data_json_and_resources_out() {
+        let code = f(FileTypesPreset::Code, &[], &[]);
+        let both = f(FileTypesPreset::DocumentsAndCode, &[], &[]);
+        for file in [
+            "package.json",
+            "web/vercel.json",
+            "tsconfig.base.json",
+            "src/appsettings.Development.json",
+            ".eslintrc.json",
+            "api/user.schema.json",
+            "web/config/voice.json",
+            ".github/renovate.json",
+            "a.jsonc",
+        ] {
+            assert_eq!(code.check_file(file), Ok(()), "{file}");
+        }
+        for file in [
+            "art/med/rooms/registry.json",
+            "art/characters/her/anim/pour/clip.json",
+            "game/test/coop/data/temple_runs.json",
+            "src.json",
+            ".rc.json",
+            "game/ui/theme.tres",
+        ] {
+            assert_eq!(code.check_file(file), Err(Excluded::NotIncluded), "{file}");
+            assert_eq!(both.check_file(file), Ok(()), "{file}");
+        }
+        let t = tempfile::tempdir().unwrap();
+        std::fs::write(t.path().join(".seleneignore"), "!art/keep.json\n").unwrap();
+        let rules = FolderRules::new(t.path());
+        assert_eq!(code.check_file_with("art/keep.json", Some(&rules)), Ok(()));
+        assert_eq!(
+            code.check_file_with("art/other.json", Some(&rules)),
+            Err(Excluded::NotIncluded)
+        );
     }
 
     #[test]

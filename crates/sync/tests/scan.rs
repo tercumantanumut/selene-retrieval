@@ -820,6 +820,60 @@ async fn new_ignore_defaults_rescan_every_folder_once() {
     );
 }
 
+/// 2026-11-09: an existing folder set to Code picks the new defaults up by itself. The first start
+/// after the update (an older defaults stamp) rescans it: its GDScript and `project.godot` are
+/// cataloged, its data JSON is swept, configuration JSON stays, and Godot's cache and sidecars
+/// stay out.
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn defaults_bump_brings_gdscript_into_an_existing_code_folder() {
+    let fx = setup();
+    let root = fx.dir("godot");
+    write(&root, "game/src/temple_maps.gd", "extends Node\n");
+    write(&root, "game/project.godot", "config_version=5\n");
+    write(&root, "web/package.json", "{}");
+    write(&root, "art/rooms/registry.json", "{\"rooms\": []}");
+    write(&root, "game/.godot/editor/cached.gd", "var x = 1\n");
+    write(&root, "game/icon.png.import", "[remap]\n");
+    let svc = fx.service(Arc::new(FakeExec::new(&fx.cat)), fx.epoch(), fast_cfg());
+    let rec = svc.reconciler();
+    let id = add(rec, &fx, &root);
+    // What a Code folder held before the update: its JSON files, no GDScript.
+    let mut s = fx.folder(id).settings;
+    s.file_types_preset = sr_common::config::FileTypesPreset::Custom;
+    s.include_extensions = vec!["json".into()];
+    rec.update_settings(id, &s).unwrap();
+    scan(rec, id);
+    assert_eq!(
+        fx.file_paths(id),
+        vec!["art/rooms/registry.json", "web/package.json"]
+    );
+    s.file_types_preset = sr_common::config::FileTypesPreset::Code;
+    s.include_extensions = Vec::new();
+    rec.update_settings(id, &s).unwrap();
+    let key = sr_sync::filter::META_IGNORE_DEFAULTS_VERSION;
+    fx.cat
+        .write_blocking(move |c| sr_catalog::repo::meta::set(c, key, "2"))
+        .unwrap();
+
+    let r = svc.startup().await.unwrap();
+    assert_eq!(r.scans_enqueued, 1);
+    let job = fx
+        .live_jobs(Some(id))
+        .into_iter()
+        .find(|j| j.kind == JobKind::ScanFolder)
+        .unwrap();
+    assert_eq!(job.payload.unwrap()["trigger"], "settings_change");
+    run_until_idle(&fx, &svc, Duration::from_secs(20)).await;
+    assert_eq!(
+        fx.file_paths(id),
+        vec![
+            "game/project.godot",
+            "game/src/temple_maps.gd",
+            "web/package.json"
+        ]
+    );
+}
+
 /// A Cargo workspace keeps its build-script modules (`crates/common/build/*.rs`, `include!`d by
 /// the crates' `build.rs`) and modules named like output directories (`src/env/`, `src/out/`);
 /// `target/`, a `dist/` next to the manifest and a JavaScript app's `build/` stay ignored. A saved

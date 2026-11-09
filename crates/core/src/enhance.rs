@@ -24,8 +24,9 @@
 //! JavaScript/TypeScript, Python, SQL and JSON, so a Rust snippet reached the model as prose with
 //! its `let` bindings as identifiers. Here every language the chunker has a grammar for
 //! ([`CodeLang`]: Rust, Go, Java, C#, C/C++, `.mjs`/`.cjs`, ...) is fenced as code, and Rust
-//! snippets list their item names (`fn`, `struct`, `enum`, `trait`, ...). Files on Selene's list
-//! come out byte for byte as before (the parity fixtures).
+//! snippets list their item names (`fn`, `struct`, `enum`, `trait`, ...). Since 2026-11-09 so is
+//! every other file type the Code preset indexes (GDScript as `gdscript`, Kotlin, YAML, ...).
+//! Files on Selene's list come out byte for byte as before (the parity fixtures).
 //!
 //! Untrusted text (prompt, history, memories, file text) has every opening or closing variant of
 //! the delimiter tags escaped ([`escape_delimiters`]), exactly like Selene, so a file can't close
@@ -37,6 +38,7 @@ use std::time::Duration;
 use serde::{Deserialize, Serialize};
 use sr_common::Result;
 use sr_common::error::{Error, ErrorCode, Purpose};
+use sr_common::protocol::extract::DocKind;
 use sr_providers::{ChatMessage, ChatRequest, LlmProvider, Role};
 use tokio_util::sync::CancellationToken;
 
@@ -556,9 +558,14 @@ const SELENE_RESULT_CODE: [&str; 7] = ["ts", "tsx", "js", "jsx", "py", "sql", "j
 const SELENE_FALLBACK_CODE: [&str; 6] = ["ts", "tsx", "js", "jsx", "py", "sql"];
 
 /// A snippet of a file with extension `ext` is fenced as code: Selene's list, plus every
-/// language the chunker has a grammar for (deviation 2).
+/// language the chunker has a grammar for and (2026-11-09) every other file type the Code preset
+/// indexes, such as GDScript (deviation 2). Selene's own extensions keep Selene's choice (its
+/// fallback prompt does not fence JSON).
 fn is_code_ext(ext: &str, selene: &[&str]) -> bool {
-    selene.contains(&ext) || CodeLang::from_extension(ext).is_some()
+    if SELENE_RESULT_CODE.contains(&ext) {
+        return selene.contains(&ext);
+    }
+    CodeLang::from_extension(ext).is_some() || DocKind::from_extension(ext) == Some(DocKind::Code)
 }
 
 /// JSX/TSX props: `name =` / `name:` followed by `{` (distinct, at most 5).
@@ -631,6 +638,7 @@ pub fn format_search_results(hits: &[EnhanceHit]) -> String {
             "md" => "markdown",
             "json" => "json",
             "sql" => "sql",
+            "gd" => "gdscript",
             "" => "text",
             // Beyond Selene's names: the chunker's grammar name (`rust`, `go`, `cpp`, ...).
             other => CodeLang::from_extension(other).map_or(other, |l| l.name()),
@@ -1285,5 +1293,33 @@ mod tests {
             ),
             vec!["a", "tests", "Alias", "E", "T"]
         );
+    }
+
+    /// 2026-11-09: GDScript (no chunker grammar) is fenced as code like every Code-preset type;
+    /// JSON keeps Selene's choice (fenced in the results, not in the fallback); prose is not.
+    #[test]
+    fn gdscript_and_other_code_preset_types_are_code() {
+        let gd = "const TEMPLE_ARENAS := 2\nfunc arena_count() -> int:\n\treturn TEMPLE_ARENAS";
+        let out = format_search_results(&[
+            hit("game/src/battle/battle_stage.gd", 10, gd),
+            hit("app/build.gradle.kts", 1, "plugins { id(\"x\") }"),
+            hit("notes/plan.txt", 1, "func is a word here"),
+        ]);
+        assert!(out.contains(&format!("\n```gdscript\n{gd}\n```")), "{out}");
+        assert!(out.contains("Functions/Vars: `TEMPLE_ARENAS`"), "{out}");
+        assert!(out.contains("\n```kts\nplugins"), "{out}");
+        assert!(!out.contains("```txt"), "{out}");
+        let f = fallback_prompt(
+            "q",
+            &[
+                hit("game/src/battle/battle_stage.gd", 10, gd),
+                hit("web/package.json", 1, "{}"),
+            ],
+        );
+        assert!(f.contains(&format!("```gd\n{gd}\n```")), "{f}");
+        assert!(f.contains("From `web/package.json`:\n{}"), "{f}");
+        assert!(is_code_ext("json", &SELENE_RESULT_CODE));
+        assert!(!is_code_ext("json", &SELENE_FALLBACK_CODE));
+        assert!(!is_code_ext("md", &SELENE_RESULT_CODE));
     }
 }

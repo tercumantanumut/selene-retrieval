@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - First public source release: README, contributing guide, security policy, code of conduct, issue and pull request templates.
+- Godot projects are searchable: GDScript (`.gd`), Godot shaders, scenes (`.tscn`) and `project.godot` count as code, and Godot's cache (`.godot/`) and `.import` / `.uid` files are skipped. About 90 more code file types are recognised too (Julia, GLSL, HLSL, WGSL, Solidity, Nix, Groovy and others). Existing folders pick them up by themselves after the update.
+
+### Changed
+
+- A folder set to "Code" now skips JSON that isn't project configuration (asset lists, reports, test data) and Godot `.tres` resources, so code comes first in its results. `package.json`, `tsconfig.json`, other settings files and files in a `config` folder are still searched; "Documents and code" still searches every JSON file.
 
 ### Removed
 

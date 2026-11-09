@@ -77,6 +77,22 @@ impl DocKind {
             | "json" | "jsonc" | "xml" | "css" | "scss" | "less" | "vue" | "svelte" | "astro"
             | "zig" | "nim" | "ex" | "exs" | "erl" | "hs" | "ml" | "fs" | "fsx" | "clj"
             | "gradle" | "cmake" | "proto" | "graphql" | "tf" | "vb" | "pl" | "pm" => DocKind::Code,
+            // 2026-11-09: Godot (GDScript, shaders, text scenes, `project.godot`, text resources;
+            // the Code preset leaves `.tres` out as data, `sr_sync::filter::is_code_data_file`).
+            "gd" | "gdshader" | "gdshaderinc" | "tscn" | "godot" | "tres" => DocKind::Code,
+            // 2026-11-09: extensions the chunker already had a grammar for.
+            "mts" | "cts" | "pyw" | "inl" => DocKind::Code,
+            // 2026-11-09: languages, shaders, build and infrastructure files that were missing.
+            "jl" | "groovy" | "sbt" | "csx" | "vbs" | "psd1" | "fish" | "luau" | "tcl" | "elm"
+            | "purs" | "gleam" | "cr" | "hx" | "coffee" | "cljs" | "cljc" | "rkt" | "scm"
+            | "lisp" | "el" | "mli" | "fsi" | "hrl" | "eex" | "heex" | "sol" | "ino" | "pyx"
+            | "pxd" | "f90" | "f95" | "f03" | "f08" | "ada" | "adb" | "ads" | "pas" | "asm"
+            | "sv" | "svh" | "vhd" | "vhdl" | "glsl" | "vert" | "frag" | "geom" | "comp"
+            | "tesc" | "tese" | "hlsl" | "hlsli" | "wgsl" | "metal" | "cu" | "cuh" | "shader"
+            | "cginc" | "gql" | "thrift" | "tfvars" | "hcl" | "bicep" | "nix" | "prisma"
+            | "bzl" | "bazel" | "mk" | "mak" | "dockerfile" | "xaml" | "csproj" | "fsproj"
+            | "vbproj" | "erb" | "ejs" | "hbs" | "twig" | "liquid" | "pug" | "cshtml" | "razor"
+            | "jinja" | "j2" | "sass" | "styl" => DocKind::Code,
             _ => return None,
         })
     }
@@ -338,6 +354,15 @@ mod tests {
         assert_eq!(DocKind::from_extension("rs"), Some(DocKind::Code));
         assert_eq!(DocKind::from_extension("xlsx"), Some(DocKind::Xlsx));
         assert_eq!(DocKind::from_extension("exe"), None);
+        // 2026-11-09: Godot's text formats and the code types the audit added.
+        for e in [
+            "gd", "GD", "gdshader", "tscn", "godot", "tres", "mts", "jl", "wgsl", "nix",
+        ] {
+            assert_eq!(DocKind::from_extension(e), Some(DocKind::Code), "{e}");
+        }
+        // Generated Godot sidecars are no file type (and a default ignore).
+        assert_eq!(DocKind::from_extension("import"), None);
+        assert_eq!(DocKind::from_extension("uid"), None);
         assert!(DocKind::Code.is_verbatim_text());
         assert!(!DocKind::Html.is_verbatim_text());
     }

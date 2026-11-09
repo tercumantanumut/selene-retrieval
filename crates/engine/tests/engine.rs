@@ -999,3 +999,146 @@ async fn long_line_json_is_skipped_as_a_data_file_unless_re_included() {
     assert_eq!(skipped[0].skip_reason.as_deref(), Some("data_file"));
     e.drain().await;
 }
+
+/// 2026-11-09: a Godot project in a folder set to **Code**. GDScript, scenes, `project.godot` and
+/// project-config JSON are indexed (GDScript through the text splitter, cut between functions);
+/// data JSON and `.tres` resources (data in a code folder), Godot's `.godot/` cache and the
+/// `*.import` / `*.uid` sidecars are not.
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn code_preset_indexes_gdscript_and_leaves_data_and_godot_caches_out() {
+    let t = tmp();
+    let data = t.path().join("d");
+    let root = t.path().join("corpus");
+    let mut gd = String::from(
+        "extends Node\nclass_name TempleMaps\n## How many maps the temple episode has.\n\n\
+         signal map_loaded(id: int)\n\nconst TEMPLE_MAP_COUNT := 2\n\
+         @export var gdscriptcanarytoken := true\n\n\n",
+    );
+    for i in 0..40 {
+        gd.push_str(&format!(
+            "func temple_map_{i}() -> Dictionary:\n\tvar rooms := [\"hall\", \"shrine\", \
+             \"garden\", \"court\"]\n\tfor r in rooms:\n\t\tprint(\"map {i} room %s\" % r)\n\t\
+             return {{\"id\": {i}, \"rooms\": rooms}}\n\n\n"
+        ));
+    }
+    write_files(
+        &root,
+        &[
+            ("game/src/temple_maps.gd", gd.as_str()),
+            (
+                "game/scenes/temple.tscn",
+                "[gd_scene format=3]\n\n[node name=\"Temple\" type=\"Node2D\"]\nscenecanarytoken = 1\n",
+            ),
+            (
+                "game/project.godot",
+                "config_version=5\n\n[application]\nconfig/name=\"projectcanarytoken\"\n",
+            ),
+            (
+                "web/package.json",
+                "{\n  \"name\": \"packagecanarytoken\"\n}\n",
+            ),
+            (
+                "art/rooms/registry.json",
+                "{\n  \"rooms\": [\"datacanarytoken\"]\n}\n",
+            ),
+            (
+                "game/ui/theme.tres",
+                "[gd_resource type=\"Theme\" format=3]\nrescanarytoken = 1\n",
+            ),
+            (
+                "game/.godot/global_script_class_cache.cfg",
+                "cachecanarytoken\n",
+            ),
+            (
+                "game/.godot/editor/cached.gd",
+                "var cachedcanarytoken = 1\n",
+            ),
+            ("game/icon.png.import", "[remap]\nimportcanarytoken=1\n"),
+            ("game/src/temple_maps.gd.uid", "uid://uidcanarytoken\n"),
+            ("docs/notes.md", "notescanarytoken\n"),
+        ],
+    );
+    let p = Profile::new("godot");
+    let e = Engine::start(config(
+        &data,
+        ExtractSetup::Config(Box::new(worker_config(&data, &p))),
+    ))
+    .await
+    .unwrap();
+    let id = e
+        .add_folder(&root.to_string_lossy(), Some("Game".into()))
+        .await
+        .unwrap()
+        .folder_id;
+    let mut s = e.folder_detail(id).await.unwrap().settings;
+    s.file_types_preset = sr_common::config::FileTypesPreset::Code;
+    e.update_folder_settings(id, s).await.unwrap();
+    e.run_pending_jobs().await.unwrap();
+
+    let indexed = e
+        .catalog()
+        .read(move |c| {
+            sr_catalog::repo::files::files_in_state(c, id, sr_catalog::FileState::Indexed)
+        })
+        .unwrap();
+    let paths: Vec<&str> = indexed.iter().map(|f| f.rel_path.as_str()).collect();
+    assert_eq!(
+        paths,
+        [
+            "game/project.godot",
+            "game/scenes/temple.tscn",
+            "game/src/temple_maps.gd",
+            "web/package.json",
+        ]
+    );
+    let found = |q: &'static str| {
+        let e = e.clone();
+        async move {
+            e.search(args(q))
+                .await
+                .unwrap()
+                .hits
+                .iter()
+                .any(|h| h.snippet.contains(q))
+        }
+    };
+    for q in [
+        "gdscriptcanarytoken",
+        "scenecanarytoken",
+        "projectcanarytoken",
+        "packagecanarytoken",
+    ] {
+        assert!(found(q).await, "{q} is searchable");
+    }
+    for q in [
+        "datacanarytoken",
+        "rescanarytoken",
+        "cachecanarytoken",
+        "cachedcanarytoken",
+        "importcanarytoken",
+        "uidcanarytoken",
+        "notescanarytoken",
+    ] {
+        assert!(!found(q).await, "{q} is not indexed");
+    }
+    // The GDScript file is split into several chunks, each starting at a whole function.
+    let gd_id = indexed[2].id;
+    let chunks = e
+        .catalog()
+        .read(move |c| {
+            let mut out = Vec::new();
+            for ch in sr_catalog::repo::chunks::file_chunks(c, gd_id)? {
+                out.push(sr_catalog::repo::chunks::text(c, &ch.text_hash)?.unwrap_or_default());
+            }
+            Ok(out)
+        })
+        .unwrap();
+    assert!(chunks.len() >= 3, "{} chunks", chunks.len());
+    for text in &chunks[1..] {
+        assert!(
+            text.starts_with("func temple_map_"),
+            "chunk starts mid-function: {text:?}"
+        );
+    }
+    e.drain().await;
+}
