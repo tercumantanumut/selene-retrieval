@@ -174,7 +174,8 @@ pub fn is_data_dump(ext: &str, bytes: u64, lines: u64) -> bool {
 /// question. "Documents and code" and "All text files" still index them.
 pub const CODE_DATA_EXTS: &[&str] = &["json", "tres"];
 
-/// Well-known project configuration JSON (lower-case name without `.json`), kept by **Code**.
+/// Well-known project configuration JSON (lower-case name without `.json` and without a leading
+/// dot, so `.mcp.json` matches `mcp`), kept by **Code**.
 const CONFIG_JSON_NAMES: &[&str] = &[
     "package",
     "composer",
@@ -196,7 +197,6 @@ const CONFIG_JSON_NAMES: &[&str] = &[
     "tasks",
     "extensions",
     "devcontainer",
-    ".devcontainer",
     "renovate",
     "biome",
     "components",
@@ -209,17 +209,24 @@ const CONFIG_JSON_NAMES: &[&str] = &[
     "nodemon",
     "typedoc",
     "cspell",
-    ".cspell",
     "tslint",
     "openapi",
     "swagger",
+    // Infrastructure templates: CloudFormation `template.json`, Azure `azuredeploy.json`.
+    "template",
+    "azuredeploy",
 ];
+
+/// Name endings (before `.json`) of configuration JSON: Terraform `main.tf.json`, Step Functions
+/// `flow.asl.json`.
+const CONFIG_JSON_SUFFIXES: &[&str] = &[".tf", ".asl"];
 
 /// Words that make a JSON name configuration (`tsconfig.base.json`, `appsettings.Development.json`,
 /// `user.schema.json`).
 const CONFIG_JSON_WORDS: &[&str] = &["config", "settings", "schema"];
 
-/// Directories whose JSON is configuration (`web/config/voice.json`, `.github/...`).
+/// Directories whose JSON is configuration (`web/config/voice.json`, `.github/...`, JSON Schema
+/// files in `schemas/`).
 const CONFIG_JSON_DIRS: &[&str] = &[
     "config",
     "configs",
@@ -229,13 +236,16 @@ const CONFIG_JSON_DIRS: &[&str] = &[
     ".github",
     ".devcontainer",
     ".vscode",
+    "schema",
+    "schemas",
 ];
 
 /// A file a folder set to **Code** leaves out as data ([`CODE_DATA_EXTS`]). JSON stays when it
-/// looks like project configuration: a well-known name (`package.json`, `vercel.json`, ...), a
-/// name with `config`, `settings` or `schema` in it, a dot-file ending in `rc`
-/// (`.eslintrc.json`), or a file in a `config` / `settings` directory. `dirs` are the path's
-/// directories, `name` its file name, `ext` its lower-case extension.
+/// looks like project configuration: a well-known name (`package.json`, `.mcp.json`,
+/// `vercel.json`, `template.json`, ...), a name with `config`, `settings` or `schema` in it, a
+/// name ending in `.tf.json` or `.asl.json`, a dot-file ending in `rc` (`.eslintrc.json`), or a
+/// file in a `config`, `settings` or `schemas` directory. `dirs` are the path's directories,
+/// `name` its file name, `ext` its lower-case extension.
 pub fn is_code_data_file(dirs: &[&str], name: &str, ext: &str) -> bool {
     if !CODE_DATA_EXTS.contains(&ext) {
         return false;
@@ -245,8 +255,9 @@ pub fn is_code_data_file(dirs: &[&str], name: &str, ext: &str) -> bool {
     }
     let lower = name.to_ascii_lowercase();
     let stem = lower.strip_suffix(".json").unwrap_or(&lower);
-    let config = CONFIG_JSON_NAMES.contains(&stem)
+    let config = CONFIG_JSON_NAMES.contains(&stem.trim_start_matches('.'))
         || CONFIG_JSON_WORDS.iter().any(|w| stem.contains(w))
+        || CONFIG_JSON_SUFFIXES.iter().any(|s| stem.ends_with(s))
         || (stem.len() > 3 && stem.starts_with('.') && stem.ends_with("rc"))
         || dirs
             .iter()
@@ -857,6 +868,14 @@ mod tests {
             "web/config/voice.json",
             ".github/renovate.json",
             "a.jsonc",
+            // Dot-prefixed well-known names, schema folders, infrastructure templates.
+            ".mcp.json",
+            ".devcontainer.json",
+            "api/schemas/user.json",
+            "infra/template.json",
+            "azuredeploy.json",
+            "infra/main.tf.json",
+            "flows/order.asl.json",
         ] {
             assert_eq!(code.check_file(file), Ok(()), "{file}");
         }
@@ -866,6 +885,9 @@ mod tests {
             "game/test/coop/data/temple_runs.json",
             "src.json",
             ".rc.json",
+            ".registry.json",
+            "art/schemata/rooms.json",
+            "tf.json",
             "game/ui/theme.tres",
         ] {
             assert_eq!(code.check_file(file), Err(Excluded::NotIncluded), "{file}");

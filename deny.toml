@@ -17,6 +17,9 @@ ignore = [
   # not vulnerabilities. Re-check on every lancedb bump (R24) and by the date given. (W2-H)
   { id = "RUSTSEC-2024-0436", reason = "paste: proc-macro, compile time only (lance-bitpacking/lance-encoding); no runtime code; re-check by 2027-01-18" },
   { id = "RUSTSEC-2024-0449", reason = "unsafe-libyaml via serde_yaml_ng <- lindera <- lance-tokenizer: parses lindera's own dictionary config, never user content; we index with tantivy, not lindera; re-check by 2027-01-18" },
+  # Bundled SQLite < 3.54 (libsqlite3-sys 0.38.2 via rusqlite 0.40). The fix needs rusqlite 0.41,
+  # which the latest tokio-rusqlite and rusqlite_migration don't accept yet (docs/04 R48).
+  { id = "RUSTSEC-2026-0459", reason = "SR opens only its own catalog database in its own per-user data dir, and the advisory needs a crafted database + -wal pair from a less trusted party; the fix (libsqlite3-sys 0.39 / rusqlite 0.41) is blocked because tokio-rusqlite 0.8.0 and rusqlite_migration 2.6.0 require rusqlite ^0.40; re-check by 2026-12-09" },
 ]
 
 [licenses]

@@ -87,12 +87,12 @@ impl DocKind {
             | "purs" | "gleam" | "cr" | "hx" | "coffee" | "cljs" | "cljc" | "rkt" | "scm"
             | "lisp" | "el" | "mli" | "fsi" | "hrl" | "eex" | "heex" | "sol" | "ino" | "pyx"
             | "pxd" | "f90" | "f95" | "f03" | "f08" | "ada" | "adb" | "ads" | "pas" | "asm"
-            | "sv" | "svh" | "vhd" | "vhdl" | "glsl" | "vert" | "frag" | "geom" | "comp"
-            | "tesc" | "tese" | "hlsl" | "hlsli" | "wgsl" | "metal" | "cu" | "cuh" | "shader"
-            | "cginc" | "gql" | "thrift" | "tfvars" | "hcl" | "bicep" | "nix" | "prisma"
-            | "bzl" | "bazel" | "mk" | "mak" | "dockerfile" | "xaml" | "csproj" | "fsproj"
-            | "vbproj" | "erb" | "ejs" | "hbs" | "twig" | "liquid" | "pug" | "cshtml" | "razor"
-            | "jinja" | "j2" | "sass" | "styl" => DocKind::Code,
+            | "sv" | "svh" | "vhdl" | "glsl" | "vert" | "frag" | "geom" | "comp" | "tesc"
+            | "tese" | "hlsl" | "hlsli" | "wgsl" | "metal" | "cu" | "cuh" | "shader" | "cginc"
+            | "gql" | "thrift" | "tfvars" | "hcl" | "bicep" | "nix" | "prisma" | "bzl"
+            | "bazel" | "mk" | "mak" | "dockerfile" | "xaml" | "csproj" | "fsproj" | "vbproj"
+            | "erb" | "ejs" | "hbs" | "twig" | "liquid" | "pug" | "cshtml" | "razor" | "jinja"
+            | "j2" | "sass" | "styl" => DocKind::Code,
             _ => return None,
         })
     }
@@ -363,6 +363,9 @@ mod tests {
         // Generated Godot sidecars are no file type (and a default ignore).
         assert_eq!(DocKind::from_extension("import"), None);
         assert_eq!(DocKind::from_extension("uid"), None);
+        // `.vhd` is usually a Windows virtual disk image, not VHDL (`.vhdl` is code).
+        assert_eq!(DocKind::from_extension("vhd"), None);
+        assert_eq!(DocKind::from_extension("vhdl"), Some(DocKind::Code));
         assert!(DocKind::Code.is_verbatim_text());
         assert!(!DocKind::Html.is_verbatim_text());
     }

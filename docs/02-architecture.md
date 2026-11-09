@@ -136,7 +136,7 @@ folders(id ULID PK, collection_id FK CASCADE, kind ENUM(indexed|access_grant), d
         root_path, root_key UNIQUE(collection_id, root_key), volume_serial, recursive=1,
         indexing_mode ENUM(files_only|vector), sync_mode ENUM(auto|manual|scheduled|triggered),  -- indexing_mode 2026-11-08: removed, Amendment 17 (no longer a setting; 'files_only' marks a folder paused until the user chooses)
         cadence_min=60, reindex_policy ENUM(smart|always|never)=smart,
-        file_types_preset ENUM(documents|code|documents_and_code|all_text|custom)=documents_and_code,  -- 2026-11-09: code adds GDScript (.gd), Godot shaders, .tscn, project.godot and 90 more code types (DocKind::from_extension); code leaves out non-config JSON and .tres (sr_sync::filter::is_code_data_file); .godot/, .import/, *.import, *.uid are default ignores; IGNORE_DEFAULTS_VERSION 3 rescans existing folders
+        file_types_preset ENUM(documents|code|documents_and_code|all_text|custom)=documents_and_code,  -- 2026-11-09: code adds GDScript (.gd), Godot shaders, .tscn, project.godot and 89 more code types (DocKind::from_extension); code leaves out non-config JSON and .tres (sr_sync::filter::is_code_data_file); .godot/, .import/, *.import, *.uid are default ignores; IGNORE_DEFAULTS_VERSION 3 rescans existing folders
         include_extensions JSON, exclude_globs JSON, file_type_filters JSON,
         max_file_bytes=10485760, chunk_preset ENUM(balanced|small|large|custom)=balanced,
         chunk_size_override NULL, chunk_overlap_override NULL, follow_symlinks=0, include_online_only=0,

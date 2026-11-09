@@ -8,6 +8,7 @@
 use std::path::Path;
 use std::time::{Duration, Instant};
 
+use sr_common::protocol::extract::DocKind;
 use sr_common::sandbox::SecretFilter;
 
 use crate::dto::Estimate;
@@ -32,15 +33,15 @@ const SKIP_DIRS: &[&str] = &[
     "system volume information",
 ];
 
-/// Documents and code (approximation of the daemon's `documents_and_code` preset).
-const TEXT_EXT: &[&str] = &[
-    "txt", "md", "markdown", "rst", "org", "csv", "tsv", "json", "jsonl", "yaml", "yml", "toml",
-    "ini", "cfg", "xml", "html", "htm", "rs", "py", "ts", "tsx", "js", "jsx", "mjs", "cjs", "go",
-    "java", "kt", "cs", "c", "h", "cpp", "hpp", "cc", "rb", "php", "swift", "scala", "sql", "sh",
-    "ps1", "bat", "lua", "r", "m", "vue", "svelte", "css", "scss", "tex", "log",
-];
-/// Binary containers whose text is a fraction of their size.
-const DOC_EXT: &[&str] = &["pdf", "docx", "pptx", "xlsx", "xls", "odt", "rtf", "epub"];
+/// What the walk counts, by extension: the file types of the daemon's `documents_and_code`
+/// preset (`DocKind::from_extension`, the presets' own table; 2026-11-09, was a copy). Text kinds
+/// count in full; binary containers (PDF, Office) count a tenth of their size as text.
+fn counted(ext: &str) -> Option<bool> {
+    match DocKind::from_extension(ext)? {
+        DocKind::Pdf | DocKind::Docx | DocKind::Xlsx | DocKind::Pptx => Some(false),
+        _ => Some(true),
+    }
+}
 
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
 pub struct Count {
@@ -80,12 +81,16 @@ pub fn count(root: &Path, max_files: u64, budget: Duration) -> Count {
             } else if ft.is_file() {
                 let ext = name.rsplit_once('.').map_or("", |(_, x)| x);
                 let len = e.metadata().map_or(0, |m| m.len());
-                if TEXT_EXT.contains(&ext) {
-                    c.files += 1;
-                    c.text_bytes += len.min(10 * 1024 * 1024);
-                } else if DOC_EXT.contains(&ext) {
-                    c.files += 1;
-                    c.text_bytes += (len / 10).min(1024 * 1024);
+                match counted(ext) {
+                    Some(true) => {
+                        c.files += 1;
+                        c.text_bytes += len.min(10 * 1024 * 1024);
+                    }
+                    Some(false) => {
+                        c.files += 1;
+                        c.text_bytes += (len / 10).min(1024 * 1024);
+                    }
+                    None => {}
                 }
             }
         }
@@ -185,6 +190,23 @@ mod tests {
         assert_eq!(c.files, 3, "{c:?}");
         assert!(!c.capped);
         assert_eq!(c.text_bytes, 4000 + 12 + 1000);
+    }
+
+    /// 2026-11-09: the walk counts the presets' file types (GDScript too), not a copied list.
+    #[test]
+    fn counts_the_presets_file_types() {
+        let t = tempfile::tempdir().unwrap();
+        let r = t.path();
+        fs::write(r.join("temple_maps.gd"), "extends Node\n").unwrap();
+        fs::write(r.join("arena.tscn"), "[gd_scene]\n").unwrap();
+        fs::write(r.join("icon.png.import"), "[remap]\n").unwrap();
+        fs::write(r.join("deck.pptx"), [0u8; 2_000]).unwrap();
+        let c = count(r, MAX_FILES, TIME_BUDGET);
+        assert_eq!(c.files, 3, "{c:?}");
+        assert_eq!(c.text_bytes, 13 + 11 + 200);
+        assert_eq!(counted("GD"), Some(true));
+        assert_eq!(counted("xlsx"), Some(false));
+        assert_eq!(counted("exe"), None);
     }
 
     #[test]
