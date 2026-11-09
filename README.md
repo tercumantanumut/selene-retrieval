@@ -8,7 +8,7 @@ Selene Retrieval is a Windows desktop app and MCP server. It indexes folders on 
 [![Windows 10/11 x64](https://img.shields.io/badge/Windows-10%20%7C%2011%20x64-0078D4)](#install)
 [![MCP server](https://img.shields.io/badge/MCP-server-6E56CF)](https://modelcontextprotocol.io)
 
-**Status: beta.** Installers will be published on the [Releases page](https://github.com/tercumantanumut/selene-retrieval/releases). They are not code-signed yet. Until the first release, build from source with [CONTRIBUTING.md](CONTRIBUTING.md).
+**Status: beta.** Download the installer from the [Releases page](https://github.com/tercumantanumut/selene-retrieval/releases). It is not code-signed yet (see [Install](#install)). To build from source, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## See it in action
 
