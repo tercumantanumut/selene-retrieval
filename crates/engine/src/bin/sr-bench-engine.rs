@@ -13,7 +13,11 @@
 //!                 [--exact-lane on|off|ungated] [--rerank on|off] [--rerank-top-n <n>]
 //!                 [--rerank-mode replace|rrf:<weight>] [--rerank-skip-lookups on|off]
 //!                 [--rerank-max-tokens <n>] [--first-stage search|answer]
+//!                 [--file-types documents|code|documents_and_code|all_text]
 //! ```
+//! `--file-types` sets the corpus folder's file-type preset (default: the app default,
+//! documents and code) before indexing; on a reopened index a different value is applied as a
+//! settings change.
 //! `--first-stage answer` (docs/08) returns, per query, the `k` passages an answer with a first
 //! search of `k` would show the model (a wider search, then the file-by-file pick) instead of the
 //! search's top `k`.
@@ -61,6 +65,8 @@ struct Args {
     /// M3 reranker A/B: `on` turns the Advanced reranker on (downloads its pinned files into the
     /// index's data dir on first use, like the app's switch) and waits until it is loaded.
     rerank: bool,
+    /// The corpus folder's file-type preset; `None` keeps the folder's (new folder: the default).
+    file_types: Option<sr_common::config::FileTypesPreset>,
 }
 
 fn parse() -> Result<Args, String> {
@@ -134,6 +140,11 @@ fn parse() -> Result<Args, String> {
                     "off" => false,
                     _ => return Err("--rerank needs on or off".into()),
                 }
+            }
+            "--file-types" => {
+                a.file_types = Some(serde_json::from_value(Value::String(val()?)).map_err(
+                    |_| "--file-types needs documents, code, documents_and_code or all_text",
+                )?);
             }
             other => return Err(format!("unknown argument {other}")),
         }
@@ -440,6 +451,27 @@ async fn run(a: Args) -> Result<(), String> {
             .add_folder(&corpus_s, Some("corpus".into()))
             .await
             .map_err(|e| format!("add folder: {e}"))?;
+    }
+    if let Some(preset) = a.file_types {
+        let id = engine
+            .list_folders()
+            .await
+            .map_err(|e| e.to_string())?
+            .first()
+            .map(|f| f.folder_id)
+            .ok_or("no corpus folder")?;
+        let mut s = engine
+            .folder_detail(id)
+            .await
+            .map_err(|e| e.to_string())?
+            .settings;
+        if s.file_types_preset != preset {
+            s.file_types_preset = preset;
+            engine
+                .update_folder_settings(id, s)
+                .await
+                .map_err(|e| format!("file types: {e}"))?;
+        }
     }
     let t0 = Instant::now();
     let jobs = engine
