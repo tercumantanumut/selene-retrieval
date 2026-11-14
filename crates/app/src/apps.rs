@@ -154,7 +154,10 @@ pub fn write_error(app: ClientApp, e: WriteError) -> UiError {
         ),
         WriteError::Io(kind) => UiError::new(
             &format!("Couldn't save {short}'s settings"),
-            &format!("Windows didn't allow the change. Quit {short} and try again."),
+            &format!(
+                "{} didn't allow the change. Quit {short} and try again.",
+                crate::dto::OS_NAME
+            ),
             UiAction::Retry,
             "Retry",
             &format!("ClientConfigIo · {kind:?}"),
@@ -176,9 +179,10 @@ fn not_installed(app: ClientApp) -> UiError {
 }
 
 fn bridge_missing() -> UiError {
-    UiError::from(
-        Error::new(ErrorCode::Internal).with_detail("sr-bridge.exe missing next to the app"),
-    )
+    UiError::from(Error::new(ErrorCode::Internal).with_detail(format!(
+        "sr-bridge{} missing next to the app",
+        std::env::consts::EXE_SUFFIX
+    )))
 }
 
 /// [Connect {app}]: writes our entry into every installed variant's config. Returns the plain

@@ -81,6 +81,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "330a5ed07fa54e4702c9d6c4174f74427fc0ef6e214bbd677ae50a5099946470"
 
 [[package]]
+name = "apple-native-keyring-store"
+version = "1.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2b350bfd03649e07aa05c0a81b3e15934374e585c98204a57e20b9d49f49bb9a"
+dependencies = [
+ "keyring-core",
+ "log",
+ "security-framework",
+]
+
+[[package]]
 name = "arc-swap"
 version = "1.9.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -8088,6 +8099,7 @@ name = "sr-client"
 version = "0.1.0"
 dependencies = [
  "blake3",
+ "libc",
  "serde",
  "serde_json",
  "sr-common",
@@ -8101,6 +8113,7 @@ version = "0.1.0"
 dependencies = [
  "blake3",
  "dunce",
+ "libc",
  "schemars 1.2.3",
  "serde",
  "serde_json",
@@ -8159,6 +8172,7 @@ dependencies = [
  "grep-searcher",
  "ignore",
  "lancedb",
+ "libc",
  "moka",
  "rusqlite",
  "serde",
@@ -8184,6 +8198,7 @@ dependencies = [
  "chardetng",
  "encoding_rs",
  "flate2",
+ "libc",
  "memchr",
  "pdfium-render",
  "proptest",
@@ -8202,6 +8217,7 @@ dependencies = [
 name = "sr-extract-client"
 version = "0.1.0"
 dependencies = [
+ "libc",
  "serde_json",
  "sr-common",
  "tempfile",
@@ -8245,12 +8261,14 @@ dependencies = [
 name = "sr-providers"
 version = "0.1.0"
 dependencies = [
+ "apple-native-keyring-store",
  "fastembed",
  "futures",
  "genai",
  "getrandom 0.3.4",
  "half",
  "keyring-core",
+ "libc",
  "ort",
  "reqwest 0.13.5",
  "rustls",
@@ -8275,6 +8293,7 @@ dependencies = [
  "dunce",
  "globset",
  "ignore",
+ "libc",
  "notify",
  "rusqlite",
  "serde_json",

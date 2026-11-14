@@ -18,6 +18,12 @@
 //!   it changes) or `Retry` (transient: file locked, worker could not start, shutting down).
 //! * Workers are recycled after a job whose peak commit exceeds `recycle_peak_bytes` and every
 //!   `recycle_after_jobs` jobs; a killed or crashed worker is replaced on the next job.
+//! * macOS (Amendment 18.2): the worker applies a Seatbelt deny-default profile to itself before
+//!   it reads any request, and the supervisor checks the denials on its pid (`sandbox_check`)
+//!   before it gets work; limits are a footprint and CPU watchdog, `RLIMIT_CPU` and a
+//!   process-group kill. One mode, no fallback: a worker that is not sandboxed never gets work.
+//!   On other non-Windows systems [`ExtractPool::start`] fails and no worker ever starts (fail
+//!   closed; see [`sandbox`]).
 
 mod pool;
 pub mod sandbox;
@@ -38,7 +44,8 @@ pub use sandbox::{WorkerId, delete_app_container_profile, ensure_app_packages_re
 /// Default AppContainer profile name of the extractor (deleted on uninstall, Amendment 3.17).
 pub const APP_CONTAINER_NAME: &str = "SeleneRetrieval.Extract";
 
-/// Which token the workers run with.
+/// Which token the workers run with (Windows). On macOS every mode means the one Seatbelt
+/// sandbox.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SandboxMode {
     /// AppContainer; fall back to low integrity (logged, shown in diagnostics and status) only
@@ -57,6 +64,8 @@ pub enum SandboxMode {
 pub enum ActiveSandbox {
     AppContainer,
     LowIntegrity,
+    /// macOS: the Seatbelt deny-default profile (full protection, the AppContainer's twin).
+    Seatbelt,
 }
 
 /// Supervisor configuration. [`ExtractConfig::new`] gives the defaults.

@@ -505,6 +505,7 @@ async fn index_move_check_plan_copy_and_reopen() {
     e.drain().await;
 }
 
+#[cfg(windows)]
 #[test]
 fn trusted_image_rule() {
     use sr_engine::pipe::is_trusted_image;
@@ -530,7 +531,42 @@ fn trusted_image_rule() {
     ));
 }
 
+/// macOS port: same rule without `.exe`; names and folders compare exactly.
+#[cfg(unix)]
+#[test]
+fn trusted_image_rule_unix() {
+    use sr_engine::pipe::{host_call_allowed, is_trusted_image};
+    use std::path::Path;
+    let daemon = Path::new("/Applications/SR/sr-daemon");
+    assert!(is_trusted_image(
+        Path::new("/Applications/SR/sr-app"),
+        daemon
+    ));
+    assert!(is_trusted_image(daemon, daemon), "the admin CLI");
+    assert!(!is_trusted_image(
+        Path::new("/Applications/SR/SR-APP"),
+        daemon
+    ));
+    assert!(!is_trusted_image(
+        Path::new("/Applications/sr/sr-app"),
+        daemon
+    ));
+    assert!(!is_trusted_image(
+        Path::new("/Applications/SR/sr-app.exe"),
+        daemon
+    ));
+    assert!(!is_trusted_image(Path::new("/tmp/sr-app"), daemon));
+    assert!(!is_trusted_image(
+        Path::new("/Applications/SR/sub/sr-app"),
+        daemon
+    ));
+    let setup = Path::new("/private/tmp/x/sr-setup");
+    assert!(host_call_allowed("host.shutdown", false, Some(setup)));
+    assert!(!host_call_allowed("host.restart", false, Some(setup)));
+}
+
 /// S-05 (R31): stopping the service and drain-restarts are for our own programs only.
+#[cfg(windows)]
 #[test]
 fn host_calls_and_drain_restart_need_our_programs() {
     use sr_engine::pipe::{host_call_allowed, is_install_image};

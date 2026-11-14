@@ -20,6 +20,7 @@ import { defaultFolderHint, useCreateDefaultFolder, useDefaultFolder } from "@/l
 import { baseName, pickFolder } from "@/lib/folders";
 import { cn } from "@/lib/utils";
 import { Cloud, FolderOpen, FolderPlus, FolderSearch, Loader2 } from "lucide-react";
+import { FILE_MANAGER, START_AT_LOGIN_WIZARD } from "@/lib/platform";
 
 type Step =
   | { kind: "pick" }
@@ -285,7 +286,7 @@ export function WizardPage() {
           <StepTitle focus={false}>Your folder is ready</StepTitle>
           <CardText>
             Anything you put in “{step.res.name}” becomes searchable automatically. It's in your Documents folder.
-            {step.res.opened && " We opened it in File Explorer for you."}
+            {step.res.opened && ` We opened it in ${FILE_MANAGER} for you.`}
           </CardText>
           {step.res.in_onedrive && (
             <p className="flex items-start gap-1.5 text-sm text-muted-foreground">
@@ -346,7 +347,7 @@ export function WizardPage() {
               checked={autostartChecked}
               onChange={(e) => setStartWithWindows(e.target.checked)}
             />
-            Start Selene Retrieval when Windows starts (recommended, keeps your folders up to date)
+            {START_AT_LOGIN_WIZARD}
           </label>
           <Button size="lg" onClick={() => void finish()}>
             Finish

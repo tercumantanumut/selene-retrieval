@@ -12,6 +12,9 @@
 //!   - 3.6: Standard = AVX2 + 8 GiB RAM + 10 GiB disk + (dGPU ≥ 4 GiB or ≥ 6 physical cores);
 //!     High = AVX2 + 16 GiB RAM + 25 GiB disk + **dGPU ≥ 6 GiB**.
 //! * All comparisons are `>=` (at the threshold qualifies).
+//! * Amendment 18 (macOS on Apple silicon): there is no DirectML, so adapters are ignored and
+//!   embeddings run on the processor (never High); aarch64's baseline NEON stands in for AVX2.
+//!   [`TierPlatform`] carries both facts; Windows x64 decisions are unchanged.
 //! * The profile in force is the **active index's** profile, never the recommended one (§2.8).
 
 use schemars::JsonSchema;
@@ -251,10 +254,51 @@ pub fn best_gpu<'a>(hw: &'a HwInfo, t: &Thresholds) -> Option<(&'a GpuInfo, GpuC
         })
 }
 
-/// Pure tier selection (Amendment 3.6).
+/// What the platform gives the tier rules (Amendment 18).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct TierPlatform {
+    /// Graphics adapters can run DirectML (Windows only).
+    pub directml: bool,
+    /// The processor's vector unit always qualifies, whatever [`HwInfo::avx2`] says (aarch64
+    /// NEON is part of the base instruction set).
+    pub simd_baseline: bool,
+}
+
+impl TierPlatform {
+    /// Windows on x64: DirectML, and AVX2 must be detected.
+    pub const WINDOWS_X64: Self = Self {
+        directml: true,
+        simd_baseline: false,
+    };
+    /// macOS on Apple silicon: no DirectML, NEON always present.
+    pub const MACOS_ARM64: Self = Self {
+        directml: false,
+        simd_baseline: true,
+    };
+
+    /// The platform this build runs on.
+    pub const fn current() -> Self {
+        Self {
+            directml: cfg!(windows),
+            simd_baseline: cfg!(target_arch = "aarch64"),
+        }
+    }
+}
+
+/// Pure tier selection (Amendment 3.6) for the platform this build runs on.
 pub fn select_tier(hw: &HwInfo, t: &Thresholds) -> TierDecision {
+    select_tier_on(hw, t, TierPlatform::current())
+}
+
+/// Pure tier selection (Amendment 3.6) for `platform`. Without DirectML the adapters are never
+/// used, so the plan is always [`EpPlan::Cpu`].
+pub fn select_tier_on(hw: &HwInfo, t: &Thresholds, platform: TierPlatform) -> TierDecision {
     let mut reasons = Vec::new();
-    let best = best_gpu(hw, t);
+    let best = if platform.directml {
+        best_gpu(hw, t)
+    } else {
+        None
+    };
     let vram = best.map_or(0, |(g, _)| g.dedicated_vram);
     let (ep, gpu_class) = match best {
         Some((g, GpuClass::Dedicated)) => {
@@ -282,8 +326,12 @@ pub fn select_tier(hw: &HwInfo, t: &Thresholds) -> TierDecision {
                 GpuClass::Integrated,
             )
         }
-        None => {
+        None if platform.directml => {
             reasons.push("no suitable graphics card; using the processor".into());
+            (EpPlan::Cpu, GpuClass::None)
+        }
+        None => {
+            reasons.push("search runs on the processor on this computer".into());
             (EpPlan::Cpu, GpuClass::None)
         }
     };
@@ -292,7 +340,7 @@ pub fn select_tier(hw: &HwInfo, t: &Thresholds) -> TierDecision {
     // Gates shared by every tier above Minimum.
     let gates = |min_ram: u64, min_disk: u64| -> Vec<String> {
         let mut r = Vec::new();
-        if !hw.avx2 {
+        if !hw.avx2 && !platform.simd_baseline {
             r.push("processor lacks AVX2".into());
         }
         if hw.total_ram < min_ram {

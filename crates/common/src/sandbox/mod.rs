@@ -22,10 +22,29 @@
 //!
 //! Residual TOCTOU (a directory swapped for a junction between resolve and open) is closed in M1 by
 //! `SandboxFs` opening handles relative to a cap-std `Dir` per root; this module is the policy.
+//!
+//! **Unix (macOS, Amendment 18)** keeps steps 2 and 4 and swaps the syntax for POSIX rules:
+//! * Absolute means a leading `/`; components are split on `/` only. There are no drive, UNC,
+//!   verbatim, device or 8.3 forms, so [`Violation::DriveRelative`] and
+//!   [`Violation::ForeignPrefix`] never occur.
+//! * `..` and `.` are refused as on Windows. `\` is an ordinary file name character, but a name
+//!   that would read as `..`, `.` or an absolute path if `\` were taken as a separator is refused,
+//!   so no consumer can turn it into a traversal.
+//! * The Win32 aliasing rules do not apply: `CON`, `a:b`, `file.`, `a?b` are plain names. The
+//!   macOS resource-fork path `..namedfork` is refused as [`Violation::AlternateDataStream`].
+//! * Containment and the catalog [`path_key`] compare exact bytes (no case folding), so a
+//!   sibling `/Vol/docs` is never inside root `/Vol/Docs` on a case-sensitive volume. On the
+//!   default case-insensitive APFS, `canonicalize` returns the on-disk case, so canonical paths
+//!   still match; a path that does not exist yet keeps the case it was given, and a
+//!   differently cased duplicate of it is refused or treated as a new name (fails closed).
+//! * A dangling symbolic link is refused ([`Violation::OutsideRoot`]): its target is unknown,
+//!   so a write through it could land outside the root.
 
 use std::fmt;
 use std::io;
-use std::path::{Component, Path, PathBuf, Prefix};
+#[cfg(windows)]
+use std::path::Prefix;
+use std::path::{Component, Path, PathBuf};
 
 use crate::error::{Error, ErrorCode};
 
@@ -201,6 +220,16 @@ pub fn validate_component(c: &str) -> Result<(), Violation> {
     if c == ".." {
         return Err(Violation::ParentTraversal);
     }
+    platform_component_rules(c)?;
+    if c.encode_utf16().count() > 255 {
+        return Err(Violation::ComponentTooLong);
+    }
+    Ok(())
+}
+
+/// Win32 rules: ADS streams, wildcard characters, trailing dots/spaces, device names.
+#[cfg(windows)]
+fn platform_component_rules(c: &str) -> Result<(), Violation> {
     if c.contains(':') {
         return Err(Violation::AlternateDataStream);
     }
@@ -216,17 +245,48 @@ pub fn validate_component(c: &str) -> Result<(), Violation> {
     if is_reserved_device_name(c) {
         return Err(Violation::ReservedName);
     }
-    if c.encode_utf16().count() > 255 {
-        return Err(Violation::ComponentTooLong);
+    Ok(())
+}
+
+/// POSIX rules: every byte but `/` and NUL is legal, so only what changes meaning is refused.
+#[cfg(not(windows))]
+fn platform_component_rules(c: &str) -> Result<(), Violation> {
+    // `file/..namedfork/rsrc` opens the resource fork on macOS: a hidden stream, like NTFS ADS.
+    if c.eq_ignore_ascii_case("..namedfork") {
+        return Err(Violation::AlternateDataStream);
+    }
+    if c.chars().any(|ch| (ch as u32) < 0x20) {
+        return Err(Violation::InvalidChar);
+    }
+    // `\` is a plain character here. Refuse names that would become `..`, `.` or an absolute
+    // path if anything ever read `\` as a separator.
+    if c.starts_with('\\') {
+        return Err(Violation::InvalidChar);
+    }
+    for piece in c.split('\\') {
+        if piece == ".." {
+            return Err(Violation::ParentTraversal);
+        }
+        if piece == "." {
+            return Err(Violation::CurrentDir);
+        }
     }
     Ok(())
 }
 
+#[cfg(windows)]
 fn split_components(s: &str) -> impl Iterator<Item = &str> {
     s.split(['/', '\\'])
 }
 
+/// Unix: only `/` separates; `\` is part of a name.
+#[cfg(not(windows))]
+fn split_components(s: &str) -> impl Iterator<Item = &str> {
+    s.split('/')
+}
+
 /// Parse a path relative to a root into validated components. `""` means the root itself.
+#[cfg(windows)]
 pub fn parse_relative(rel: &str) -> Result<Vec<String>, Violation> {
     if rel.is_empty() {
         return Ok(Vec::new());
@@ -255,8 +315,31 @@ pub fn parse_relative(rel: &str) -> Result<Vec<String>, Violation> {
     Ok(out)
 }
 
+/// Parse a path relative to a root into validated components. `""` means the root itself.
+#[cfg(not(windows))]
+pub fn parse_relative(rel: &str) -> Result<Vec<String>, Violation> {
+    if rel.is_empty() {
+        return Ok(Vec::new());
+    }
+    if rel.starts_with('/') {
+        return Err(Violation::NotRelative);
+    }
+    let n = split_components(rel).count();
+    let mut out = Vec::new();
+    for (i, c) in split_components(rel).enumerate() {
+        // A single trailing separator ("dir/") is tolerated; empty inner components are not.
+        if c.is_empty() && i + 1 == n {
+            continue;
+        }
+        validate_component(c)?;
+        out.push(c.to_string());
+    }
+    Ok(out)
+}
+
 /// Catalog path key of a root-relative path: `/`-separated and case-folded, so `Docs\A.md` and
 /// `docs/a.md` collide in `UNIQUE(folder_id, path_key)` exactly as they do on NTFS.
+#[cfg(windows)]
 pub fn path_key(rel: &str) -> String {
     split_components(rel)
         .filter(|c| !c.is_empty())
@@ -265,10 +348,21 @@ pub fn path_key(rel: &str) -> String {
         .join("/")
 }
 
+/// Catalog path key of a root-relative path (Unix): `/`-separated, exact case, so `A.md` and
+/// `a.md` on a case-sensitive volume are two files. On case-insensitive APFS the walker and
+/// [`Sandbox::resolve_relative`] report the on-disk case, so one file keeps one key.
+#[cfg(not(windows))]
+pub fn path_key(rel: &str) -> String {
+    split_components(rel)
+        .filter(|c| !c.is_empty())
+        .collect::<Vec<_>>()
+        .join("/")
+}
+
 /// Form of an absolute input path.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum AbsoluteForm {
-    /// `C:\…`
+    /// `C:\…` (Windows), or `/…` (Unix).
     Drive,
     /// `\\server\share\…`, `\\?\…`, `\\.\…`, `\??\…` — allowed only under a root given in that form.
     Special,
@@ -276,6 +370,7 @@ pub enum AbsoluteForm {
 
 /// Syntactic check of an absolute path. Returns its form and the validated components after the
 /// prefix (`C:\` or the special prefix and, for UNC, server and share).
+#[cfg(windows)]
 pub fn parse_absolute(path: &str) -> Result<(AbsoluteForm, Vec<String>), Violation> {
     if path.is_empty() {
         return Err(Violation::Empty);
@@ -324,7 +419,60 @@ pub fn parse_absolute(path: &str) -> Result<(AbsoluteForm, Vec<String>), Violati
     Err(Violation::NotAbsolute)
 }
 
+/// Syntactic check of an absolute path (Unix): a leading `/`, then validated components split on
+/// `/` only. The form is always [`AbsoluteForm::Drive`]; `//x` is an empty component.
+#[cfg(not(windows))]
+pub fn parse_absolute(path: &str) -> Result<(AbsoluteForm, Vec<String>), Violation> {
+    if path.is_empty() {
+        return Err(Violation::Empty);
+    }
+    let Some(rest) = path.strip_prefix('/') else {
+        return Err(Violation::NotAbsolute);
+    };
+    let comps = parse_relative(rest).map_err(|v| match v {
+        Violation::NotRelative => Violation::Empty, // `//x`: empty component
+        other => other,
+    })?;
+    Ok((AbsoluteForm::Drive, comps))
+}
+
+/// How input paths are spelled before parsing: `\` on Windows, unchanged on Unix.
+#[cfg(windows)]
+fn normalize_input(s: &str) -> String {
+    s.replace('/', "\\")
+}
+
+#[cfg(not(windows))]
+fn normalize_input(s: &str) -> String {
+    s.to_string()
+}
+
+/// Whether a user path looks absolute (else it is taken relative to the only root).
+#[cfg(windows)]
+fn looks_absolute(path: &str) -> bool {
+    let b = path.as_bytes();
+    path.starts_with(['/', '\\']) || (b.len() >= 2 && b[1] == b':' && b[0].is_ascii_alphabetic())
+}
+
+#[cfg(not(windows))]
+fn looks_absolute(path: &str) -> bool {
+    path.starts_with('/')
+}
+
+/// Whether canonical `path` is `root` or inside it: case-insensitive on Windows (NTFS), exact
+/// components on Unix (a case-sensitive volume has distinct `Docs` and `docs`).
+#[cfg(windows)]
+fn path_within_root(path: &Path, root: &Path) -> bool {
+    path_starts_with_ci(path, root)
+}
+
+#[cfg(not(windows))]
+fn path_within_root(path: &Path, root: &Path) -> bool {
+    path.starts_with(root)
+}
+
 /// Component-wise, case-insensitive `starts_with` on canonical paths.
+#[cfg(windows)]
 fn path_starts_with_ci(path: &Path, root: &Path) -> bool {
     let mut p = path.components();
     for r in root.components() {
@@ -336,6 +484,7 @@ fn path_starts_with_ci(path: &Path, root: &Path) -> bool {
     true
 }
 
+#[cfg(windows)]
 fn eq_component(a: Component<'_>, b: Component<'_>) -> bool {
     match (a, b) {
         (Component::Prefix(x), Component::Prefix(y)) => prefix_eq(x.kind(), y.kind()),
@@ -346,6 +495,7 @@ fn eq_component(a: Component<'_>, b: Component<'_>) -> bool {
     }
 }
 
+#[cfg(windows)]
 fn prefix_eq(a: Prefix<'_>, b: Prefix<'_>) -> bool {
     use Prefix::*;
     let lc = |s: &std::ffi::OsStr| s.to_string_lossy().to_lowercase();
@@ -371,6 +521,12 @@ fn realpath_existing_ancestor(p: &Path) -> SResult<PathBuf> {
                 return Ok(real);
             }
             Err(e) if e.kind() == io::ErrorKind::NotFound => {
+                // Unix: a link whose target is missing also reports NotFound. Its target is
+                // unknown, so it is never treated as a new name inside the root.
+                #[cfg(not(windows))]
+                if std::fs::symlink_metadata(&cur).is_ok() {
+                    return Err(Violation::OutsideRoot.into());
+                }
                 let Some(name) = cur.file_name().map(ToOwned::to_owned) else {
                     return Err(SandboxError::Io(e));
                 };
@@ -387,7 +543,7 @@ fn realpath_existing_ancestor(p: &Path) -> SResult<PathBuf> {
 /// One allowed root.
 #[derive(Debug, Clone)]
 pub struct SandboxRoot {
-    /// As given (picker / catalog), normalised to backslashes.
+    /// As given (picker / catalog), normalised to backslashes (Windows) or unchanged (Unix).
     pub configured: String,
     /// `std::fs::canonicalize` result (verbatim form, long names, links resolved).
     pub canonical: PathBuf,
@@ -396,10 +552,18 @@ pub struct SandboxRoot {
 }
 
 impl SandboxRoot {
+    #[cfg(windows)]
     fn textually_contains(&self, input_norm: &str) -> bool {
         let root = self.configured.trim_end_matches('\\').to_lowercase();
         let inp = input_norm.to_lowercase();
         inp == root || inp.starts_with(&format!("{root}\\"))
+    }
+
+    /// Unix has no special forms (`special` is always false); exact, `/`-separated.
+    #[cfg(not(windows))]
+    fn textually_contains(&self, input_norm: &str) -> bool {
+        let root = self.configured.trim_end_matches('/');
+        input_norm == root || input_norm.starts_with(&format!("{root}/"))
     }
 }
 
@@ -463,7 +627,7 @@ impl Sandbox {
     /// not be (or be inside) a [`SecretFilter`] name such as `.ssh`. `\\.\` / `\??\` device paths
     /// and `\\?\` forms other than `\\?\X:\` and `\\?\UNC\` are refused.
     pub fn add_root(&mut self, root: impl AsRef<Path>) -> SResult<usize> {
-        let raw = root.as_ref().to_string_lossy().replace('/', "\\");
+        let raw = normalize_input(&root.as_ref().to_string_lossy());
         let (form, _) = parse_absolute(&raw)?;
         let special = form == AbsoluteForm::Special;
         if special {
@@ -519,7 +683,7 @@ impl Sandbox {
 
     /// Resolve an absolute path; it must be inside one of the roots.
     pub fn resolve(&self, path: &str) -> SResult<ResolvedPath> {
-        let norm = path.replace('/', "\\");
+        let norm = normalize_input(path);
         let (form, _) = parse_absolute(&norm)?;
         let mut last_err: SandboxError = Violation::OutsideRoot.into();
         for (i, r) in self.roots.iter().enumerate() {
@@ -537,10 +701,7 @@ impl Sandbox {
 
     /// Resolve a user-supplied path: absolute (any root) or relative to the only root.
     pub fn resolve_any(&self, path: &str) -> SResult<ResolvedPath> {
-        let b = path.as_bytes();
-        let looks_absolute = path.starts_with(['/', '\\'])
-            || (b.len() >= 2 && b[1] == b':' && b[0].is_ascii_alphabetic());
-        if looks_absolute {
+        if looks_absolute(path) {
             return self.resolve(path);
         }
         match self.roots.len() {
@@ -552,7 +713,7 @@ impl Sandbox {
     fn contain(&self, root: usize, candidate: &Path) -> SResult<ResolvedPath> {
         let r = self.roots.get(root).ok_or(Violation::BadRoot)?;
         let real = realpath_existing_ancestor(candidate)?;
-        if !path_starts_with_ci(&real, &r.canonical) {
+        if !path_within_root(&real, &r.canonical) {
             return Err(Violation::OutsideRoot.into());
         }
         // Re-validate what the file system resolved to (a junction target could be named "CON.").
@@ -580,10 +741,15 @@ impl Sandbox {
 mod fs_tests;
 
 #[cfg(test)]
+#[cfg(unix)]
+mod fs_tests_unix;
+
+#[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
+    #[cfg(windows)]
     fn path_keys_fold_case_and_separators() {
         assert_eq!(path_key(r"Docs\Sub/A.MD"), "docs/sub/a.md");
         assert_eq!(path_key("docs/sub/a.md/"), "docs/sub/a.md");
@@ -641,6 +807,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(windows)]
     fn component_rules() {
         assert_eq!(
             validate_component("a:b"),
@@ -663,6 +830,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(windows)]
     fn absolute_forms() {
         assert_eq!(parse_absolute("C:foo"), Err(Violation::DriveRelative));
         assert_eq!(parse_absolute("\\foo"), Err(Violation::NotAbsolute));
@@ -683,5 +851,107 @@ mod tests {
             parse_absolute("\\\\?\\C:\\a\\..\\b"),
             Err(Violation::ParentTraversal)
         );
+    }
+
+    /// Unix keys keep case and `\`: `A.md` and `a.md` are two files on a case-sensitive volume.
+    #[test]
+    #[cfg(not(windows))]
+    fn unix_path_keys_keep_case_and_backslashes() {
+        assert_eq!(path_key("Docs/Sub/A.MD"), "Docs/Sub/A.MD");
+        assert_ne!(path_key("A.md"), path_key("a.md"));
+        assert_eq!(path_key(r"docs/a\b.md/"), r"docs/a\b.md");
+        assert_eq!(path_key(""), "");
+    }
+
+    #[test]
+    #[cfg(not(windows))]
+    fn unix_component_rules() {
+        // Win32-only rules do not apply: these are ordinary POSIX names.
+        for ok in [
+            "a:b",
+            "x.",
+            "x ",
+            "...",
+            "CON",
+            "nul.txt",
+            "a*",
+            "a?b",
+            "<x>",
+            "a|b",
+            r"a\b",
+            r"a\",
+            ".gitignore",
+            "résumé (final).docx",
+        ] {
+            assert_eq!(validate_component(ok), Ok(()), "{ok}");
+        }
+        assert_eq!(validate_component(".."), Err(Violation::ParentTraversal));
+        assert_eq!(validate_component("."), Err(Violation::CurrentDir));
+        assert_eq!(validate_component(""), Err(Violation::Empty));
+        assert_eq!(validate_component("a\nb"), Err(Violation::InvalidChar));
+        assert_eq!(validate_component("a\0b"), Err(Violation::InvalidChar));
+        assert_eq!(
+            validate_component(&"a".repeat(256)),
+            Err(Violation::ComponentTooLong)
+        );
+        // macOS resource fork access (`file/..namedfork/rsrc`).
+        assert_eq!(
+            validate_component("..namedfork"),
+            Err(Violation::AlternateDataStream)
+        );
+        assert_eq!(
+            validate_component("..NamedFork"),
+            Err(Violation::AlternateDataStream)
+        );
+        // `\` never becomes traversal or an absolute path for a consumer that splits on it.
+        for (bad, want) in [
+            (r"..\x", Violation::ParentTraversal),
+            (r"a\..", Violation::ParentTraversal),
+            (r"a\..\..\b", Violation::ParentTraversal),
+            (r".\x", Violation::CurrentDir),
+            (r"\etc", Violation::InvalidChar),
+            (r"\", Violation::InvalidChar),
+        ] {
+            assert_eq!(validate_component(bad), Err(want), "{bad}");
+        }
+    }
+
+    #[test]
+    #[cfg(not(windows))]
+    fn unix_relative_and_absolute_forms() {
+        assert_eq!(parse_relative("a/b/").unwrap(), vec!["a", "b"]);
+        assert_eq!(parse_relative(r"a\b").unwrap(), vec![r"a\b"]);
+        assert_eq!(parse_relative("C:foo").unwrap(), vec!["C:foo"]);
+        assert_eq!(parse_relative("/etc"), Err(Violation::NotRelative));
+        assert_eq!(parse_relative("a//b"), Err(Violation::Empty));
+        assert_eq!(parse_relative("a/../b"), Err(Violation::ParentTraversal));
+        assert_eq!(
+            parse_relative(r"a\..\..\b"),
+            Err(Violation::ParentTraversal)
+        );
+        assert_eq!(parse_relative("./a"), Err(Violation::CurrentDir));
+
+        assert_eq!(
+            parse_absolute("/Users/me/Docs"),
+            Ok((
+                AbsoluteForm::Drive,
+                vec!["Users".into(), "me".into(), "Docs".into()]
+            ))
+        );
+        assert_eq!(parse_absolute("/"), Ok((AbsoluteForm::Drive, vec![])));
+        assert_eq!(parse_absolute(""), Err(Violation::Empty));
+        assert_eq!(parse_absolute("Users/me"), Err(Violation::NotAbsolute));
+        assert_eq!(parse_absolute(r"C:\a\b"), Err(Violation::NotAbsolute));
+        assert_eq!(parse_absolute(r"\\?\C:\a"), Err(Violation::NotAbsolute));
+        assert_eq!(parse_absolute("//server/share"), Err(Violation::Empty));
+        assert_eq!(
+            parse_absolute("/Users/me/../other"),
+            Err(Violation::ParentTraversal)
+        );
+        assert_eq!(parse_absolute("/a/./b"), Err(Violation::CurrentDir));
+        assert_eq!(parse_absolute("/a//b"), Err(Violation::Empty));
+        assert!(looks_absolute("/x"));
+        assert!(!looks_absolute(r"\x"));
+        assert!(!looks_absolute(r"C:\x"));
     }
 }

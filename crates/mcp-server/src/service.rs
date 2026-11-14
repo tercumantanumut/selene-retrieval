@@ -8,11 +8,11 @@
 
 use rmcp::ServiceExt;
 use serde_json::Value;
+use sr_client::sys::ServerStream;
 use sr_common::error::{ClientKind, Error};
 use sr_common::events::{EngineEvent, Snapshot};
 use sr_engine::EngineHandle;
 use sr_engine::pipe::{EventHub, PipeService, SessionInfo};
-use tokio::net::windows::named_pipe::NamedPipeServer;
 
 use crate::server::McpServer;
 use crate::slot::{EngineSlot, START_WAIT};
@@ -139,7 +139,7 @@ impl PipeService for DaemonService {
         }
     }
 
-    async fn serve_mcp(&self, stream: NamedPipeServer, session: SessionInfo) {
+    async fn serve_mcp(&self, stream: ServerStream, session: SessionInfo) {
         self.slot.bus().publish(EngineEvent::ClientConnected {
             client: client_kind(&session.handshake.client_id),
         });
@@ -186,7 +186,7 @@ impl PipeService for DaemonService {
         if sr_common::api::is_privileged(&method) && !session.trusted_app {
             let peer = session
                 .client_pid
-                .and_then(sr_client::win::process_image_path)
+                .and_then(sr_client::sys::process_image_path)
                 .and_then(|p| p.file_name().map(|n| n.to_string_lossy().into_owned()))
                 .unwrap_or_else(|| "unknown".into());
             tracing::warn!(target: "sr_mcp::rpc", method = %method, peer = %peer, "privileged call refused: caller is not Selene Retrieval's app");

@@ -166,6 +166,15 @@ pub fn err_documents_missing() -> UiError {
 }
 
 pub fn err_access_denied() -> UiError {
+    #[cfg(target_os = "macos")]
+    return choose_error(
+        "Couldn't create the folder",
+        "macOS didn't let Selene Retrieval create a folder in Documents. If you chose “Don’t Allow” \
+         when asked about your Documents folder, you can allow it in System Settings → Privacy & \
+         Security → Files & Folders. Choose a folder you already have instead.",
+        "DefaultFolder · AccessDenied",
+    );
+    #[cfg(not(target_os = "macos"))]
     choose_error(
         "Couldn't create the folder",
         "Windows didn't let Selene Retrieval create a folder in Documents. If Windows Security showed \
@@ -638,7 +647,10 @@ mod tests {
                 assert!(!e.body.contains(jargon), "{jargon} in {}", e.body);
             }
         }
+        #[cfg(not(target_os = "macos"))]
         assert!(err_access_denied().body.contains("ransomware protection"));
+        #[cfg(target_os = "macos")]
+        assert!(err_access_denied().body.contains("Files & Folders"));
     }
 
     /// Live check (docs/07 §7): the app's real create-and-add path against a **debug** daemon the
@@ -675,7 +687,7 @@ mod tests {
             docs: Some(Box::leak(docs.clone().into_boxed_path())),
             added,
             roots_managed: false,
-            elevated: sr_client::win::process_elevated().unwrap_or(true),
+            elevated: sr_client::sys::process_elevated().unwrap_or(true),
             timeout: FS_TIMEOUT,
         };
 

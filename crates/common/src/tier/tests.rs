@@ -47,8 +47,9 @@ fn hw(ram_gib: u64, cores: u32, avx2: bool, disk_gib: u64, gpus: Vec<GpuInfo>) -
 fn t() -> Thresholds {
     Thresholds::default()
 }
+/// The tier tables are the Windows x64 ones on every host (see `macos_*` tests for Apple silicon).
 fn dec(h: &HwInfo) -> TierDecision {
-    select_tier(h, &t())
+    select_tier_on(h, &t(), TierPlatform::WINDOWS_X64)
 }
 fn tier(h: &HwInfo) -> Tier {
     dec(h).tier
@@ -623,4 +624,49 @@ fn upgrade_disk_preflight_formula() {
     let n = upgrade_disk_needed(218_155_826, 100_000, 768);
     assert_eq!(n, 218_155_826 + 307_200_000 + 92_160_000 + 2 * GIB);
     assert_eq!(upgrade_disk_needed(u64::MAX, u64::MAX, 1024), u64::MAX);
+}
+
+// ------------------------------------------------------------------ Amendment 18: Apple silicon
+fn mac(h: &HwInfo) -> TierDecision {
+    select_tier_on(h, &t(), TierPlatform::MACOS_ARM64)
+}
+
+#[test]
+fn macos_never_uses_directml_and_ignores_adapters() {
+    // Whatever an adapter list says, there is no DirectML on macOS: CPU plan, never High.
+    for gpus in [vec![], vec![dgpu(16 * GIB)], vec![igpu(GIB)]] {
+        let d = mac(&hw(64, 12, false, 500, gpus));
+        assert_eq!((d.ep, d.gpu_class), (EpPlan::Cpu, GpuClass::None));
+        assert_eq!(d.tier, Tier::Standard, "{:?}", d.reasons);
+        let (plan, _) = effective_ep(&d, &[dgpu(16 * GIB)], true, &GpuState::default());
+        assert_eq!(plan, EpPlan::Cpu);
+    }
+}
+
+#[test]
+fn macos_tier_follows_ram_cores_and_disk_without_avx2() {
+    // `avx2` is false on aarch64; NEON qualifies instead.
+    assert_eq!(mac(&hw(8, 8, false, 100, vec![])).tier, Tier::Standard); // M1/M2 8 GB
+    assert_eq!(mac(&hw(16, 10, false, 100, vec![])).tier, Tier::Standard);
+    assert_eq!(mac(&hw(7, 8, false, 100, vec![])).tier, Tier::Minimum);
+    assert_eq!(mac(&hw(16, 4, false, 100, vec![])).tier, Tier::Minimum);
+    assert_eq!(mac(&hw(16, 8, false, 9, vec![])).tier, Tier::Minimum);
+    let d = mac(&hw(8, 8, false, 100, vec![]));
+    assert!(
+        !d.reasons.iter().any(|r| r.contains("AVX2")),
+        "{:?}",
+        d.reasons
+    );
+    // The same machine on Windows x64 without AVX2 stays at Minimum (unchanged).
+    assert_eq!(dec(&hw(8, 8, false, 100, vec![])).tier, Tier::Minimum);
+}
+
+#[test]
+fn current_platform_matches_the_build() {
+    let p = TierPlatform::current();
+    assert_eq!(p.directml, cfg!(windows));
+    #[cfg(all(windows, target_arch = "x86_64"))]
+    assert_eq!(p, TierPlatform::WINDOWS_X64);
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    assert_eq!(p, TierPlatform::MACOS_ARM64);
 }

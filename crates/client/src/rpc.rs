@@ -22,12 +22,19 @@ use sr_common::protocol::rpc::{
     SubscribeResult,
 };
 use tokio::io::{AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt, ReadHalf, WriteHalf};
-use tokio::net::windows::named_pipe::NamedPipeClient;
 use tokio::sync::{Mutex, mpsc, oneshot};
 
 use crate::attach::{AttachOptions, Connection, attach};
+use crate::sys::Stream;
 
 type Pending = Arc<std::sync::Mutex<HashMap<u64, oneshot::Sender<rpc::Response>>>>;
+
+/// macOS (R50): `host.challenge` returns `{nonce}`; the same process then answers with
+/// `host.attest {nonce}`, and the daemon trusts the session if that process is our own app
+/// (`sr_engine::pipe`). Other platforms don't serve these methods.
+pub const HOST_CHALLENGE: &str = "host.challenge";
+/// See [`HOST_CHALLENGE`]. Returns `{trusted}`.
+pub const HOST_ATTEST: &str = "host.attest";
 
 /// Reads one frame. `Ok(None)` on clean EOF at a frame boundary.
 pub async fn read_frame<R: AsyncRead + Unpin>(r: &mut R) -> std::io::Result<Option<Vec<u8>>> {
@@ -59,7 +66,7 @@ fn disconnected() -> Error {
 
 /// A connected app-RPC client.
 pub struct AppClient {
-    writer: Arc<Mutex<WriteHalf<NamedPipeClient>>>,
+    writer: Arc<Mutex<WriteHalf<Stream>>>,
     pending: Pending,
     next_id: AtomicU64,
     notes: std::sync::Mutex<Option<mpsc::Receiver<Notification>>>,
@@ -79,7 +86,25 @@ impl AppClient {
     pub async fn connect(opts: &AttachOptions) -> Result<Self, Error> {
         let mut o = opts.clone();
         o.kind = ConnKind::App;
-        Ok(Self::from_connection(attach(&o).await?))
+        let c = Self::from_connection(attach(&o).await?);
+        #[cfg(target_os = "macos")]
+        c.attest().await;
+        Ok(c)
+    }
+
+    /// macOS (R50): proves to the daemon that this process holds the connection, so our own
+    /// app gets its privileged calls. Best effort: on failure the session stays untrusted and
+    /// privileged calls are refused with the plain "only in the app" error.
+    #[cfg(target_os = "macos")]
+    async fn attest(&self) {
+        let Ok(v) = self.request(HOST_CHALLENGE, serde_json::json!({})).await else {
+            return;
+        };
+        if let Some(nonce) = v.get("nonce").and_then(Value::as_str) {
+            let _ = self
+                .request(HOST_ATTEST, serde_json::json!({ "nonce": nonce }))
+                .await;
+        }
     }
 
     /// Wraps an attached `kind=app` connection.
@@ -181,11 +206,7 @@ impl AppClient {
     }
 }
 
-async fn read_loop(
-    mut r: ReadHalf<NamedPipeClient>,
-    pending: Pending,
-    notes: mpsc::Sender<Notification>,
-) {
+async fn read_loop(mut r: ReadHalf<Stream>, pending: Pending, notes: mpsc::Sender<Notification>) {
     loop {
         let frame = match read_frame(&mut r).await {
             Ok(Some(f)) => f,

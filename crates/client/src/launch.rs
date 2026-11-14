@@ -14,17 +14,35 @@
 //!
 //! Packaged (MSIX) context: breakaway does not drop package identity, so only the task is used
 //! (in-job would put the daemon's writes in the package's virtualised folder).
+//!
+//! Unix (macOS port): there are no Job Objects. "Breakaway" is a detached start in a new session
+//! (`setsid`, stdio on `/dev/null`, `sys::spawn_detached`); the launcher exits at once, so the
+//! daemon's parent is launchd. The task and in-job methods report "not available".
+//!
+//! No LaunchAgent (macOS phase 2 decision). On Windows the scheduled task exists to escape a
+//! kill-on-close Job Object (MSIX, MCP clients that kill their process tree). macOS has neither:
+//! a process in its own session and process group, re-parented to launchd, is out of reach of
+//! the client's group signals and of its exit, and nothing kills it with the client. A
+//! LaunchAgent would add a plist in `~/Library/LaunchAgents`, a "Background item added" notice
+//! and (with `SMAppService`) a signed bundle, for no gain in lifetime. A sandboxed MCP client
+//! would not be helped either: its children inherit the sandbox, and so would `launchctl`.
+//! Open for phase 4 (packaging): privacy prompts (TCC) name the app that started the daemon.
 
 use std::io::Write;
 use std::path::{Path, PathBuf};
+#[cfg(windows)]
 use std::process::{Command, Stdio};
+#[cfg(windows)]
 use std::time::Duration;
 
+#[cfg(windows)]
 use windows_sys::Win32::System::Threading::{
     CREATE_BREAKAWAY_FROM_JOB, CREATE_NEW_PROCESS_GROUP, CREATE_NO_WINDOW, DETACHED_PROCESS,
 };
 
 use crate::naming::{self, LAUNCH_LOG};
+use crate::sys;
+#[cfg(windows)]
 use crate::win::{self, OwnedProcess};
 
 /// `sr-launch` exit codes.
@@ -80,24 +98,26 @@ pub struct LaunchArgs {
 
 impl LaunchArgs {
     /// Defaults: `sr-daemon.exe` next to `sr-launch.exe`, the per-user task, order
-    /// breakaway → task → in-job (task only when packaged). Debug builds honour `SR_DAEMON_EXE`,
-    /// `SR_TASK_PREFIX` and `SR_LAUNCH_ORDER`.
+    /// breakaway → task → in-job (task only when packaged; Unix: breakaway only). Debug builds
+    /// honour `SR_DAEMON_EXE`, `SR_TASK_PREFIX` and `SR_LAUNCH_ORDER`.
     pub fn new(data_dir: PathBuf) -> Result<Self, String> {
         naming::validate_data_dir(&data_dir).map_err(|e| e.to_string())?;
         let daemon_exe = match naming::dev_env("SR_DAEMON_EXE") {
             Some(p) => PathBuf::from(p),
-            None => naming::sibling_exe("sr-daemon.exe").map_err(|e| e.to_string())?,
+            None => naming::sibling_exe(&naming::exe_file_name("sr-daemon"))
+                .map_err(|e| e.to_string())?,
         };
-        let sid = win::user_sid_string().map_err(|e| e.to_string())?;
+        let sid = sys::user_sid_string().map_err(|e| e.to_string())?;
         let task_name = naming::task_name(&sid, &data_dir);
-        let packaged = win::package_full_name().is_some();
+        let packaged = sys::package_full_name().is_some();
         let order = match naming::dev_env("SR_LAUNCH_ORDER") {
             Some(o) => o
                 .to_string_lossy()
                 .split(',')
                 .filter_map(Method::parse)
                 .collect(),
-            None => vec![Method::Breakaway, Method::Task, Method::InJob],
+            None if cfg!(windows) => vec![Method::Breakaway, Method::Task, Method::InJob],
+            None => vec![Method::Breakaway],
         };
         Ok(Self {
             data_dir,
@@ -108,6 +128,7 @@ impl LaunchArgs {
         })
     }
 
+    #[cfg(windows)]
     fn daemon_args(&self, launched_by: &str) -> String {
         format!(
             "--data-dir {} --launched-by {launched_by}",
@@ -164,7 +185,7 @@ pub fn run(args: &LaunchArgs) -> Outcome {
             "launch start order={:?} packaged={} launcher_in_job={:?} daemon={}",
             args.order,
             args.packaged,
-            win::current_process_in_job(),
+            sys::current_process_in_job(),
             args.daemon_exe.display()
         ),
     );
@@ -196,6 +217,7 @@ pub fn run(args: &LaunchArgs) -> Outcome {
     }
 }
 
+#[cfg(windows)]
 fn breakaway(args: &LaunchArgs) -> Result<Outcome, String> {
     let child = OwnedProcess::spawn(
         &args.daemon_exe,
@@ -222,6 +244,31 @@ fn breakaway(args: &LaunchArgs) -> Result<Outcome, String> {
     Ok(Outcome::Breakaway { pid: child.pid() })
 }
 
+/// Unix: detached in a new session, no inherited stdio (see the module docs).
+#[cfg(unix)]
+fn breakaway(args: &LaunchArgs) -> Result<Outcome, String> {
+    let a: [&std::ffi::OsStr; 4] = [
+        "--data-dir".as_ref(),
+        args.data_dir.as_os_str(),
+        "--launched-by".as_ref(),
+        "breakaway".as_ref(),
+    ];
+    let pid = sys::spawn_detached(&args.daemon_exe, &a, args.daemon_exe.parent())
+        .map_err(|e| format!("spawn (setsid): {e}"))?;
+    Ok(Outcome::Breakaway { pid })
+}
+
+#[cfg(unix)]
+fn task(_: &LaunchArgs) -> Result<Outcome, String> {
+    Err("not available on this platform".into())
+}
+
+#[cfg(unix)]
+fn in_job(_: &LaunchArgs) -> Result<Outcome, String> {
+    Err("not available on this platform".into())
+}
+
+#[cfg(windows)]
 fn in_job(args: &LaunchArgs) -> Result<Outcome, String> {
     let child = OwnedProcess::spawn(
         &args.daemon_exe,
@@ -234,6 +281,7 @@ fn in_job(args: &LaunchArgs) -> Result<Outcome, String> {
     Ok(Outcome::InJob { pid: child.pid() })
 }
 
+#[cfg(windows)]
 fn schtasks() -> Result<PathBuf, String> {
     win::system_dir()
         .map(|d| d.join("schtasks.exe"))
@@ -241,6 +289,7 @@ fn schtasks() -> Result<PathBuf, String> {
 }
 
 /// Runs `schtasks.exe` with no window; returns (exit code, stdout).
+#[cfg(windows)]
 fn run_schtasks(args: &[&str]) -> Result<(i32, String), String> {
     use std::os::windows::process::CommandExt;
     let out = Command::new(schtasks()?)
@@ -257,6 +306,7 @@ fn run_schtasks(args: &[&str]) -> Result<(i32, String), String> {
     Ok((code, text))
 }
 
+#[cfg(windows)]
 fn xml_escape(s: &str) -> String {
     s.replace('&', "&amp;")
         .replace('<', "&lt;")
@@ -266,6 +316,7 @@ fn xml_escape(s: &str) -> String {
 
 /// Task definition: on demand only (no trigger), never times out, ignores battery, one instance,
 /// normal priority, the user's own non-elevated interactive token (M0-D §5.9, validated).
+#[cfg(windows)]
 pub fn task_xml(sid: &str, daemon_exe: &Path, arguments: &str) -> String {
     format!(
         r#"<?xml version="1.0" encoding="UTF-16"?>
@@ -296,6 +347,7 @@ pub fn task_xml(sid: &str, daemon_exe: &Path, arguments: &str) -> String {
 }
 
 /// Registers (or replaces) the task from XML. No admin needed for a per-user, non-elevated task.
+#[cfg(windows)]
 pub fn register_task(task_name: &str, data_dir: &Path, daemon_exe: &Path) -> Result<(), String> {
     let sid = win::user_sid_string().map_err(|e| e.to_string())?;
     let args = format!(
@@ -319,6 +371,7 @@ pub fn register_task(task_name: &str, data_dir: &Path, daemon_exe: &Path) -> Res
 }
 
 /// Deletes the task (uninstaller, tests).
+#[cfg(windows)]
 pub fn delete_task(task_name: &str) -> Result<(), String> {
     match run_schtasks(&["/delete", "/tn", task_name, "/f"])? {
         (0, _) => Ok(()),
@@ -327,6 +380,7 @@ pub fn delete_task(task_name: &str) -> Result<(), String> {
 }
 
 /// Whether the registered task already runs `daemon_exe` for `data_dir`.
+#[cfg(windows)]
 fn task_matches(task_name: &str, data_dir: &Path, daemon_exe: &Path) -> bool {
     let Ok((0, xml)) = run_schtasks(&["/query", "/tn", task_name, "/xml"]) else {
         return false;
@@ -337,6 +391,7 @@ fn task_matches(task_name: &str, data_dir: &Path, daemon_exe: &Path) -> bool {
     lower.contains(&format!("<command>{exe}</command>")) && lower.contains(&dd)
 }
 
+#[cfg(windows)]
 fn task(args: &LaunchArgs) -> Result<Outcome, String> {
     let mut registered = false;
     if !task_matches(&args.task_name, &args.data_dir, &args.daemon_exe) {
@@ -353,6 +408,7 @@ fn task(args: &LaunchArgs) -> Result<Outcome, String> {
 mod tests {
     use super::*;
 
+    #[cfg(windows)]
     #[test]
     fn xml_is_escaped_and_has_no_trigger() {
         let x = task_xml(

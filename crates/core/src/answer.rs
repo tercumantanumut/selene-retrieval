@@ -669,9 +669,17 @@ pub(crate) async fn one_pass(
 }
 
 /// Paths compared the Windows way: `/` = `\\`, case-insensitive.
+#[cfg(windows)]
 fn same_path(a: &str, b: &str) -> bool {
     let n = |s: &str| s.trim().replace('/', "\\").to_lowercase();
     n(a) == n(b)
+}
+
+/// S-09 on Unix: exact match. File names are case-sensitive and may hold `\\` or edge spaces,
+/// so any folding could let a different file pass as a source.
+#[cfg(not(windows))]
+fn same_path(a: &str, b: &str) -> bool {
+    a == b
 }
 
 /// S-09: may the answer loop read `path`? Only a file among the current sources (retrieved,
@@ -760,9 +768,20 @@ mod tests {
         };
         let v = vec![s];
         assert!(source_file_allowed(&v, r"C:\Notes\proj\a.md"));
-        assert!(source_file_allowed(&v, "c:/notes/PROJ/a.md"));
         assert!(source_file_allowed(&v, "proj/a.md"));
-        assert!(source_file_allowed(&v, r"proj\a.md"));
+        // Windows folds case and slashes; Unix paths must match exactly.
+        #[cfg(windows)]
+        {
+            assert!(source_file_allowed(&v, "c:/notes/PROJ/a.md"));
+            assert!(source_file_allowed(&v, r"proj\a.md"));
+        }
+        #[cfg(not(windows))]
+        {
+            assert!(!source_file_allowed(&v, "c:/notes/PROJ/a.md"));
+            assert!(!source_file_allowed(&v, r"proj\a.md"));
+            assert!(!source_file_allowed(&v, "PROJ/a.md"));
+            assert!(!source_file_allowed(&v, " proj/a.md"));
+        }
         // S-09: another in-scope file, a sibling, or nothing at all is refused.
         assert!(!source_file_allowed(&v, r"C:\Notes\proj\b.md"));
         assert!(!source_file_allowed(&v, r"C:\Users\me\.ssh\id_rsa"));

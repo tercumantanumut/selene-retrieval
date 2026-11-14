@@ -10,17 +10,29 @@ use std::time::Duration;
 use sr_common::protocol::extract::DocKind;
 use sr_extract_client::{ExtractConfig, SandboxMode, delete_app_container_profile};
 
+/// The pdfium library's file name on this platform (`pdfium.dll`, `libpdfium.dylib`, ...).
+pub fn pdfium_name() -> String {
+    format!(
+        "{}pdfium{}",
+        std::env::consts::DLL_PREFIX,
+        std::env::consts::DLL_SUFFIX
+    )
+}
+
 /// pdfium.dll: `SR_PDFIUM_DLL`, else `<workspace root>/vendor-bin/pdfium-7881/pdfium.dll`, where
-/// `cargo xtask fetch-pdfium` puts the pinned chromium/7881 build.
+/// `cargo xtask fetch-pdfium` puts the pinned chromium/7881 build (`libpdfium.dylib` on macOS).
 pub fn pdfium_dll() -> PathBuf {
     if let Some(p) = std::env::var_os("SR_PDFIUM_DLL") {
         return PathBuf::from(p);
     }
-    let p = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../vendor-bin/pdfium-7881/pdfium.dll");
+    let p = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../../vendor-bin/pdfium-7881")
+        .join(pdfium_name());
     let p = std::fs::canonicalize(&p).unwrap_or_else(|e| {
         panic!(
-            "pdfium.dll not found at {} ({e}); run `cargo xtask fetch-pdfium` or set SR_PDFIUM_DLL \
+            "{} not found at {} ({e}); run `cargo xtask fetch-pdfium` or set SR_PDFIUM_DLL \
              to a pdfium chromium/7881 build",
+            pdfium_name(),
             p.display()
         )
     });
@@ -44,12 +56,16 @@ pub fn tmp_root() -> PathBuf {
 pub fn stage(name: &str) -> (PathBuf, PathBuf) {
     let dir = tmp_root().join("stage").join(name);
     std::fs::create_dir_all(&dir).unwrap();
-    let exe = dir.join("sr-extract.exe");
-    let dll = dir.join("pdfium.dll");
+    let exe = dir.join(format!("sr-extract{}", std::env::consts::EXE_SUFFIX));
+    let dll = dir.join(pdfium_name());
     // SR_EXTRACT_EXE: run the suite against another build (e.g. the +crt-static packaging one).
     let src = std::env::var_os("SR_EXTRACT_EXE")
         .map(PathBuf::from)
         .unwrap_or_else(|| PathBuf::from(env!("CARGO_BIN_EXE_sr-extract")));
+    // macOS caches a binary's code signature per file: copying a new build over the old file in
+    // place makes the kernel kill it at exec. A fresh file avoids that.
+    #[cfg(unix)]
+    let _ = std::fs::remove_file(&exe);
     std::fs::copy(src, &exe).unwrap();
     if !dll.exists() {
         std::fs::copy(pdfium_dll(), &dll).unwrap();

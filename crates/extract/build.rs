@@ -13,4 +13,8 @@ fn main() {
     if std::env::var("CARGO_CFG_TARGET_ENV").is_ok_and(|v| v == "msvc") {
         println!("cargo:rustc-link-arg-bin=sr-extract=/STACK:67108864");
     }
+    // The same 64 MiB main-thread stack on macOS (ld64 flag).
+    if std::env::var("CARGO_CFG_TARGET_OS").is_ok_and(|v| v == "macos") {
+        println!("cargo:rustc-link-arg-bin=sr-extract=-Wl,-stack_size,0x4000000");
+    }
 }

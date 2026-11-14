@@ -302,7 +302,8 @@ pub fn plan_blocking(
         win::snapshot()
     };
     if override_url.is_none() && !all_local && snapshot.is_none() {
-        plan.system_fallback = cfg!(windows);
+        // No WinHTTP answer (or not Windows): reqwest's system proxy (registry / macOS settings).
+        plan.system_fallback = true;
     }
     for url in urls {
         let Some(host) = host_of(url) else { continue };

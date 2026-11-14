@@ -241,9 +241,42 @@ fn context_is_used_when_present() {
 
 #[test]
 fn display_and_debug_never_show_full_paths() {
-    let e = Error::new(ErrorCode::FileLocked).with_path(r"C:\Users\secret-name\file.txt");
-    assert!(!format!("{e}").contains("secret-name"));
-    assert!(!format!("{e:?}").contains("secret-name"));
+    // A Windows-style path is redacted on every platform, a POSIX one on Unix.
+    let mut paths = vec![r"C:\Users\secret-name\file.txt"];
+    if cfg!(not(windows)) {
+        paths.push("/Users/secret-name/file.txt");
+    }
+    for p in paths {
+        let e = Error::new(ErrorCode::FileLocked).with_path(p);
+        assert!(!format!("{e}").contains("secret-name"), "{p}");
+        assert!(!format!("{e:?}").contains("secret-name"), "{p}");
+        assert_eq!(e.ctx.file_name().as_deref(), Some("file.txt"), "{p}");
+        let m = Error::new(ErrorCode::FileTooLarge)
+            .with_path(p)
+            .user_message();
+        assert!(!m.body.contains("secret-name"), "{p}: {}", m.body);
+    }
+}
+
+/// Unix: a POSIX path shows only its file name; a name with `\` keeps only its last part.
+#[test]
+#[cfg(not(windows))]
+fn unix_paths_show_only_the_file_name() {
+    let m = Error::new(ErrorCode::FileTooLarge)
+        .with_ctx(ErrCtx {
+            limit: Some("10 MB".into()),
+            ..ErrCtx::default()
+        })
+        .with_path("/Users/me/data/big.bin")
+        .user_message();
+    assert_eq!(
+        m.body,
+        "\"big.bin\" is bigger than the 10 MB limit and was skipped."
+    );
+    let e = Error::new(ErrorCode::FileLocked).with_path(r"/Users/me/odd\name.txt");
+    assert_eq!(e.ctx.file_name().as_deref(), Some("name.txt"));
+    let e = Error::new(ErrorCode::FileLocked).with_path("/");
+    assert_eq!(e.ctx.file_name(), None);
 }
 
 #[test]
@@ -274,9 +307,13 @@ fn fallback_wording_is_never_capitalised_mid_sentence() {
             }
         }
     }
+    #[cfg(windows)]
+    let want = "Windows didn't allow access to this file.";
+    #[cfg(not(windows))]
+    let want = "Your Mac didn't allow access to this file.";
     assert_eq!(
         Error::new(ErrorCode::PermissionDenied).user_message().body,
-        "Windows didn't allow access to this file."
+        want
     );
 }
 

@@ -16,6 +16,11 @@
 //!   value (and no folder is allowed); a key with a wrong type locks that key. Each problem is a
 //!   plain note in [`Policy::issues`] for the log and diagnostics. Unknown keys are ignored.
 //!
+//! On macOS (Amendment 18) the engine reads the same `policy.toml` from
+//! `/Library/Application Support/SeleneRetrieval` (there is no registry); allowed roots there are
+//! POSIX paths (`/…`, no `.` or `..`) and compare exact components (case-sensitive), so a
+//! differently cased folder on a case-sensitive volume is never inside an allowed root.
+//!
 //! This module is plain data plus parsing; reading the file and the registry is the engine's job.
 //! The engine installs the loaded policy once per process ([`install`]); the sandbox's production
 //! root rules ([`crate::sandbox::DangerousRoots::from_env`]) consult it ([`current`]), so every
@@ -29,7 +34,7 @@ use serde::{Deserialize, Serialize};
 
 use super::{SearchModel, Settings};
 
-/// File name inside `%ProgramData%\SeleneRetrieval`.
+/// File name inside `%ProgramData%\SeleneRetrieval` (macOS: `/Library/Application Support/SeleneRetrieval`).
 pub const POLICY_FILE: &str = "policy.toml";
 /// Folder under `%ProgramData%` holding [`POLICY_FILE`].
 pub const POLICY_DIR: &str = "SeleneRetrieval";
@@ -579,6 +584,7 @@ pub fn url_is_loopback(url: &str) -> bool {
 }
 
 /// `C:\…` or `\\server\share\…` (not drive-relative, not relative, not a device path).
+#[cfg(windows)]
 fn is_absolute_root(p: &Path) -> bool {
     let s = p.to_string_lossy();
     if s.starts_with(r"\\?\") || s.starts_with(r"\\.\") {
@@ -594,7 +600,18 @@ fn is_absolute_root(p: &Path) -> bool {
     drive || unc
 }
 
+/// Unix: `/…` naming at least one folder, with no `.` or `..` component (a root names one
+/// folder exactly as written; `/` alone would match nothing in the sandbox, so it is dropped).
+#[cfg(not(windows))]
+fn is_absolute_root(p: &Path) -> bool {
+    let s = p.to_string_lossy();
+    s.starts_with('/')
+        && s.split('/').all(|c| c != "." && c != "..")
+        && s.split('/').any(|c| !c.is_empty())
+}
+
 /// Case-insensitive path components (`\` and `/` alike; a verbatim prefix dropped).
+#[cfg(windows)]
 fn components(p: &Path) -> Vec<String> {
     let s = dunce::simplified(p).to_string_lossy().to_lowercase();
     let unc = s.starts_with(r"\\") || s.starts_with("//");
@@ -607,6 +624,16 @@ fn components(p: &Path) -> Vec<String> {
         v[0] = format!(r"\\{}", v[0]);
     }
     v
+}
+
+/// Unix: exact `/`-separated components (a case-sensitive volume has distinct `Work` and `work`).
+#[cfg(not(windows))]
+fn components(p: &Path) -> Vec<String> {
+    p.to_string_lossy()
+        .split('/')
+        .filter(|c| !c.is_empty() && *c != ".")
+        .map(str::to_string)
+        .collect()
 }
 
 fn same_path(a: &Path, b: &Path) -> bool {
@@ -642,10 +669,16 @@ pub fn current() -> Arc<Policy> {
 mod tests {
     use super::*;
 
+    #[cfg(windows)]
+    const ROOTS_TOML: &str = r"allowed_roots = ['D:\Work', '\\server\share\team']";
+    #[cfg(not(windows))]
+    const ROOTS_TOML: &str = "allowed_roots = ['/Volumes/D/Work', '/Volumes/share/team']";
+
     #[test]
     fn full_file_parses_and_locks() {
         let p = Policy::from_toml_str(
-            r#"
+            &format!(
+                r#"
 [providers]
 allow_remote = false
 allowed = ["Ollama", "openai"]
@@ -654,10 +687,11 @@ allow_http_server = false
 allow_mcp_add_folder = false
 allow_mcp_sync_folder = false
 [folders]
-allowed_roots = ['D:\Work', '\\server\share\team']
+{ROOTS_TOML}
 [models]
 allow_downloads = false
-"#,
+"#
+            ),
             "policy.toml",
         );
         assert!(p.issues.is_empty(), "{:?}", p.issues);
@@ -669,10 +703,22 @@ allow_downloads = false
         assert!(!p.http_server_allowed() && !p.mcp_add_folder_allowed());
         assert!(!p.mcp_sync_folder_allowed());
         assert!(!p.model_downloads_allowed());
-        assert!(p.folder_allowed(Path::new(r"d:\work\notes")));
-        assert!(p.folder_allowed(Path::new(r"\\SERVER\share\team\x")));
-        assert!(!p.folder_allowed(Path::new(r"D:\Workshop")));
-        assert!(!p.folder_allowed(Path::new(r"C:\Users\me\Documents")));
+        #[cfg(windows)]
+        {
+            assert!(p.folder_allowed(Path::new(r"d:\work\notes")));
+            assert!(p.folder_allowed(Path::new(r"\\SERVER\share\team\x")));
+            assert!(!p.folder_allowed(Path::new(r"D:\Workshop")));
+            assert!(!p.folder_allowed(Path::new(r"C:\Users\me\Documents")));
+        }
+        #[cfg(not(windows))]
+        {
+            assert!(p.folder_allowed(Path::new("/Volumes/D/Work/notes")));
+            assert!(p.folder_allowed(Path::new("/Volumes/share/team/x")));
+            assert!(!p.folder_allowed(Path::new("/Volumes/D/Workshop")));
+            assert!(!p.folder_allowed(Path::new("/Users/me/Documents")));
+            // Exact case on Unix: another folder on a case-sensitive volume.
+            assert!(!p.folder_allowed(Path::new("/volumes/d/work/notes")));
+        }
         // Ollama on this computer is fine; OpenAI is a cloud provider and remote is off.
         assert!(p.provider_allowed("ollama", Some("http://localhost:11434")));
         assert!(!p.provider_allowed("openai", Some("https://api.openai.com/v1/")));
@@ -763,6 +809,7 @@ enabled = false
     }
 
     #[test]
+    #[cfg(windows)]
     fn relative_roots_are_dropped_never_widening() {
         let p = Policy::from_toml_str(
             "[folders]\nallowed_roots = ['Work', 'C:Docs', '\\\\?\\C:\\x', 'E:\\Data']\n",
@@ -773,6 +820,20 @@ enabled = false
             Some(vec![PathBuf::from(r"E:\Data")])
         );
         assert_eq!(p.issues.len(), 3);
+    }
+
+    #[test]
+    #[cfg(not(windows))]
+    fn unix_relative_and_dotted_roots_are_dropped_never_widening() {
+        let p = Policy::from_toml_str(
+            "[folders]\nallowed_roots = ['Work', 'C:\\Docs', '/a/../b', '/a/./b', '/', '/Data/']\n",
+            "policy.toml",
+        );
+        assert_eq!(p.allowed_folder_roots, Some(vec![PathBuf::from("/Data/")]));
+        assert_eq!(p.issues.len(), 5, "{:?}", p.issues);
+        assert!(p.folder_allowed(Path::new("/Data")));
+        assert!(p.folder_allowed(Path::new("/Data/x")));
+        assert!(!p.folder_allowed(Path::new("/DataX")));
     }
 
     #[test]
@@ -809,18 +870,24 @@ enabled = false
 
     #[test]
     fn merge_takes_the_most_restrictive() {
+        #[cfg(windows)]
+        let (d, e_data, d_work, d_work_a, d_other) =
+            (r"D:\", r"E:\Data", r"D:\Work", r"D:\Work\a", r"D:\Other");
+        #[cfg(not(windows))]
+        let (d, e_data, d_work, d_work_a, d_other) =
+            ("/D", "/E/Data", "/D/Work", "/D/Work/a", "/D/Other");
         let file = Policy {
             allow_http_server: Some(true),
             allow_model_downloads: Some(false),
             allowed_providers: Some(vec!["ollama".into(), "openai".into()]),
-            allowed_folder_roots: Some(vec![PathBuf::from(r"D:\"), PathBuf::from(r"E:\Data")]),
+            allowed_folder_roots: Some(vec![PathBuf::from(d), PathBuf::from(e_data)]),
             ..Policy::default()
         };
         let hklm = Policy {
             allow_http_server: Some(false),
             allow_mcp_sync_folder: Some(false),
             allowed_providers: Some(vec!["openai".into()]),
-            allowed_folder_roots: Some(vec![PathBuf::from(r"D:\Work")]),
+            allowed_folder_roots: Some(vec![PathBuf::from(d_work)]),
             ..Policy::default()
         };
         let m = file.merge(hklm);
@@ -828,18 +895,24 @@ enabled = false
         assert!(!m.mcp_sync_folder_allowed());
         assert!(!m.model_downloads_allowed());
         assert_eq!(m.allowed_providers, Some(vec!["openai".to_string()]));
-        assert!(m.folder_allowed(Path::new(r"D:\Work\a")));
-        assert!(!m.folder_allowed(Path::new(r"D:\Other")));
-        assert!(!m.folder_allowed(Path::new(r"E:\Data")));
+        assert!(m.folder_allowed(Path::new(d_work_a)));
+        assert!(!m.folder_allowed(Path::new(d_other)));
+        assert!(!m.folder_allowed(Path::new(e_data)));
     }
 
     #[test]
     fn registry_values_map_like_the_file() {
         let p = Policy::from_registry("HKLM", |name| match name {
             reg_names::ALLOW_REMOTE_PROVIDERS => Some(RegValue::Dword(0)),
+            #[cfg(windows)]
             reg_names::ALLOWED_FOLDER_ROOTS => Some(RegValue::Strings(vec![
                 r"D:\Work".into(),
                 r"E:\A; E:\B".into(),
+            ])),
+            #[cfg(not(windows))]
+            reg_names::ALLOWED_FOLDER_ROOTS => Some(RegValue::Strings(vec![
+                "/D/Work".into(),
+                "/E/A; /E/B".into(),
             ])),
             reg_names::ALLOW_HTTP_SERVER => Some(RegValue::Strings(vec!["maybe".into()])),
             reg_names::ALLOWED_PROVIDERS => Some(RegValue::Dword(1)),

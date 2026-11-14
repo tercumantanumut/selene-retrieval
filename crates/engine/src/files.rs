@@ -70,6 +70,22 @@ pub struct ReadFileResult {
     pub message: String,
 }
 
+/// `root` joined with a catalog path (`/`-separated, relative). Windows: one join with `\`
+/// separators (the shown path is unchanged); elsewhere: one join per non-empty component, so a
+/// leading `/` can never replace `root`.
+pub(crate) fn join_rel(root: &Path, rel: &str) -> PathBuf {
+    #[cfg(windows)]
+    {
+        root.join(rel.replace('/', "\\"))
+    }
+    #[cfg(not(windows))]
+    {
+        rel.split('/')
+            .filter(|c| !c.is_empty())
+            .fold(root.to_path_buf(), |p, c| p.join(c))
+    }
+}
+
 fn invalid(detail: impl Into<String>) -> Error {
     Error::new(ErrorCode::InvalidInput).with_detail(detail)
 }
@@ -526,7 +542,7 @@ pub fn grep_with_budget(
             let Ok(file) = dir.open(&rel) else { continue };
             let file = file.into_std();
             out.files_searched += 1;
-            let display = t.root_display.join(rel.replace('/', "\\"));
+            let display = join_rel(&t.root_display, &rel);
             let mut hit_limit = false;
             let res = searcher.search_file(
                 &matcher,

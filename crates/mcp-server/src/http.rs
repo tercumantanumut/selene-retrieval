@@ -347,10 +347,17 @@ enum BindError {
 /// Bind 127.0.0.1 exactly on the remembered port (a free one only the first time, when none is
 /// remembered yet). Never any other address, never silently another port (S-03).
 /// `SO_EXCLUSIVEADDRUSE` is set before `bind`, so nothing can bind next to us with `SO_REUSEADDR`.
+/// Unix: `SO_REUSEADDR` only lets us take our remembered port back while closed connections on
+/// it sit in TIME_WAIT (without it a restart after a token revocation found "Port in use"). It
+/// never allows a second listener on the same address; that needs `SO_REUSEPORT`, which is never
+/// set here, on both sockets, so the kernel still refuses anyone binding next to us.
 async fn bind(port: Option<u16>) -> Result<TcpListener, BindError> {
     let want = port.filter(|p| *p >= 1024);
     let sock = tokio::net::TcpSocket::new_v4().map_err(BindError::Other)?;
+    #[cfg(windows)]
     sr_client::win::set_exclusive_addr_use(&sock).map_err(BindError::Other)?;
+    #[cfg(unix)]
+    sock.set_reuseaddr(true).map_err(BindError::Other)?;
     let addr = SocketAddr::from((Ipv4Addr::LOCALHOST, want.unwrap_or(0)));
     if let Err(e) = sock.bind(addr) {
         // WSAEADDRINUSE, or WSAEACCES when the holder bound it exclusively.

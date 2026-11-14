@@ -257,12 +257,18 @@ pub struct ErrCtx {
 }
 
 impl ErrCtx {
-    /// File name of `path` (never the full path).
+    /// File name of `path` (never the full path). On Unix a `\` also ends the folder part, so a
+    /// Windows-style path that reaches a macOS build (from a client, a setting) is never shown
+    /// whole; a name that really contains `\` is shortened, never widened.
     pub fn file_name(&self) -> Option<String> {
-        self.path
+        let name = self
+            .path
             .as_deref()
             .and_then(Path::file_name)
-            .map(|n| n.to_string_lossy().into_owned())
+            .map(|n| n.to_string_lossy().into_owned())?;
+        #[cfg(not(windows))]
+        let name = name.rsplit('\\').find(|s| !s.is_empty())?.to_string();
+        Some(name)
     }
 }
 

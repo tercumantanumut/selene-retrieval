@@ -275,7 +275,7 @@ pub enum SkipReason {
     Unreadable,
     /// "Took too long to read".
     Timeout,
-    /// "Windows didn't allow access".
+    /// "Windows didn't allow access" ("Your Mac didn't …" on a Mac).
     Permission,
     /// "In use by another program; retried automatically".
     Locked,
@@ -390,7 +390,7 @@ pub struct ClientsList {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 pub struct Snippet {
     pub kind: ClientKind,
-    /// Where the text goes, in plain words or a path with `%USERPROFILE%`.
+    /// Where the text goes, in plain words or a path with `%USERPROFILE%` (Windows) or `~` (macOS).
     pub file_hint: String,
     pub text: String,
 }

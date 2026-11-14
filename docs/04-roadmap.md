@@ -174,6 +174,41 @@ Evidence: `research/m5-{s,e,a,i}-*.md`, `research/m5-c-cli-providers.md`, indepe
   sign-in test (owner); Narrator checklist (`m5-a-app.md`); 3-new-user test.
 - **P2:** new R38–R40; R25, R31, R34 (mitigated), R35, R-UX43 updated; R41–R43, R-UX44–R-UX47 by M5-C.
 
+### macOS port: phases 1–4 done; Developer ID signing open (started 2026-11-14)
+Owner decision 2026-11-14: port to macOS (Apple silicon) in phases with the same security as on Windows. Windows
+behaviour is unchanged; every Windows code path stays and is gated `cfg(windows)`. macOS builds are ad-hoc signed
+and not notarized (R-UX54); do not distribute them beyond testers until Developer ID signing is in place.
+
+- **Phase 1, everything compiles on macOS (done, gated):** Unix-socket transport replacing the named pipe
+  (per-user 0700 folder under the Darwin per-user temp dir, socket 0600, `lstat` owner/mode checks on both sides,
+  peer uid checked before anything is read or sent, stale socket replaced only under the host lock, extended ACLs
+  stripped); data folder 0700 instead of `icacls`; Keychain store (`apple-native-keyring-store`, same service and
+  accounts); ORT with the CoreML binary, embeddings on the CPU; `/usr/bin/open` opener (reveal-only for files and
+  app bundles).
+- **Phase 2, runs end to end (done):** POSIX path rules in the common sandbox (exact-case containment, macOS
+  dangerous roots with exceptions for iCloud Drive / CloudStorage and the per-user temp dir), policy file location,
+  plain-language errors that say "Your Mac"; hardware probes (`sysctl`) and tier on Apple silicon (NEON meets the
+  AVX2 rule, no DirectML → CPU); peer trust by audit token (R50); socket key exact-case and index-move parent check
+  (R52); index-move overlap checks resolve symlinks (`/var` → `/private/var`); sync: `(st_dev, st_ino)` identity,
+  iCloud placeholders (`SF_DATALESS`) never downloaded by indexing, network/removable volumes from the cached mount
+  table (`getfsstat(MNT_NOWAIT)`, never blocks on a dead share), FSEvents renames reconciled from disk state; CLI
+  discovery and Terminal sign-in; Dock/menu-bar behaviour; HTTP listener re-binds its remembered port after a
+  restart (`SO_REUSEADDR`, never `SO_REUSEPORT`). No LaunchAgent: the app or bridge starts the daemon detached
+  (`setsid`), as on Windows.
+- **Phase 3, parser sandbox (done):** Seatbelt deny-default profile applied by `sr-extract` itself after loading
+  pdfium (fonts readable; no network, file writes, fork/exec or Mach lookups); the supervisor checks the worker's
+  sandbox from outside with `sandbox_check` before it gets any work and kills it on any doubt (fail closed); CPU
+  rlimit, footprint watchdog, no core files, process-group kill before reap; `fetch-pdfium` pins the macOS dylib.
+  The smoke, hostile-corpus, fuzz and supervisor suites pass on macOS.
+- **Phase 4, distribution (done 2026-11-14, except signing):** `cargo xtask package-mac` builds `Selene Retrieval.app` (programs in
+  `Contents/MacOS`, pdfium in `Contents/Frameworks`, model in `Contents/Resources`), signs it ad hoc inside out,
+  verifies the signature, checks with `otool -L` that only system libraries are linked (in place of `check-crt` /
+  `check-delayload`), and writes `SeleneRetrieval-<v>-arm64.dmg` (316 MiB app, 153 MB dmg). Verified on the
+  packaged app: the daemon starts, a folder with Markdown, text and a PDF (parsed in the sandbox) is indexed, MCP
+  `context_search` through `sr-bridge` finds each file, `admin shutdown` drains; the app opens to the first-run wizard. Developer ID signing, hardened runtime and
+  notarization wait for a signing identity (R-UX54).
+- **P2:** R-UX54 (Gatekeeper on an unsigned app) is the one open macOS P2 failure; R-UX53 is closed.
+
 ## Risks
 
 | ID | Risk | L | I | Mitigation |
@@ -276,3 +311,9 @@ Evidence: `research/m5-{s,e,a,i}-*.md`, `research/m5-c-cli-providers.md`, indepe
 | R-UX52 | A folder set to **Code** leaves out JSON that isn't project configuration (asset registries, reports, test data) and Godot `.tres` resources (2026-11-09; before, they filled every result of a code question in a Godot project). A user who wants one of those files found in a Code folder doesn't see why it's missing and must switch the folder to "Documents and code" (or add a `.seleneignore` `!path`): fails the standing check for that case | L | L | Configuration JSON stays (`package.json`, `*config*`, `*settings*`, `.eslintrc.json`, files in a `config/` folder, ...: `sr_sync::filter::is_code_data_file`); "Documents and code", the default, keeps every JSON file. Follow-up with page 25: name the preset's rule next to the file-type choice |
 | R47 | Godot `.tscn` scenes (code since 2026-11-09) can hold one very long data line: a TileMap's `tile_data = PackedInt32Array(...)` or `tile_map_data = PackedByteArray("…base64…")`, or an embedded image. The long-line data rule looks only at JSON, and printable base64 passes the binary check, so such lines become junk chunks in Code and in "Documents and code" (found in review; the user's Godot project has none) | M | L | Not changed yet. Follow-up: a per-line cap in the text splitter, or `.tscn` in the data-file rule (`DATA_FILE_EXTS`); until then a `.seleneignore` or Exclude pattern keeps a tile-heavy scene out |
 | R48 | The bundled SQLite (libsqlite3-sys 0.38.2, SQLite 3.53.2) has RUSTSEC-2026-0459 / CVE-2026-119375: opening a database together with a crafted `-wal` file of a different page size can return uninitialized memory. The fix (libsqlite3-sys 0.39, rusqlite 0.41) is blocked: tokio-rusqlite 0.8.0 and rusqlite_migration 2.6.0, the latest releases, require rusqlite ^0.40. Ignored in `deny.toml` with a reason (2026-11-09) | L | M | SR opens only its own catalog database in its own per-user data dir, never a database or `-wal` from another party. Re-check by 2026-12-09: move to rusqlite 0.41 as soon as both crates accept it |
+| R49 | macOS parser sandbox (port phase 1 had none) | L | H | **Closed by phase 3** (2026-11-14): Seatbelt deny-default profile, outside `sandbox_check` before any work (fail closed), CPU limit, memory watchdog, process-group kill; smoke, hostile, fuzz and supervisor suites pass on macOS |
+| R50 | macOS peer trust (S-05 / R31): a same-user process could connect, hand the socket to a child and `exec` the real `sr-app`; pid reuse is a second, rarer race | L | M | **Mitigated in phase 2:** trust comes from the peer's audit token (`LOCAL_PEERTOKEN`; its pid version changes on `exec`), proved per connection with a nonce and re-checked per privileged call; Unix sessions start untrusted. Open: a code-signature check on the peer needs a Developer ID (R-UX54) |
+| R-UX53 | macOS phase 1 indexed no files (no parser sandbox yet) | L | H | **Closed by phase 3** (2026-11-14): documents are parsed in the Seatbelt sandbox |
+| R-UX54 | The macOS app is ad-hoc signed, not notarized: Gatekeeper blocks the first open ("cannot verify the developer"), and the user must allow it in System Settings → Privacy & Security; Keychain may ask again after each update | H | M | Phase 4 needs a Developer ID: signing with hardened runtime, notarization and stapling (`SR_MAC_SIGN_IDENTITY` is already honoured by `package-mac`); the same identity across updates keeps Keychain access |
+| R51 | macOS has no kill-on-close job object: if the daemon crashes, a running Claude / Codex CLI and its helpers keep running until they finish | M | L | Cancel, timeout and normal exit kill the CLI's process group before the leader is reaped. Open: a startup sweep of leftover groups recorded by the daemon (not built yet) |
+| R52 | macOS items from the phase 1 security review: data dirs differing only in case shared a socket name; index-move could copy into a parent another account may write to | L | M | **Closed in phase 2:** the socket key is exact-case; index-move refuses a group/other-writable parent without the sticky bit and resolves symlinks before its overlap checks |

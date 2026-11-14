@@ -3,6 +3,8 @@
 //! A real OneDrive placeholder needs a sync root; `FILE_ATTRIBUTE_OFFLINE` (`attrib +O`, one of the
 //! three attributes the service treats as online-only) gives the same metadata without one. The
 //! test skips itself on a file system that refuses the attribute.
+// Windows only: OneDrive placeholders and `attrib.exe`.
+#![cfg(windows)]
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
 mod common;

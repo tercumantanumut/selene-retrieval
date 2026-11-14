@@ -8,9 +8,10 @@ use std::path::{Path, PathBuf};
 
 use sr_common::error::{Error, ErrorCode};
 
-use crate::win;
+use crate::sys;
 
-/// Folder under `%LOCALAPPDATA%` (known-folder API, never the environment).
+/// Folder under `%LOCALAPPDATA%` (known-folder API, never the environment); on macOS under
+/// `~/Library/Application Support` (home from the user database).
 pub const DATA_DIR_NAME: &str = "SeleneRetrieval";
 /// Held by the daemon for its whole life (single host per user + data dir).
 pub const HOST_LOCK: &str = "host.lock";
@@ -33,9 +34,9 @@ pub fn dev_env(name: &str) -> Option<OsString> {
     }
 }
 
-/// `%LOCALAPPDATA%\SeleneRetrieval`.
+/// `%LOCALAPPDATA%\SeleneRetrieval` (macOS: `~/Library/Application Support/SeleneRetrieval`).
 pub fn default_data_dir() -> Result<PathBuf, Error> {
-    win::local_appdata()
+    sys::local_appdata()
         .map(|p| p.join(DATA_DIR_NAME))
         .map_err(|e| Error::new(ErrorCode::Internal).with_source(e))
 }
@@ -72,9 +73,36 @@ pub fn validate_data_dir(dir: &Path) -> Result<(), Error> {
 }
 
 /// Case- and separator-insensitive key of a data dir (what the pipe/task names hash).
+#[cfg(windows)]
 pub fn data_dir_key(dir: &Path) -> String {
     let s = dir.to_string_lossy().replace('/', "\\");
     s.trim_end_matches('\\').to_lowercase()
+}
+
+/// Unix key of a data dir (what the socket name hashes): the path's components joined with `/`,
+/// byte for byte, so `//`, `/./` and a trailing `/` don't matter but case does (R52: a
+/// case-sensitive volume may hold both `SR` and `sr`, and they must never share a socket). No
+/// file system access, so a client and a daemon that start before and after the folder exists
+/// agree. Another spelling of the same folder gives another key; the data dir's host lock then
+/// keeps a second daemon out, so a client never reaches a daemon of another folder.
+#[cfg(not(windows))]
+pub fn data_dir_key(dir: &Path) -> String {
+    use std::path::Component;
+    let mut out = String::new();
+    for c in dir.components() {
+        match c {
+            Component::RootDir => {}
+            Component::CurDir => continue,
+            other => {
+                out.push('/');
+                out.push_str(&other.as_os_str().to_string_lossy());
+            }
+        }
+    }
+    if out.is_empty() && dir.has_root() {
+        out.push('/');
+    }
+    out
 }
 
 fn hex(bytes: &[u8], n: usize) -> String {
@@ -84,12 +112,32 @@ fn hex(bytes: &[u8], n: usize) -> String {
 
 /// `\\.\pipe\sr-<hex(blake3(SID))[..16]>-<hex(blake3(data dir key))[..16]>`.
 /// The SID is hashed so the name doesn't reveal it; the DACL (user SID only) is the real guard.
+#[cfg(windows)]
 pub fn pipe_name(user_sid: &str, data_dir: &Path) -> String {
     format!(
         r"\\.\pipe\sr-{}-{}",
         hex(user_sid.as_bytes(), 16),
         hex(data_dir_key(data_dir).as_bytes(), 16)
     )
+}
+
+/// Unix: the socket's file name `sr-<hex(blake3(uid))[..16]>-<hex(blake3(data dir key))[..16]>.sock`
+/// (same inputs as the pipe name; `user_sid` is the decimal uid). The folder comes from
+/// `sys::socket_dir` (private, per user), so the full path fits `sun_path` and never holds the
+/// data dir itself.
+#[cfg(unix)]
+pub fn pipe_name(user_sid: &str, data_dir: &Path) -> String {
+    format!(
+        "sr-{}-{}.sock",
+        hex(user_sid.as_bytes(), 16),
+        hex(data_dir_key(data_dir).as_bytes(), 16)
+    )
+}
+
+/// File name of one of our programs on this platform: `sr-daemon.exe` on Windows, `sr-daemon`
+/// elsewhere.
+pub fn exe_file_name(stem: &str) -> String {
+    format!("{stem}{}", std::env::consts::EXE_SUFFIX)
 }
 
 /// Per-user on-demand scheduled task: `\SR\daemon-<sid8>` for the default data dir,
@@ -128,6 +176,7 @@ pub fn sibling_exe(name: &str) -> Result<PathBuf, Error> {
 mod tests {
     use super::*;
 
+    #[cfg(windows)]
     #[test]
     fn pipe_name_is_stable_and_hides_the_sid() {
         let sid = "S-1-5-21-1111111111-2222222222-3333333333-1001";
@@ -145,6 +194,45 @@ mod tests {
         assert_ne!(a, pipe_name(sid, Path::new(r"D:\other")));
     }
 
+    #[cfg(unix)]
+    #[test]
+    fn socket_name_is_short_stable_and_hides_the_uid() {
+        let d = Path::new("/Users/u/Library/Application Support/SeleneRetrieval");
+        let a = pipe_name("501", d);
+        assert_eq!(a, pipe_name("501", d));
+        assert!(a.starts_with("sr-") && a.ends_with(".sock"), "{a}");
+        assert_eq!(a.len(), "sr-".len() + 16 + 1 + 16 + ".sock".len());
+        assert!(!a.contains('/') && !a.contains("501") && !a.contains("Library"));
+        assert_ne!(a, pipe_name("502", d));
+        assert_ne!(a, pipe_name("501", Path::new("/Users/u/other")));
+        assert_eq!(exe_file_name("sr-daemon"), "sr-daemon");
+        // R52: case is kept (a case-sensitive volume may hold both); redundant separators not.
+        let sr = Path::new("/Volumes/data/SR");
+        assert_ne!(
+            pipe_name("501", sr),
+            pipe_name("501", Path::new("/Volumes/data/sr"))
+        );
+        for same in [
+            "/Volumes/data/SR/",
+            "/Volumes//data/./SR",
+            "/Volumes/data/SR//",
+        ] {
+            assert_eq!(
+                pipe_name("501", sr),
+                pipe_name("501", Path::new(same)),
+                "{same}"
+            );
+        }
+        assert_eq!(data_dir_key(sr), "/Volumes/data/SR");
+        assert_eq!(data_dir_key(Path::new("/")), "/");
+        // A backslash is an ordinary file-name byte on Unix.
+        assert_ne!(
+            data_dir_key(Path::new("/a\\b")),
+            data_dir_key(Path::new("/a/b"))
+        );
+    }
+
+    #[cfg(windows)]
     #[test]
     fn data_dir_rules() {
         assert!(validate_data_dir(Path::new(r"C:\x\y")).is_ok());

@@ -6,10 +6,16 @@
 //! leave as frames on stdout (`sr_common::protocol::extract`). One request at a time; the parser
 //! runs on a scoped thread with a large stack under `catch_unwind`.
 //!
+//! On macOS the sandbox is a Seatbelt profile the worker applies to itself ([`seatbelt`]) right
+//! after pdfium is loaded and before the ready frame; if it can't, the worker exits without reading
+//! a request. Other Unix systems have no sandbox yet, so the worker refuses to run there.
+//!
 //! Usage (supervisor only): `sr-extract --pdfium <absolute path to pdfium.dll>`
 
 #[cfg(feature = "test-probes")]
 mod probes;
+#[cfg(target_os = "macos")]
+mod seatbelt;
 mod win;
 
 use std::ffi::OsString;
@@ -27,6 +33,9 @@ use sr_extract::{Extracted, Failure, PdfEngine, extract};
 
 const EXIT_PROTOCOL: u8 = 3;
 const EXIT_IO: u8 = 4;
+/// The sandbox could not be applied (macOS) or this platform has none: no request is ever read.
+#[cfg(not(windows))]
+const EXIT_NO_SANDBOX: u8 = 5;
 
 fn main() -> ExitCode {
     let t0 = Instant::now();
@@ -46,6 +55,18 @@ fn main() -> ExitCode {
         },
         None => (None, Some("no --pdfium argument".to_string())),
     };
+    // Fail closed: from here on the worker reads untrusted input, so it must be confined.
+    #[cfg(target_os = "macos")]
+    if let Err(e) = seatbelt::apply() {
+        eprintln!("sr-extract: {e}");
+        return ExitCode::from(EXIT_NO_SANDBOX);
+    }
+    #[cfg(all(unix, not(target_os = "macos")))]
+    {
+        drop(engine);
+        eprintln!("sr-extract: no sandbox on this platform; refusing to run");
+        return ExitCode::from(EXIT_NO_SANDBOX);
+    }
     let (integrity, app_container) = win::token_info();
     let ready = WorkerReady {
         proto: EXTRACT_PROTO,
