@@ -244,6 +244,8 @@ mod tests {
         assert_eq!(m, Ok(Some(Mode::CertStore { sha1: t.into() })));
     }
 
+    // `C:\K\10.0.…` paths only have a Windows file name (the version) on Windows.
+    #[cfg(windows)]
     #[test]
     fn sdk_versions_sort_numerically() {
         let mut v = [

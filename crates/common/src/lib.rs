@@ -9,6 +9,7 @@ pub mod config;
 pub mod error;
 pub mod events;
 pub mod ids;
+pub mod install;
 pub mod protocol;
 pub mod sandbox;
 pub mod tier;

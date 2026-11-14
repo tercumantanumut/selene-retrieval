@@ -4,8 +4,13 @@
 //! The ACL is set with `icacls.exe` from System32 (absolute path, never `PATH`), so the engine needs
 //! no extra `unsafe`. It is idempotent and runs at every start, before `host.lock` is created, so
 //! every file the daemon writes afterwards inherits it.
+//!
+//! Unix (macOS port): the folder must be a real folder (never a link) owned by this uid; it is set
+//! to mode 0700, its extended ACL (macOS) is removed, and it is checked again, so nothing below it
+//! is reachable by other accounts.
 
 use std::path::{Path, PathBuf};
+#[cfg(windows)]
 use std::process::Command;
 
 use sr_common::error::{Error, ErrorCode, Section};
@@ -166,6 +171,7 @@ pub fn prepare(anchor: &Path) -> Result<DataLayout, Error> {
 }
 
 /// `icacls.exe` from System32.
+#[cfg(windows)]
 fn icacls() -> Result<PathBuf, Error> {
     let sys =
         sr_client::win::system_dir().map_err(|e| Error::new(ErrorCode::Internal).with_source(e))?;
@@ -174,6 +180,7 @@ fn icacls() -> Result<PathBuf, Error> {
 
 /// Protected DACL: current user and SYSTEM, full control, inherited by everything below; no
 /// inherited ACEs from `%LOCALAPPDATA%`. Idempotent.
+#[cfg(windows)]
 pub fn restrict_acl(root: &Path) -> Result<(), Error> {
     let sid = sr_client::win::user_sid_string()
         .map_err(|e| Error::new(ErrorCode::Internal).with_source(e))?;
@@ -200,6 +207,7 @@ pub fn restrict_acl(root: &Path) -> Result<(), Error> {
 /// Is `owner` acceptable as the owner of a folder that will hold the index? Us, or
 /// `BUILTIN\Administrators` (folders an elevated process of ours created). Pure, for tests.
 /// SDDL prints Administrators as the alias `BA`.
+#[cfg(windows)]
 pub fn owner_is_acceptable(owner: &str, me: &str) -> bool {
     owner.eq_ignore_ascii_case(me)
         || owner.eq_ignore_ascii_case("BA")
@@ -209,6 +217,7 @@ pub fn owner_is_acceptable(owner: &str, me: &str) -> bool {
 /// Is the `D:` part of `sddl` a protected DACL whose ACEs are all allow ACEs for `me` or SYSTEM
 /// (`SY` / `S-1-5-18`)? Pure, for tests. Anything unexpected (deny ACEs, other trustees, an
 /// unprotected DACL, no DACL) is "not private".
+#[cfg(windows)]
 pub fn dacl_is_private(sddl: &str, me: &str) -> bool {
     let Some(d) = sddl.find("D:").map(|i| &sddl[i + 2..]) else {
         return false;
@@ -242,6 +251,7 @@ pub fn dacl_is_private(sddl: &str, me: &str) -> bool {
 
 /// The `O:` part of an SDDL string (`O:<sid or alias>G:…D:…`). SIDs and aliases contain no
 /// `:`, so the owner ends at the first of `G:` / `D:` / `S:`.
+#[cfg(windows)]
 pub fn owner_of(sddl: &str) -> Option<&str> {
     let o = sddl.strip_prefix("O:")?;
     let end = ["G:", "D:", "S:"]
@@ -261,6 +271,7 @@ pub fn owner_of(sddl: &str) -> Option<&str> {
 ///    Administrators) and a protected two-ACE DACL in **one** call
 ///    ([`sr_client::win::set_private_dacl`]). `icacls /grant:r` alone kept foreign explicit
 ///    ACEs. Runs before the first file is copied, on resume, and at every start with a pointer.
+#[cfg(windows)]
 pub fn protect_index_dir(dir: &Path) -> Result<(), Error> {
     let denied = |detail: String| {
         Error::new(ErrorCode::PermissionDenied)
@@ -291,12 +302,71 @@ pub fn protect_index_dir(dir: &Path) -> Result<(), Error> {
 }
 
 /// The data dir's ACL as `icacls` prints it (diagnostics and tests).
+#[cfg(windows)]
 pub fn describe_acl(root: &Path) -> Result<String, Error> {
     let out = Command::new(icacls()?)
         .arg(root)
         .output()
         .map_err(|e| Error::new(ErrorCode::Internal).with_source(e))?;
     Ok(String::from_utf8_lossy(&out.stdout).into_owned())
+}
+
+/// Unix: make `dir` private to this account, or refuse. `lstat` (a link is refused, never
+/// followed), owner must be `getuid()`, then mode 0700 and (macOS) no extended ACL, set through
+/// an `O_NOFOLLOW` handle ([`sr_client::sys::make_private_dir`]), and a second check that must
+/// show no group or other bits and no ACL. An inherited ACL is removed, not refused. Idempotent.
+/// Another account's folder is `PermissionDenied`.
+#[cfg(unix)]
+fn make_private_dir(dir: &Path) -> Result<(), Error> {
+    use std::os::unix::fs::MetadataExt;
+    let denied = |detail: String| {
+        Error::new(ErrorCode::PermissionDenied)
+            .with_name(dir.display().to_string())
+            .with_detail(detail)
+    };
+    let me = sr_client::sys::uid();
+    let m = std::fs::symlink_metadata(dir)
+        .map_err(|e| Error::from(e).with_detail("reading the data folder's owner"))?;
+    if m.file_type().is_symlink() {
+        return Err(denied("the folder is a link".into()));
+    }
+    if !m.is_dir() {
+        return Err(settings_invalid("data directory is not a directory"));
+    }
+    if m.uid() != me {
+        return Err(denied(format!(
+            "the folder belongs to another account (uid {})",
+            m.uid()
+        )));
+    }
+    sr_client::sys::make_private_dir(dir, me).map_err(|e| {
+        if e.kind() == std::io::ErrorKind::PermissionDenied {
+            denied(format!("the folder could not be made private: {e}"))
+        } else {
+            Error::from(e).with_detail("protecting the data folder")
+        }
+    })
+}
+
+/// Unix twin of the protected DACL: the data dir is ours and mode 0700 ([`make_private_dir`]).
+#[cfg(unix)]
+pub fn restrict_acl(root: &Path) -> Result<(), Error> {
+    make_private_dir(root)
+}
+
+/// Unix twin of S-02: a (moved) index folder must be ours and is made mode 0700; a link or
+/// another account's folder is refused.
+#[cfg(unix)]
+pub fn protect_index_dir(dir: &Path) -> Result<(), Error> {
+    make_private_dir(dir)
+}
+
+/// Unix: owner and mode of `root` (diagnostics and tests), e.g. `uid=501 mode=700`.
+#[cfg(unix)]
+pub fn describe_acl(root: &Path) -> Result<String, Error> {
+    use std::os::unix::fs::MetadataExt;
+    let m = std::fs::symlink_metadata(root).map_err(Error::from)?;
+    Ok(format!("uid={} mode={:o}", m.uid(), m.mode() & 0o7777))
 }
 
 #[cfg(all(test, windows))]
@@ -418,5 +488,65 @@ mod tests {
             !f.contains("BUILTIN\\Users") && !f.contains("Everyone"),
             "{f}"
         );
+    }
+}
+
+#[cfg(all(test, unix))]
+mod unix_tests {
+    use super::*;
+    use std::os::unix::fs::PermissionsExt;
+
+    #[test]
+    fn data_dir_is_made_private_and_links_are_refused() {
+        let dir = tempfile::tempdir().unwrap();
+        let root = dir.path().join("sr");
+        std::fs::create_dir(&root).unwrap();
+        std::fs::set_permissions(&root, std::fs::Permissions::from_mode(0o755)).unwrap();
+        restrict_acl(&root).unwrap();
+        restrict_acl(&root).unwrap(); // idempotent
+        assert_eq!(
+            describe_acl(&root).unwrap(),
+            format!("uid={} mode=700", sr_client::sys::uid())
+        );
+        let link = dir.path().join("link");
+        std::os::unix::fs::symlink(&root, &link).unwrap();
+        let e = protect_index_dir(&link).unwrap_err();
+        assert_eq!(e.code, ErrorCode::PermissionDenied);
+    }
+
+    /// macOS: an inherited `everyone allow` ACL is removed, not just the mode bits fixed.
+    #[cfg(target_os = "macos")]
+    #[test]
+    fn data_dir_loses_its_extended_acl() {
+        let dir = tempfile::tempdir().unwrap();
+        let root = dir.path().join("sr");
+        std::fs::create_dir(&root).unwrap();
+        let ok = std::process::Command::new("/bin/chmod")
+            .arg("+a")
+            .arg("everyone allow list,search")
+            .arg(&root)
+            .status()
+            .unwrap();
+        assert!(ok.success());
+        assert_eq!(sr_client::sys::extended_acl_entries(&root).unwrap(), (1, 1));
+        restrict_acl(&root).unwrap();
+        assert_eq!(sr_client::sys::extended_acl_entries(&root).unwrap(), (0, 0));
+        assert_eq!(
+            describe_acl(&root).unwrap(),
+            format!("uid={} mode=700", sr_client::sys::uid())
+        );
+        // An index folder too, also when it is already mode 0700.
+        let idx = dir.path().join("idx");
+        std::fs::create_dir(&idx).unwrap();
+        std::fs::set_permissions(&idx, std::fs::Permissions::from_mode(0o700)).unwrap();
+        let ok = std::process::Command::new("/bin/chmod")
+            .arg("+a")
+            .arg("group:staff allow list,search,read")
+            .arg(&idx)
+            .status()
+            .unwrap();
+        assert!(ok.success());
+        protect_index_dir(&idx).unwrap();
+        assert_eq!(sr_client::sys::extended_acl_entries(&idx).unwrap(), (0, 0));
     }
 }

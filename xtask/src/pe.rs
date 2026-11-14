@@ -283,10 +283,13 @@ pub fn imports_of_file(path: &Path) -> Result<Imports, String> {
 mod tests {
     use super::*;
 
+    #[cfg(windows)]
     fn lower(v: &[String]) -> Vec<String> {
         v.iter().map(|s| s.to_ascii_lowercase()).collect()
     }
 
+    // The test binary is a PE file only on Windows.
+    #[cfg(windows)]
     #[test]
     fn reads_own_test_binary() {
         let exe = std::env::current_exe().unwrap_or_else(|e| panic!("current_exe: {e}"));

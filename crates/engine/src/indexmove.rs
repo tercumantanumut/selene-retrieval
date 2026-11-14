@@ -137,17 +137,49 @@ fn key(p: &Path) -> String {
     sr_client::naming::data_dir_key(p)
 }
 
-/// `a` is `b` or inside it (path keys, case-insensitive).
+/// `a` is `b` or inside it (path keys: case-insensitive on Windows, exact on Unix).
 fn inside(a: &Path, b: &Path) -> bool {
     let (a, b) = (key(a), key(b));
-    a == b || a.starts_with(&format!("{b}\\"))
+    let sep = std::path::MAIN_SEPARATOR;
+    a == b || a.starts_with(&format!("{}{sep}", b.trim_end_matches(sep)))
 }
 
 fn overlaps(a: &Path, b: &Path) -> bool {
     inside(a, b) || inside(b, a)
 }
 
+/// Unix: `p` with symlinks resolved in its longest existing part (the rest appended as given),
+/// so `/var/…` and `/private/var/…`, or a link into an added folder, compare as the same place.
+/// Folder roots are stored resolved. Windows: unchanged (roots are compared by path key).
+#[cfg(unix)]
+fn real(p: &Path) -> PathBuf {
+    let mut base = p.to_path_buf();
+    let mut rest: Vec<std::ffi::OsString> = Vec::new();
+    loop {
+        if let Ok(r) = std::fs::canonicalize(&base) {
+            let mut out = r;
+            for c in rest.iter().rev() {
+                out.push(c);
+            }
+            return out;
+        }
+        match (base.file_name().map(|n| n.to_os_string()), base.parent()) {
+            (Some(n), Some(parent)) => {
+                rest.push(n);
+                base = parent.to_path_buf();
+            }
+            _ => return p.to_path_buf(),
+        }
+    }
+}
+
+#[cfg(windows)]
+fn real(p: &Path) -> PathBuf {
+    p.to_path_buf()
+}
+
 /// `X:` of a drive-letter path.
+#[cfg(windows)]
 fn drive_of(p: &Path) -> Option<String> {
     let s = p.to_string_lossy();
     let mut c = s.chars();
@@ -157,6 +189,51 @@ fn drive_of(p: &Path) -> Option<String> {
         }
         _ => None,
     }
+}
+
+/// Unix: the mount point of the volume holding `p` (`/`, `/Volumes/Data`).
+#[cfg(unix)]
+fn drive_of(p: &Path) -> Option<String> {
+    crate::win::volume(p).map(|v| v.mount_point.display().to_string())
+}
+
+/// Unix: the target is on a volume of this Mac that keeps file owners: `MNT_LOCAL`, not
+/// removable media, not a network file system (also when a driver reports it local), and not
+/// mounted with "Ignore ownership" (there every account owns every file). Fails closed when the
+/// volume can't be read.
+#[cfg(unix)]
+fn local_volume(p: &Path) -> bool {
+    const NETWORK: &[&str] = &["smbfs", "nfs", "afpfs", "webdav", "cifs", "ftp"];
+    crate::win::volume(p).is_some_and(|v| {
+        v.local && !v.removable && !v.ignores_owners && !NETWORK.contains(&v.fs_type.as_str())
+    })
+}
+
+/// R52 (Unix): the copy goes by path, so no folder on the way to `p` may be one another
+/// account can rename things in: every existing folder from `p` up to `/` is ours or root's,
+/// and one that its group or others can write to must have the sticky bit (like `/tmp`, where
+/// only an entry's owner may rename it). Links on the way are judged by what they point to.
+#[cfg(unix)]
+fn path_is_private(p: &Path) -> bool {
+    use std::os::unix::fs::MetadataExt;
+    let me = sr_client::sys::uid();
+    let mut cur = Some(p);
+    while let Some(dir) = cur {
+        match std::fs::metadata(dir) {
+            Ok(m) => {
+                let owner_ok = m.uid() == me || m.uid() == 0;
+                let shared = m.mode() & 0o022 != 0;
+                let sticky = m.mode() & 0o1000 != 0;
+                if !m.is_dir() || !owner_ok || (shared && !sticky) {
+                    return false;
+                }
+            }
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
+            Err(_) => return false,
+        }
+        cur = dir.parent();
+    }
+    true
 }
 
 /// Index files (relative path, size) and directories (relative paths).
@@ -276,28 +353,40 @@ fn problem_for(
     index_path: &Path,
     drive: &str,
 ) -> Option<MoveProblem> {
-    let s = target.to_string_lossy();
-    if drive.is_empty()
-        || s.starts_with(r"\\")
-        || sr_sync::fsid::is_unc(target)
-        || sr_sync::fsid::drive_kind(target) != sr_sync::fsid::DriveKind::Local
+    #[cfg(windows)]
     {
+        let s = target.to_string_lossy();
+        if drive.is_empty()
+            || s.starts_with(r"\\")
+            || sr_sync::fsid::is_unc(target)
+            || sr_sync::fsid::drive_kind(target) != sr_sync::fsid::DriveKind::Local
+        {
+            return Some(MoveProblem::NotLocal);
+        }
+    }
+    #[cfg(unix)]
+    if drive.is_empty() || !local_volume(target) {
         return Some(MoveProblem::NotLocal);
     }
     if datadir::validate_index_root(index_path).is_err() {
         return Some(MoveProblem::TooLong);
     }
-    if key(index_path) == key(i.current) {
+    let index_path = &real(index_path);
+    let (current, anchor, app_dir) = (&real(i.current), &real(i.anchor), &real(i.app_dir));
+    if key(index_path) == key(current) {
         return Some(MoveProblem::SameAsCurrent);
     }
-    let back_home = key(index_path) == key(i.anchor);
-    if overlaps(index_path, i.app_dir)
-        || overlaps(index_path, i.current)
-        || (!back_home && overlaps(index_path, i.anchor))
+    let back_home = key(index_path) == key(anchor);
+    if overlaps(index_path, app_dir)
+        || overlaps(index_path, current)
+        || (!back_home && overlaps(index_path, anchor))
     {
         return Some(MoveProblem::InsideApp);
     }
-    if i.folder_roots.iter().any(|r| overlaps(index_path, r)) {
+    if i.folder_roots
+        .iter()
+        .any(|r| overlaps(index_path, &real(r)))
+    {
         return Some(MoveProblem::InsideFolder);
     }
     let not_empty = if back_home {
@@ -315,10 +404,16 @@ fn problem_for(
     if !target.is_dir() || !writable(target) {
         return Some(MoveProblem::NotWritable);
     }
+    // R52: another account must not be able to swap a folder on the way to the copy.
+    #[cfg(unix)]
+    if !path_is_private(index_path) {
+        return Some(MoveProblem::NotWritable);
+    }
     None
 }
 
 /// Owner of `p` is us (or Administrators) and `p` is no link (S-02).
+#[cfg(windows)]
 fn owned_by_us(p: &Path) -> bool {
     if p.is_symlink() {
         return false;
@@ -333,6 +428,14 @@ fn owned_by_us(p: &Path) -> bool {
         let o = sr_client::win::canonical_sid(o).unwrap_or_else(|_| o.to_string());
         datadir::owner_is_acceptable(&o, &me)
     })
+}
+
+/// Unix: `p` is no link and its owner is this uid (S-02).
+#[cfg(unix)]
+fn owned_by_us(p: &Path) -> bool {
+    use std::os::unix::fs::MetadataExt;
+    std::fs::symlink_metadata(p)
+        .is_ok_and(|m| !m.file_type().is_symlink() && m.uid() == sr_client::sys::uid())
 }
 
 fn writable(dir: &Path) -> bool {
@@ -479,6 +582,14 @@ fn copy_and_switch(
             .map_err(|e| Error::from(e).with_detail("creating the new index folder"))?;
         *claimed = true;
     } else {
+        // R52 (Unix): checked again now, before anything is created (the move runs at the next
+        // start, so the folders on the way may have changed since the check).
+        #[cfg(unix)]
+        if !path_is_private(&to) {
+            return Err(Error::new(ErrorCode::PermissionDenied)
+                .with_name(to.display().to_string())
+                .with_detail("another account can change a folder on the way to the new index"));
+        }
         // S-02 (R39): create the leaf ourselves. A folder that already exists (someone made it
         // before the copy, or a resumed copy) must be empty on a fresh start, and in every case
         // owned by us; then its owner + DACL are reset in one call (foreign ACEs dropped).
@@ -745,6 +856,7 @@ mod tests {
 
     /// S-02 (R39): an empty folder that already exists at the target (pre-created, with an
     /// explicit grant for Users) is claimed: owner us, protected DACL, the foreign ACE gone.
+    #[cfg(windows)]
     #[test]
     fn preexisting_empty_target_gets_a_private_acl() {
         let t = tempfile::tempdir().unwrap();
@@ -891,10 +1003,34 @@ mod tests {
         assert_eq!(run(&anchor).problem, Some(MoveProblem::SameAsCurrent));
         std::fs::create_dir_all(free.join(INDEX_DIR_NAME).join("x")).unwrap();
         assert_eq!(run(&free).problem, Some(MoveProblem::NotEmpty));
+        #[cfg(windows)]
         assert_eq!(
             run(Path::new(r"\\server\share\x")).problem,
             Some(MoveProblem::NotLocal)
         );
+        #[cfg(target_os = "macos")]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            // The volume's mount point is the "drive".
+            assert!(
+                !ok.drive.is_empty() && Path::new(&ok.drive).is_absolute(),
+                "{ok:?}"
+            );
+            // R52: a folder others may write to (no sticky bit) on the way is refused; with the
+            // sticky bit (like /tmp) it is fine.
+            let shared = t.path().join("shared");
+            std::fs::create_dir_all(shared.join("in")).unwrap();
+            std::fs::set_permissions(&shared, std::fs::Permissions::from_mode(0o777)).unwrap();
+            assert_eq!(
+                run(&shared.join("in")).problem,
+                Some(MoveProblem::NotWritable)
+            );
+            assert_eq!(run(&shared).problem, Some(MoveProblem::NotWritable));
+            std::fs::set_permissions(&shared, std::fs::Permissions::from_mode(0o1777)).unwrap();
+            let r = run(&shared.join("in"));
+            assert!(r.ok, "{r:?}");
+            assert!(local_volume(t.path()));
+        }
         let long = t.path().join("y".repeat(150));
         assert_eq!(run(&long).problem, Some(MoveProblem::TooLong));
         assert_eq!(

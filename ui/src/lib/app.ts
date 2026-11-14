@@ -15,6 +15,7 @@ import {
   setRequestLine,
   startAddFolder,
 } from "@/lib/store";
+import { OS_SUBJECT, QUIT_CLAUDE_HINT } from "@/lib/platform";
 
 export const VIEW_KEY = ["view"] as const;
 export const CLAUDE_KEY = ["claude"] as const;
@@ -159,7 +160,7 @@ export async function copyText(text: string, done: string) {
     await navigator.clipboard.writeText(text);
     toast.success(done);
   } catch {
-    toast.error("Couldn't copy", { description: "Windows didn't allow access to the clipboard. Try again." });
+    toast.error("Couldn't copy", { description: `${OS_SUBJECT} didn't allow access to the clipboard. Try again.` });
   }
 }
 
@@ -276,7 +277,7 @@ export function useRunAction() {
         break;
       case "restart_claude":
         toast.info("Restart Claude", {
-          description: "Quit Claude from its icon next to the clock (or File → Exit), then open it again.",
+          description: QUIT_CLAUDE_HINT,
         });
         break;
       case "copy_diagnostics":

@@ -11,6 +11,10 @@
 //!
 //! If both variants are installed, both configs are written (the user may start either).
 //!
+//! macOS: `~/Library/Application Support/Claude/claude_desktop_config.json` (`roaming` is
+//! Application Support there), counted as installed once Claude created that folder on its first
+//! start. MSIX is Windows-only and never looked for elsewhere.
+//!
 //! Writer contract (task 3): parse JSON, keep every unknown field and every other server entry,
 //! back up the original next to it, write atomically, verify by re-reading (restore the original
 //! if the check fails), and never print or log any part of the file.
@@ -82,7 +86,12 @@ pub fn msix_families(local: &Path) -> Vec<String> {
 
 /// Every installed Claude Desktop variant and the config file it reads.
 pub fn detect(roots: &Roots) -> Vec<Install> {
-    let mut out: Vec<Install> = msix_families(&roots.local)
+    let families = if cfg!(windows) {
+        msix_families(&roots.local)
+    } else {
+        Vec::new()
+    };
+    let mut out: Vec<Install> = families
         .into_iter()
         .map(|fam| Install {
             variant: Variant::Msix,
@@ -193,6 +202,21 @@ mod tests {
         assert!(!is_claude_family("claude_pzs8sxrjxfjjc"));
     }
 
+    /// macOS: the Application Support folder Claude creates on its first start; no MSIX.
+    #[cfg(not(windows))]
+    #[test]
+    fn detect_macos_folder_and_never_msix() {
+        let t = tempfile::tempdir().unwrap();
+        let r = roots(&t);
+        fs::create_dir_all(r.local.join("Packages").join("Claude_abcdefghij123")).unwrap();
+        assert!(detect(&r).is_empty());
+        fs::create_dir_all(r.roaming.join("Claude")).unwrap();
+        let d = detect(&r);
+        assert_eq!(d.len(), 1);
+        assert_eq!(d[0].variant, Variant::Standard);
+        assert_eq!(d[0].config_path, r.roaming.join("Claude").join(CONFIG_FILE));
+    }
+
     #[test]
     fn detect_nothing_installed() {
         let t = tempfile::tempdir().unwrap();
@@ -210,6 +234,7 @@ mod tests {
         assert_eq!(d[0].config_path, r.roaming.join("Claude").join(CONFIG_FILE));
     }
 
+    #[cfg(windows)]
     #[test]
     fn detect_msix_family_resolved_at_runtime() {
         let t = tempfile::tempdir().unwrap();
@@ -233,6 +258,7 @@ mod tests {
         );
     }
 
+    #[cfg(windows)]
     #[test]
     fn detect_both_variants() {
         let t = tempfile::tempdir().unwrap();

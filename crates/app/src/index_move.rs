@@ -60,6 +60,9 @@ pub fn problem_text(p: MoveProblem) -> &'static str {
         MoveProblem::NotEmpty => {
             "Choose an empty folder, or one without a “SeleneRetrieval Index” folder in it."
         }
+        MoveProblem::NotWritable if cfg!(target_os = "macos") => {
+            "macOS didn't allow Selene Retrieval to write there. Choose another place."
+        }
         MoveProblem::NotWritable => {
             "Windows didn't allow Selene Retrieval to write there. Choose another place."
         }

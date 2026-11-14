@@ -307,7 +307,11 @@ fn first_close_note(app: &AppHandle) {
         notify(
             app,
             "Selene Retrieval is still running",
-            "It's next to the clock and keeps your folders up to date.",
+            if cfg!(target_os = "macos") {
+                "It's in the menu bar and keeps your folders up to date."
+            } else {
+                "It's next to the clock and keeps your folders up to date."
+            },
         );
     }
 }
@@ -384,6 +388,17 @@ fn open_for_approval(app: &AppHandle, id: String) {
     tray::show_main(app);
 }
 
+/// App events: macOS only. A second start there does not run a second process (the single-instance
+/// handler never fires); the system sends `Reopen` to this one instead.
+fn on_run_event(app: &AppHandle, e: tauri::RunEvent) {
+    #[cfg(target_os = "macos")]
+    if let tauri::RunEvent::Reopen { .. } = e {
+        tray::show_main(app);
+    }
+    #[cfg(not(target_os = "macos"))]
+    let _ = (app, e);
+}
+
 fn main() {
     sr_client::harden_dll_search(); // S-08 (M5-E export): before anything can load a DLL by name
     let builder = specta_builder();
@@ -412,8 +427,11 @@ fn main() {
             builder.mount_events(app);
             let (shared, rx) = Shared::new();
             let link = Arc::new(DaemonLink::new());
-            let bridge_exe = sr_client::naming::sibling_exe("sr-bridge.exe")
-                .map_err(|e| std::io::Error::other(format!("{:?}", e.code)))?;
+            let bridge_exe = sr_client::naming::sibling_exe(&format!(
+                "sr-bridge{}",
+                std::env::consts::EXE_SUFFIX
+            ))
+            .map_err(|e| std::io::Error::other(format!("{:?}", e.code)))?;
             let connect = ConnectCtx {
                 roots: client_roots(app.handle())?,
                 bridge_exe,
@@ -445,7 +463,9 @@ fn main() {
             tauri::async_runtime::spawn(daemon::run_events(link, shared));
             tauri::async_runtime::spawn(push_loop(app.handle().clone(), rx));
             watch_client_configs(app.handle());
-            if !background {
+            if background {
+                tray::set_dock_visible(app.handle(), false);
+            } else {
                 tray::show_main(app.handle());
             }
             Ok(())
@@ -455,10 +475,14 @@ fn main() {
             if let WindowEvent::CloseRequested { api, .. } = e {
                 api.prevent_close();
                 let _ = w.hide();
+                tray::set_dock_visible(w.app_handle(), false);
                 first_close_note(w.app_handle());
             }
         })
-        .run(tauri::generate_context!());
+        .build(tauri::generate_context!())
+        // `Builder::run` is `build` + `run` with no handler; macOS adds one: opening the app again
+        // (Finder, Launchpad, Spotlight) while only the menu bar icon is there shows the window.
+        .map(|app| app.run(on_run_event));
     if let Err(e) = result {
         eprintln!("Selene Retrieval couldn't start: {e}");
         std::process::exit(1);

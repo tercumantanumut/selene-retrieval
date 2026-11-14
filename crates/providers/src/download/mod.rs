@@ -975,10 +975,14 @@ mod tests {
         assert_eq!(content_range_start(&h), None);
         assert_eq!(fmt_size(3 * GIB / 2), "1.5 GB");
         assert_eq!(fmt_size(208 * MIB + 1), "209 MB");
+        #[cfg(windows)]
         assert_eq!(
             drive_of(Path::new(r"D:\data\models")).as_deref(),
             Some("D:")
         );
+        // No drive letters: the message says "more disk space" without naming a drive.
+        #[cfg(unix)]
+        assert_eq!(drive_of(Path::new("/Volumes/Data/models")), None);
         assert!(is_part_file(Path::new("a.PART")) && !is_part_file(Path::new("a.onnx")));
     }
 

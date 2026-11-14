@@ -7,6 +7,14 @@ use serde::{Deserialize, Serialize};
 use specta::Type;
 use sr_common::error::{Error, Purpose, Section, SuggestedAction, UserMessage};
 
+/// The operating system as the user knows it, at the start of a sentence ("Windows didn't allow
+/// the change", "Your Mac didn't allow the change").
+pub const OS_NAME: &str = if cfg!(target_os = "macos") {
+    "Your Mac"
+} else {
+    "Windows"
+};
+
 /// The one user-facing error shape: title, body, one action, details hidden by default (P1.5).
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Type)]
 pub struct UiError {

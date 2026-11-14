@@ -12,6 +12,11 @@
 //! would run `.bat`/`.ps1`/`.js` files with their default handler. That needs the opener-plugin
 //! security review OQ-40 asks for.
 //!
+//! **macOS (port phase 1).** The same checks apply; the launcher is `/usr/bin/open` by absolute
+//! path. A link is `open <url>`, "show in folder" is `open -R` (reveals, never opens), and a folder
+//! is `open <dir>`, or `open -R` when the folder could be an app bundle, so nothing is launched.
+//! Paths compare case-sensitively with `/` separators.
+//!
 //! **M5-C (the "Sign in opened my Documents folder" bug).** The removed OAuth sign-in handed
 //! Explorer its 379-character `https://claude.ai/oauth/authorize?...` address. `explorer.exe`
 //! parses its argument as a location of at most `MAX_PATH` (260) characters, with `,` as its own
@@ -35,11 +40,25 @@ pub enum OpenError {
 }
 
 /// `C:\Windows\explorer.exe` (the parent of System32), never a PATH lookup.
+#[cfg(windows)]
 fn explorer() -> Option<PathBuf> {
-    let sys = sr_client::win::system_dir().ok()?;
+    let sys = sr_client::sys::system_dir().ok()?;
     let exe = sys.parent()?.join("explorer.exe");
     exe.is_file().then_some(exe)
 }
+
+/// macOS: `/usr/bin/open`, never a PATH lookup.
+#[cfg(not(windows))]
+fn explorer() -> Option<PathBuf> {
+    let exe = PathBuf::from("/usr/bin/open");
+    exe.is_file().then_some(exe)
+}
+
+/// Path separator used by [`norm`].
+#[cfg(windows)]
+const SEP: char = '\\';
+#[cfg(not(windows))]
+const SEP: char = '/';
 
 /// A plain `https://host/...` address: no credentials, no spaces or quotes, sane length.
 pub fn is_plain_https(url: &str) -> bool {
@@ -87,8 +106,10 @@ fn launch_explorer(arg: &str) -> Result<(), OpenError> {
         return Err(OpenError::NotAllowed);
     }
     let exe = explorer().ok_or(OpenError::Failed)?;
-    Command::new(exe)
-        .arg(arg)
+    let mut cmd = Command::new(exe);
+    #[cfg(not(windows))]
+    cmd.arg("--"); // `open`: everything after is a target, never an option
+    cmd.arg(arg)
         .stdin(Stdio::null())
         .stdout(Stdio::null())
         .stderr(Stdio::null())
@@ -107,10 +128,24 @@ pub fn open_link(url: &str, allowed: &[String]) -> Result<(), OpenError> {
 
 /// Lower-cased, `\`-separated, without a trailing separator (Windows paths compare
 /// case-insensitively).
+#[cfg(windows)]
 fn norm(p: &Path) -> String {
     let s = p.to_string_lossy().replace('/', "\\").to_lowercase();
     let s = s.strip_prefix(r"\\?\").map(str::to_owned).unwrap_or(s);
     s.trim_end_matches('\\').to_owned()
+}
+
+/// As given, without a trailing `/` (unix paths compare case-sensitively; on a case-insensitive
+/// volume a differently-cased path is refused, which fails closed).
+#[cfg(not(windows))]
+fn norm(p: &Path) -> String {
+    let s = p.to_string_lossy();
+    let t = s.trim_end_matches('/');
+    if t.is_empty() {
+        s.into_owned()
+    } else {
+        t.to_owned()
+    }
 }
 
 /// `path` is absolute, has no `..`, and lies inside one of `roots` (the added folders).
@@ -121,7 +156,7 @@ pub fn inside_added_folder(path: &Path, roots: &[PathBuf]) -> bool {
     let p = norm(path);
     roots.iter().any(|r| {
         let r = norm(r);
-        !r.is_empty() && p.len() > r.len() && p.starts_with(&r) && p[r.len()..].starts_with('\\')
+        !r.is_empty() && p.len() > r.len() && p.starts_with(&r) && p[r.len()..].starts_with(SEP)
     })
 }
 
@@ -147,12 +182,16 @@ pub fn show_in_folder(path: &Path, roots: &[PathBuf]) -> Result<(), OpenError> {
     }
     let exe = explorer().ok_or(OpenError::Failed)?;
     let mut cmd = Command::new(exe);
+    #[cfg(windows)]
     {
         use std::os::windows::process::CommandExt;
         // Explorer parses its own command line: `/select,"<path>"` must reach it unquoted as a
         // whole (a quoted `"/select,…"` is not understood).
         cmd.raw_arg(format!("/select,\"{s}\""));
     }
+    // `open -R` reveals the file in Finder; it never opens or runs it.
+    #[cfg(not(windows))]
+    cmd.arg("-R").arg("--").arg(path);
     cmd.stdin(Stdio::null())
         .stdout(Stdio::null())
         .stderr(Stdio::null())
@@ -169,7 +208,7 @@ pub fn is_or_inside_added_folder(path: &Path, roots: &[PathBuf]) -> bool {
     let p = norm(path);
     roots.iter().any(|r| {
         let r = norm(r);
-        !r.is_empty() && (p == r || (p.starts_with(&r) && p[r.len()..].starts_with('\\')))
+        !r.is_empty() && (p == r || (p.starts_with(&r) && p[r.len()..].starts_with(SEP)))
     })
 }
 
@@ -190,15 +229,30 @@ pub fn open_folder(path: &Path, roots: &[PathBuf]) -> Result<(), OpenError> {
         return Err(OpenError::NotAllowed);
     }
     let s = path.to_string_lossy();
-    if s.is_empty() || s.contains('"') || s.len() > EXPLORER_MAX_ARG {
+    if s.is_empty() || s.contains('"') || (cfg!(windows) && s.len() > EXPLORER_MAX_ARG) {
         return Err(OpenError::NotAllowed);
     }
     let exe = explorer().ok_or(OpenError::Failed)?;
     let mut cmd = Command::new(exe);
+    #[cfg(windows)]
     {
         use std::os::windows::process::CommandExt;
         // Quoted as one argument, so spaces and `,` stay part of the path.
         cmd.raw_arg(format!("\"{s}\""));
+    }
+    // `open <dir>` would launch a folder that is an app bundle (`X.app`, a folder with a
+    // `Contents` folder or a flat bundle's `Info.plist`), so such a folder is only revealed
+    // (`-R`), never opened. Checked on, and passed as, the resolved path: a link without an
+    // extension can't hide a bundle behind it.
+    #[cfg(not(windows))]
+    {
+        let maybe_bundle = real.extension().is_some()
+            || real.join("Contents").is_dir()
+            || real.join("Info.plist").exists();
+        if maybe_bundle {
+            cmd.arg("-R");
+        }
+        cmd.arg("--").arg(&real);
     }
     cmd.stdin(Stdio::null())
         .stdout(Stdio::null())
@@ -212,6 +266,7 @@ pub fn open_folder(path: &Path, roots: &[PathBuf]) -> Result<(), OpenError> {
 mod tests {
     use super::*;
 
+    #[cfg(windows)]
     #[test]
     fn open_folder_only_for_added_folders_and_their_subfolders() {
         let roots = vec![PathBuf::from(r"C:\Users\Ana\Documents")];
@@ -294,13 +349,58 @@ mod tests {
         }
         assert!(explorer_arg_ok("https://claude.com/claude-code"));
         assert!(explorer_arg_ok("https://developers.openai.com/codex/cli"));
+        #[cfg(windows)]
         assert!(explorer_arg_ok(r"C:\Users\Ana\Documents\a.txt"));
+        #[cfg(not(windows))]
+        assert!(explorer_arg_ok("/Users/ana/Documents/a.txt"));
         // Empty / relative / over-long links never reach Explorer, even if "allowed".
         let allowed = vec![String::new(), "Documents".to_owned(), oauth.clone()];
         for u in ["", "Documents", oauth.as_str()] {
             assert_eq!(open_link(u, &allowed), Err(OpenError::NotAllowed), "{u:?}");
         }
         assert_eq!(launch_explorer(""), Err(OpenError::NotAllowed));
+    }
+
+    #[cfg(not(windows))]
+    #[test]
+    fn unix_paths_compare_exactly_and_stay_inside_added_folders() {
+        let roots = vec![PathBuf::from("/Users/ana/Documents")];
+        assert!(is_or_inside_added_folder(
+            Path::new("/Users/ana/Documents"),
+            &roots
+        ));
+        assert!(is_or_inside_added_folder(
+            Path::new("/Users/ana/Documents/"),
+            &roots
+        ));
+        assert!(inside_added_folder(
+            Path::new("/Users/ana/Documents/a/b.txt"),
+            &roots
+        ));
+        assert!(!inside_added_folder(
+            Path::new("/Users/ana/Documents"),
+            &roots
+        ));
+        assert!(!inside_added_folder(
+            Path::new("/Users/ana/DocumentsOld/x.txt"),
+            &roots
+        ));
+        assert!(!inside_added_folder(
+            Path::new("/Users/ana/documents/x.txt"),
+            &roots
+        ));
+        assert!(!inside_added_folder(
+            Path::new("/Users/ana/Documents/../x.txt"),
+            &roots
+        ));
+        assert!(!inside_added_folder(Path::new("Documents/x.txt"), &roots));
+        assert!(!is_or_inside_added_folder(Path::new("/"), &roots));
+        assert_eq!(
+            show_in_folder(Path::new("/Users/ana/Documents/missing.txt"), &roots),
+            Err(OpenError::NotAllowed)
+        );
+        let d = std::env::temp_dir();
+        assert_eq!(open_folder(&d, &roots), Err(OpenError::NotAllowed));
     }
 
     #[test]
@@ -316,6 +416,7 @@ mod tests {
         );
     }
 
+    #[cfg(windows)]
     #[test]
     fn show_in_folder_stays_inside_added_folders() {
         let roots = vec![PathBuf::from(r"C:\Users\Ana\Documents")];

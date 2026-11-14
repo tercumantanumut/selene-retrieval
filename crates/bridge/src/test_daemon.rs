@@ -8,7 +8,7 @@
 //! Fake service: MCP = one JSON response line per JSON-RPC request line (enough to test a byte
 //! proxy); app-RPC `test.emit {n}` publishes n events, `test.info` describes the process.
 //! Test hooks: `--proto N`, `--ring N`, `--idle-exit-secs N` (default 120, so a leaked stub dies),
-//! `--skip-host-lock`.
+//! `--skip-host-lock`, `--strict-trust` (no self-trust: the real S-05 / R50 caller rules).
 #![windows_subsystem = "windows"]
 
 // pipe.rs logs refused callers with `tracing::warn!` (M5-E, S-05). sr-bridge keeps its tiny
@@ -33,10 +33,10 @@ use std::time::Duration;
 
 use pipe::{EventHub, PipeServerConfig, PipeService, SessionInfo};
 use serde_json::{Value, json};
+use sr_client::sys::ServerStream;
 use sr_common::error::{Error, ErrorCode};
 use sr_common::events::{EngineEvent, Snapshot};
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
-use tokio::net::windows::named_pipe::NamedPipeServer;
 
 struct Stub {
     hub: EventHub<EngineEvent>,
@@ -87,7 +87,7 @@ impl PipeService for Stub {
             .snapshot(|| json!({"emitted": self.emitted.load(Ordering::SeqCst)}))
     }
 
-    async fn serve_mcp(&self, stream: NamedPipeServer, _s: SessionInfo) {
+    async fn serve_mcp(&self, stream: ServerStream, _s: SessionInfo) {
         let (r, mut w) = tokio::io::split(stream);
         let mut lines = BufReader::new(r).lines();
         log(
@@ -163,13 +163,22 @@ fn main() {
     unsafe {
         std::env::set_var("SR_TRUST_ANY_APP", "1");
     }
+    // `--strict-trust`: the real caller rules (the socket tests check that an unproven caller is
+    // refused).
+    if std::env::args().any(|a| a == "--strict-trust") {
+        #[allow(unsafe_code)]
+        // SAFETY: still before any thread exists.
+        unsafe {
+            std::env::remove_var("SR_TRUST_ANY_APP");
+        }
+    }
     let args: Vec<String> = std::env::args().collect();
     let Some(data_dir) = arg(&args, "--data-dir").map(PathBuf::from) else {
         std::process::exit(2);
     };
     let _ = std::fs::create_dir_all(&data_dir);
     let launched_by = arg(&args, "--launched-by").unwrap_or_else(|| "direct".into());
-    let in_job = sr_client::win::current_process_in_job();
+    let in_job = sr_client::sys::current_process_in_job();
     let pid = std::process::id();
     let _ = std::fs::write(
         data_dir.join(format!("start-{pid}.json")),

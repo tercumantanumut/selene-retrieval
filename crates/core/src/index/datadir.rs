@@ -73,11 +73,11 @@ pub fn validate_store_root(path: &Path) -> Result<PathBuf> {
     Ok(path.to_path_buf())
 }
 
-#[cfg(test)]
+// Windows path forms only (the only test here).
+#[cfg(all(test, windows))]
 mod tests {
     use super::*;
 
-    #[cfg(windows)]
     #[test]
     fn windows_forms_from_m0_test_8() {
         let ok = [

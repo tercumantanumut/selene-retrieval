@@ -7,6 +7,7 @@
 //! GPU DLLs must stay delay-loaded (sr-daemon's `/DELAYLOAD`). Modules are never freed.
 
 /// A resolved export (`FARPROC`); callers transmute it to the documented signature.
+#[cfg(windows)]
 pub(crate) type Proc = unsafe extern "system" fn() -> isize;
 
 /// `GetProcAddress(LoadLibraryExW(<System32>\dll), name)`; `None` if either step fails.
@@ -39,11 +40,6 @@ pub(crate) fn system32_proc(dll: &str, name: &std::ffi::CStr) -> Option<Proc> {
     unsafe { GetProcAddress(h, name.as_ptr().cast()) }
 }
 
-#[cfg(not(windows))]
-pub(crate) fn system32_proc(_dll: &str, _name: &std::ffi::CStr) -> Option<Proc> {
-    None
-}
-
 /// Free bytes available to this user on the volume holding `path` (`GetDiskFreeSpaceExW`;
 /// kernel32 is a KnownDLL). `None` if the query fails.
 #[cfg(windows)]
@@ -74,7 +70,102 @@ pub fn free_disk(path: &std::path::Path) -> Option<u64> {
     (ok != 0).then_some(avail)
 }
 
-#[cfg(not(windows))]
+/// Free bytes available to this user on the volume holding `path` (`statvfs`: `f_bavail`, the
+/// blocks a non-root user may use). `None` if the query fails.
+#[cfg(unix)]
+#[allow(unsafe_code)] // libc FFI: statvfs. Reviewed (macOS port).
+pub fn free_disk(path: &std::path::Path) -> Option<u64> {
+    use std::os::unix::ffi::OsStrExt;
+    // The directory may not exist yet: ask about the nearest existing ancestor.
+    let mut p = path;
+    while !p.exists() {
+        p = p.parent()?;
+    }
+    let c = std::ffi::CString::new(p.as_os_str().as_bytes()).ok()?;
+    // SAFETY: an all-zero statvfs is a valid out-struct.
+    let mut st: libc::statvfs = unsafe { std::mem::zeroed() };
+    // SAFETY: `c` is NUL-terminated and `st` is a valid, writable statvfs.
+    if unsafe { libc::statvfs(c.as_ptr(), &mut st) } != 0 {
+        return None;
+    }
+    // Field widths differ between platforms (u32 / u64), hence the casts.
+    #[allow(clippy::unnecessary_cast)]
+    let (avail, frsize) = (st.f_bavail as u64, st.f_frsize as u64);
+    Some(avail.saturating_mul(frsize))
+}
+
+#[cfg(not(any(windows, unix)))]
 pub fn free_disk(_path: &std::path::Path) -> Option<u64> {
     None
+}
+
+// CLI discovery (`cli::discover`, feature `remote`) on Unix.
+
+/// Real user id of this process.
+#[cfg(all(unix, feature = "remote"))]
+#[allow(unsafe_code)] // libc FFI: getuid. Reviewed (macOS port).
+pub(crate) fn uid() -> u32 {
+    // SAFETY: no arguments; getuid cannot fail.
+    unsafe { libc::getuid() }
+}
+
+/// Home folder of the current user from the user database (`getpwuid_r`), never `$HOME` (an MCP
+/// client or a launcher may pass another environment). `None` if there is none or it is relative.
+#[cfg(all(unix, feature = "remote"))]
+#[allow(unsafe_code)] // libc FFI: getpwuid_r. Reviewed (macOS port).
+pub(crate) fn home_dir() -> Option<std::path::PathBuf> {
+    use std::os::unix::ffi::OsStringExt;
+    let mut buf = vec![0u8; 4096];
+    loop {
+        // SAFETY: an all-zero `passwd` is a valid out value (null pointers, zero ids).
+        let mut pw: libc::passwd = unsafe { std::mem::zeroed() };
+        let mut res: *mut libc::passwd = std::ptr::null_mut();
+        // SAFETY: `pw`, `buf` and `res` outlive the call and `buf.len()` is the buffer size; the
+        // strings in `pw` point into `buf` and are read before `buf` changes.
+        let rc = unsafe {
+            libc::getpwuid_r(
+                libc::getuid(),
+                &mut pw,
+                buf.as_mut_ptr().cast(),
+                buf.len(),
+                &mut res,
+            )
+        };
+        if rc == libc::ERANGE && buf.len() < 1 << 20 {
+            buf.resize(buf.len() * 4, 0);
+            continue;
+        }
+        if rc != 0 || res.is_null() || pw.pw_dir.is_null() {
+            return None;
+        }
+        // SAFETY: on success `pw_dir` is a NUL-terminated string inside `buf`.
+        let dir = unsafe { std::ffi::CStr::from_ptr(pw.pw_dir) }
+            .to_bytes()
+            .to_vec();
+        let dir = std::path::PathBuf::from(std::ffi::OsString::from_vec(dir));
+        return dir.is_absolute().then_some(dir);
+    }
+}
+
+/// Whether `path` lies on a local volume (not a network share). macOS: `statfs` `MNT_LOCAL`.
+#[cfg(all(target_os = "macos", feature = "remote"))]
+#[allow(unsafe_code)] // libc FFI: statfs. Reviewed (macOS port).
+pub(crate) fn on_local_volume(path: &std::path::Path) -> bool {
+    use std::os::unix::ffi::OsStrExt;
+    let Ok(c) = std::ffi::CString::new(path.as_os_str().as_bytes()) else {
+        return false;
+    };
+    // SAFETY: an all-zero statfs is a valid out-struct.
+    let mut st: libc::statfs = unsafe { std::mem::zeroed() };
+    // SAFETY: `c` is NUL-terminated and `st` is a valid, writable statfs.
+    if unsafe { libc::statfs(c.as_ptr(), &mut st) } != 0 {
+        return false;
+    }
+    st.f_flags & (libc::MNT_LOCAL as u32) != 0
+}
+
+/// Other Unix systems: no portable flag; treated as local.
+#[cfg(all(unix, not(target_os = "macos"), feature = "remote"))]
+pub(crate) fn on_local_volume(_path: &std::path::Path) -> bool {
+    true
 }

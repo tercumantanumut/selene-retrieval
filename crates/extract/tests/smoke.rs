@@ -1,4 +1,5 @@
-//! Basic round trips through the real sandboxed worker, in both sandbox modes.
+//! Basic round trips through the real sandboxed worker, in both sandbox modes (Windows) or the
+//! Seatbelt sandbox (macOS).
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
 mod common;
@@ -7,7 +8,7 @@ use common::*;
 use sr_common::protocol::extract::DocKind;
 use sr_extract_client::{ActiveSandbox, ExtractPool, ExtractSource, SandboxMode};
 
-fn round_trips(mode: SandboxMode, stage_name: &str, profile: &str) {
+fn round_trips(mode: SandboxMode, stage_name: &str, profile: &str, want: ActiveSandbox) {
     let (exe, dll) = stage(stage_name);
     let prof = Profile::new(profile);
     let pool = ExtractPool::start(config(&exe, &dll, mode, &prof.0)).unwrap();
@@ -23,10 +24,6 @@ fn round_trips(mode: SandboxMode, stage_name: &str, profile: &str) {
             r.text
         );
         assert_eq!(r.pages, Some(3));
-        let want = match mode {
-            SandboxMode::LowIntegrity => ActiveSandbox::LowIntegrity,
-            _ => ActiveSandbox::AppContainer,
-        };
         assert_eq!(
             r.sandbox,
             want,
@@ -58,12 +55,35 @@ fn round_trips(mode: SandboxMode, stage_name: &str, profile: &str) {
     );
 }
 
+#[cfg(windows)]
 #[test]
 fn app_container_round_trips() {
-    round_trips(SandboxMode::AppContainer, "smoke-ac", "smoke-ac");
+    round_trips(
+        SandboxMode::AppContainer,
+        "smoke-ac",
+        "smoke-ac",
+        ActiveSandbox::AppContainer,
+    );
 }
 
+#[cfg(windows)]
 #[test]
 fn low_integrity_round_trips() {
-    round_trips(SandboxMode::LowIntegrity, "smoke-low", "smoke-low");
+    round_trips(
+        SandboxMode::LowIntegrity,
+        "smoke-low",
+        "smoke-low",
+        ActiveSandbox::LowIntegrity,
+    );
+}
+
+#[cfg(target_os = "macos")]
+#[test]
+fn seatbelt_round_trips() {
+    round_trips(
+        SandboxMode::Auto,
+        "smoke-seatbelt",
+        "smoke-seatbelt",
+        ActiveSandbox::Seatbelt,
+    );
 }

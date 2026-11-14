@@ -3,6 +3,9 @@
 //! CLI adds a folder and waits → an MCP session over the named pipe lists tools, searches
 //! (path + lines, progress notifications), gets `-32602` for bad arguments and removed tools,
 //! reads `sr://status` → `admin shutdown` drains and exits 0.
+// Windows only for now (install layout with `.exe` names, named pipes). macOS phase 2: run it
+// over the Unix socket.
+#![cfg(windows)]
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
 use std::path::{Path, PathBuf};

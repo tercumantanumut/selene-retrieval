@@ -142,16 +142,22 @@ pub fn run(spec: &[u8], id: u64, out: &mut dyn Write) -> io::Result<Probe> {
                 Err(e) => format!("NET_DENIED {e}"),
             },
         ),
-        b"spawn" => ok(
-            match std::process::Command::new(r"C:\Windows\System32\cmd.exe")
-                .args(["/c", "exit", "0"])
-                .spawn()
-            {
-                Ok(mut c) => {
-                    let _ = c.kill();
-                    "SPAWN_ALLOWED".into()
-                }
-                Err(e) => format!("SPAWN_DENIED {e}"),
+        b"spawn" => ok(match spawn_command().spawn() {
+            Ok(mut c) => {
+                let _ = c.kill();
+                #[cfg(unix)]
+                let _ = c.wait();
+                "SPAWN_ALLOWED".into()
+            }
+            Err(e) => format!("SPAWN_DENIED {e}"),
+        }),
+        #[cfg(unix)]
+        b"fork" => ok(fork_probe()),
+        #[cfg(unix)]
+        b"unix" => ok(
+            match std::os::unix::net::UnixStream::connect(std::path::Path::new(&arg_s)) {
+                Ok(_) => "UNIX_ALLOWED".into(),
+                Err(e) => format!("UNIX_DENIED {e}"),
             },
         ),
         _ => Probe::Reply(Err(Failure::new(
@@ -159,4 +165,33 @@ pub fn run(spec: &[u8], id: u64, out: &mut dyn Write) -> io::Result<Probe> {
             "unknown probe",
         ))),
     })
+}
+
+#[cfg(windows)]
+fn spawn_command() -> std::process::Command {
+    let mut c = std::process::Command::new(r"C:\Windows\System32\cmd.exe");
+    c.args(["/c", "exit", "0"]);
+    c
+}
+
+#[cfg(unix)]
+fn spawn_command() -> std::process::Command {
+    std::process::Command::new("/usr/bin/true")
+}
+
+/// A raw `fork` (no exec): the child exits at once.
+#[cfg(unix)]
+fn fork_probe() -> String {
+    // SAFETY: the child calls only `_exit`, which is async-signal-safe; the parent reaps it.
+    unsafe {
+        match libc::fork() {
+            -1 => format!("FORK_DENIED {}", io::Error::last_os_error()),
+            0 => libc::_exit(0),
+            pid => {
+                let mut status = 0;
+                libc::waitpid(pid, &mut status, 0);
+                "FORK_ALLOWED".into()
+            }
+        }
+    }
 }

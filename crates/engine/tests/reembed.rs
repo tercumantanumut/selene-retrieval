@@ -832,7 +832,10 @@ fn kill9_child() {
     rt.block_on(async move {
         let w = World::open(Path::new(&dir)).await;
         let mut p = Counting::new(new_provider());
-        p.per_call = Duration::from_millis(15);
+        // 240 chunks in batches of 8 = 30 calls; 50 ms each keeps the whole rebuild (≈1.5 s)
+        // longer than the longest kill wait (1.2 s), so a kill lands mid-rebuild even on a fast
+        // machine (15 ms let an Apple-silicon child finish before the first kill).
+        p.per_call = Duration::from_millis(50);
         eprintln!("child: rebuilding");
         let r = reembed::run(
             &w.deps(),

@@ -3,7 +3,9 @@
 //!
 //! * `cargo xtask fetch-pdfium  [--dir <d>]`: bblanchon/pdfium-binaries `chromium/7881`
 //!   (`pdfium-render` feature `pdfium_7881`, the build the hostile corpus ran on). `pdfium.dll` is
-//!   **unsigned upstream**; the pin is its integrity check (m1-b B1).
+//!   **unsigned upstream**; the pin is its integrity check (m1-b B1). On macOS (Apple silicon) the
+//!   same release's `libpdfium.dylib` ([`PDFIUM_MAC_ARM64`]), fetched with `/usr/bin/curl` and
+//!   `/usr/bin/tar`.
 //! * `cargo xtask fetch-runtime [--dir <d>]`: `DirectML.dll` 1.15.4 (NuGet `Microsoft.AI.DirectML`,
 //!   app-local next to `sr-daemon.exe`, m1-d O2) and the four VC++ runtime DLLs 14.44.35211 from
 //!   the MSVC 14.44 (VS 17.14) redistributable package `Microsoft.VC.14.44.17.14.CRT.Redist.X64.base`
@@ -47,6 +49,52 @@ pub const PDFIUM: Archive = Archive {
         ("licenses/pdfium.txt", "LICENSE-pdfium.txt", ""),
     ],
 };
+
+/// macOS on Apple silicon (Amendment 18): the same bblanchon/pdfium-binaries `chromium/7881`
+/// release, `pdfium-mac-arm64.tgz`. Archive pin = the asset `digest` of the GitHub release API,
+/// cross-checked by download (2026-11-14); the API's digest for `pdfium-win-x64.tgz` equals the
+/// [`PDFIUM`] pin above. `libpdfium.dylib` is ad-hoc (linker) signed upstream and links only
+/// system frameworks (AppKit, CoreFoundation, Foundation, CoreGraphics, libSystem); install name
+/// `./libpdfium.dylib`, which does not matter because the worker opens it by absolute path.
+/// Packaging (phase 4) re-signs it with the app's identity.
+pub const PDFIUM_MAC_ARM64: Archive = Archive {
+    tree: None,
+    dir: "pdfium-7881",
+    url: "https://github.com/bblanchon/pdfium-binaries/releases/download/chromium/7881/pdfium-mac-arm64.tgz",
+    sha256: "52e94ca5aa8847934330daf3f8150c190682c5ca93831468794f8b90d4392e40",
+    files: &[
+        (
+            "lib/libpdfium.dylib",
+            "libpdfium.dylib",
+            "1bc45b15466b34cef96641ce25c77a876e70010c6b114f909dda2f5325fc5bd7",
+        ),
+        (
+            "LICENSE",
+            "LICENSE-pdfium-binaries.txt",
+            "ba26c1263131696b86c10496b5066b918a20b7161822a80c274d0080105f6c93",
+        ),
+        (
+            "licenses/pdfium.txt",
+            "LICENSE-pdfium.txt",
+            "1fe9dea718fbd75cf149adaf4d8a22a4335604d964ddb76d1b45383dec8668c9",
+        ),
+    ],
+};
+
+/// The pdfium build for the platform xtask runs on.
+pub fn pdfium_for_host() -> Result<&'static Archive, String> {
+    if cfg!(windows) {
+        Ok(&PDFIUM)
+    } else if cfg!(all(target_os = "macos", target_arch = "aarch64")) {
+        Ok(&PDFIUM_MAC_ARM64)
+    } else {
+        Err(
+            "fetch-pdfium: no pinned pdfium build for this platform (Windows x64 and macOS on \
+             Apple silicon only)"
+                .into(),
+        )
+    }
+}
 
 pub const DIRECTML: Archive = Archive {
     tree: None,
@@ -412,9 +460,17 @@ fn file_sha(path: &Path) -> Result<Option<String>, String> {
 }
 
 /// System32 tool by absolute path (never PATH: Git's own `tar`/`curl` must not be picked up).
+#[cfg(windows)]
 fn system_tool(name: &str) -> PathBuf {
     let root = std::env::var_os("SystemRoot").unwrap_or_else(|| r"C:\Windows".into());
     PathBuf::from(root).join("System32").join(name)
+}
+
+/// The system's own tool by absolute path (`/usr/bin/curl`, `/usr/bin/tar`; never PATH, so a
+/// Homebrew or other copy is not picked up). `name` is the Windows file name.
+#[cfg(not(windows))]
+fn system_tool(name: &str) -> PathBuf {
+    PathBuf::from("/usr/bin").join(name.trim_end_matches(".exe"))
 }
 
 /// Downloads `url` to `dest` (via `<dest>.part`) unless `dest` already has `sha256`.
@@ -521,7 +577,7 @@ fn vendor_arg(args: &[String]) -> Result<PathBuf, String> {
 }
 
 pub fn fetch_pdfium(args: &[String]) -> Result<(), String> {
-    fetch(&PDFIUM, &vendor_arg(args)?).map(|_| ())
+    fetch(pdfium_for_host()?, &vendor_arg(args)?).map(|_| ())
 }
 
 pub fn fetch_runtime(args: &[String]) -> Result<(), String> {
@@ -540,7 +596,15 @@ mod tests {
 
     #[test]
     fn pins_are_well_formed() {
-        for a in [&PDFIUM, &DIRECTML, &VC_RUNTIME, &NSIS, &WIX, &WIX_UI] {
+        for a in [
+            &PDFIUM,
+            &PDFIUM_MAC_ARM64,
+            &DIRECTML,
+            &VC_RUNTIME,
+            &NSIS,
+            &WIX,
+            &WIX_UI,
+        ] {
             assert_eq!(a.sha256.len(), 64, "{}", a.dir);
             assert!(a.url.starts_with("https://"), "{}", a.url);
             assert!(!a.files.is_empty());
@@ -549,9 +613,9 @@ mod tests {
             }
         }
         // Every DLL we ship from a third party is pinned by content, not just by archive.
-        for a in [&PDFIUM, &DIRECTML, &VC_RUNTIME] {
+        for a in [&PDFIUM, &PDFIUM_MAC_ARM64, &DIRECTML, &VC_RUNTIME] {
             for (_, out, sha) in a.files {
-                if out.ends_with(".dll") {
+                if out.ends_with(".dll") || out.ends_with(".dylib") {
                     assert_eq!(sha.len(), 64, "{out} must be content-pinned");
                 }
             }
@@ -562,6 +626,11 @@ mod tests {
         // Build tools that need their whole folder; every pinned file of WiX is content-pinned.
         assert_eq!(NSIS.tree, Some("nsis-3.13"));
         assert!(WIX.tree.is_some() && WIX_UI.tree.is_none() && PDFIUM.tree.is_none());
+        // Both pdfium builds come from the same release, into the folder the tests look in.
+        assert_eq!(PDFIUM_MAC_ARM64.dir, PDFIUM.dir);
+        assert!(PDFIUM_MAC_ARM64.tree.is_none());
+        let release = |u: &str| u.rsplit_once('/').map(|(r, _)| r.to_string());
+        assert_eq!(release(PDFIUM_MAC_ARM64.url), release(PDFIUM.url));
         for (_, out, sha) in WIX.files.iter().chain(WIX_UI.files) {
             assert_eq!(sha.len(), 64, "{out}");
         }

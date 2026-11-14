@@ -23,5 +23,12 @@ test("#40 ConnectionNotTrusted: the UI's text is sr-common's, verbatim", () => {
   const strings = [...block.matchAll(/"((?:[^"\\]|\\.)*)"/g)].map((m) => m[1].replace(/\\'/g, "'"));
   assert.equal(strings.length, 2, "title + body found in messages.rs");
   assert.ok(ts.includes(`title: "${strings[0]}"`), `title "${strings[0]}"`);
-  assert.ok(ts.includes(`body: "${strings[1]}"`), `body "${strings[1]}"`);
+  // The body ends in sr-common's per-platform RESTART_BODY; the UI keeps the same two sentences.
+  const restart = [...rustMsg.matchAll(/const RESTART_BODY: &str = "([^"]*)";/g)].map((m) => m[1]);
+  assert.equal(restart.length, 2, "RESTART_BODY for Windows and macOS");
+  assert.ok(strings[1].endsWith("{RESTART_BODY}"), `body "${strings[1]}"`);
+  const head = strings[1].slice(0, -"{RESTART_BODY}".length);
+  assert.ok(ts.includes(`body: \`${head}\${RESTART_BODY}\``), `body "${head}"`);
+  const [win, mac] = restart;
+  assert.ok(ts.includes(`isMac ? "${mac}" : "${win}"`), `RESTART_BODY "${mac}" / "${win}"`);
 });

@@ -9,20 +9,22 @@ publish.workspace = true
 
 [features]
 # `local` = fastembed on a statically linked ONNX Runtime (pyke build, always contains the DirectML EP
-# on Windows). The workspace entry disables default features so crates that only need the traits
+# on Windows; the CoreML build on macOS, the only flavour ort-sys ships for Apple silicon). The EP
+# features sit on the target-specific `fastembed` / `ort` entries below; `dep:` enables them. The workspace entry disables default features so crates that only need the traits
 # (sr-core) don't link ORT; the composition root (sr-engine / sr-daemon) enables `local`.
 default = ["local", "remote"]
 # `local` also brings the model downloader (`download`) and the DXGI/metered-network probes (`dxgi`):
 # only the daemon needs them, and sr-core keeps building without TLS or COM.
-local = ["dep:fastembed", "dep:ort", "fastembed/directml", "ort/directml", "ort/half", "dep:half", "download", "gpu-detect"]
+local = ["dep:fastembed", "dep:ort", "ort/half", "dep:half", "download", "gpu-detect"]
 download = ["dep:reqwest", "dep:rustls", "dep:windows"]
 gpu-detect = ["dep:windows"]
 # M3-P: remote chat + embedding providers (genai over our ring-only reqwest client), live key
 # validation and model discovery, the system proxy resolver and Credential Manager secrets.
 # sr-engine must enable it next to `local` (request in docs/research/m3-p-progress.md).
 remote = ["dep:genai", "dep:reqwest", "dep:rustls", "dep:getrandom", "keyring"]
-# Windows Credential Manager `SecretStore` only (no TLS, no genai): usable by small tools.
-keyring = ["dep:keyring-core", "dep:windows-native-keyring-store"]
+# OS credential store `SecretStore` only (no TLS, no genai): usable by small tools. Windows
+# Credential Manager on Windows, the login keychain on macOS (target-specific entries below).
+keyring = ["dep:keyring-core", "dep:windows-native-keyring-store", "dep:apple-native-keyring-store"]
 
 [dependencies]
 futures    = { workspace = true }
@@ -42,7 +44,6 @@ rustls    = { workspace = true, optional = true }   # ring provider only (3.13)
 genai     = { workspace = true, optional = true }   # no default features: no aws-lc, our reqwest client
 getrandom = { workspace = true, optional = true }   # M5-C: unique temp folder names for CLI runs
 keyring-core = { workspace = true, optional = true }
-windows-native-keyring-store = { workspace = true, optional = true, features = ["search"] }
 
 [target.'cfg(windows)'.dependencies]
 windows-sys = { workspace = true, features = [
@@ -54,6 +55,20 @@ windows = { workspace = true, optional = true, features = [
   "Win32_Foundation", "Win32_Graphics_Dxgi", "Win32_Graphics_Dxgi_Common", "Win32_Graphics_Direct3D",
   "Win32_Graphics_Direct3D12", "Win32_System_Com", "Win32_Networking_NetworkListManager",
 ] }
+# `local`: the DirectML flavour of the ORT binary (and fastembed's DirectML session settings).
+fastembed = { workspace = true, optional = true, features = ["directml"] }
+ort       = { workspace = true, optional = true, features = ["directml"] }
+windows-native-keyring-store = { workspace = true, optional = true, features = ["search"] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+# `local`: ort-sys only ships CoreML-flavoured binaries for aarch64-apple-darwin. The CoreML EP
+# itself is not used (macOS port phase 2 decision, see `local.rs`); sessions run on the CPU.
+ort = { workspace = true, optional = true, features = ["coreml"] }
+# `keyring`: the login keychain (legacy file keychain: works for unsigned builds, no entitlement).
+apple-native-keyring-store = { workspace = true, optional = true, features = ["keychain"] }
+
+[target.'cfg(unix)'.dependencies]
+libc = { workspace = true }   # statvfs (free disk), killpg (CLI process groups)
 
 [[example]]
 name = "throughput"

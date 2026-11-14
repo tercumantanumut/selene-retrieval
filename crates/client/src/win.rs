@@ -47,6 +47,11 @@ use windows_sys::Win32::UI::Shell::{
     FOLDERID_LocalAppData, KF_FLAG_DONT_VERIFY, SHGetKnownFolderPath,
 };
 
+/// Client end of a daemon connection (named pipe here, a Unix socket in `sr_client::unix`).
+pub type Stream = tokio::net::windows::named_pipe::NamedPipeClient;
+/// Server end of one daemon session.
+pub type ServerStream = NamedPipeServer;
+
 /// `ERROR_FILE_NOT_FOUND`: no pipe with that name.
 pub const ERROR_FILE_NOT_FOUND: i32 = 2;
 /// `ERROR_ACCESS_DENIED`.

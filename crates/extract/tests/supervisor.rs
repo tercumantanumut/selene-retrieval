@@ -170,6 +170,7 @@ fn parser_panic_is_a_typed_failure_and_the_worker_survives() {
     assert_no_leaks(&pool);
 }
 
+#[cfg(windows)]
 #[test]
 fn app_container_denies_files_network_and_child_processes() {
     let secret = tmp_root().join("sup-secret.txt");
@@ -201,6 +202,141 @@ fn app_container_denies_files_network_and_child_processes() {
         assert_no_leaks(&pool);
     }
     assert!(!std::path::Path::new(&format!("{user_dir}\\sr-m1b-probe.txt")).exists());
+}
+
+/// The sandbox escape tests on macOS: from inside the worker (the probes run in the real,
+/// sandboxed process) every file read outside the system fonts, every file write, IP and Unix
+/// socket connections, fork and exec must fail, while the parser itself keeps working.
+#[cfg(target_os = "macos")]
+#[test]
+fn seatbelt_denies_files_network_and_child_processes() {
+    let secret = tmp_root().join("sup-secret.txt");
+    std::fs::write(&secret, b"user data").unwrap();
+    let home = std::env::var("HOME").unwrap();
+    let home_file = std::path::Path::new(&home).join(".zshrc");
+    let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    let addr = listener.local_addr().unwrap();
+    let sock_dir = tempfile::tempdir().unwrap();
+    let sock = sock_dir.path().join("s.sock");
+    let _ul = std::os::unix::net::UnixListener::bind(&sock).unwrap();
+    let written = [
+        tmp_root().join("sr-p3-probe.txt"),
+        std::path::PathBuf::from("/private/tmp/sr-p3-probe.txt"),
+        std::path::Path::new(&home).join("sr-p3-probe.txt"),
+    ];
+    let (pool, _p) = pool_with("deny-seatbelt", SandboxMode::Auto, |_| {});
+    let text = |p: String| {
+        rt().block_on(pool.extract(probe(&p), DocKind::Text))
+            .unwrap()
+            .text
+    };
+    // EPERM ("os error 1") is the sandbox's answer; "not found" would prove nothing.
+    let eperm = |r: &str| r.contains("(os error 1)");
+    let mut seen = Vec::new();
+    let mut reads = vec![
+        secret.display().to_string(),
+        "/etc/hosts".into(),
+        "/private/etc/passwd".into(),
+    ];
+    if home_file.exists() {
+        reads.push(home_file.display().to_string());
+    }
+    for path in reads {
+        let r = text(format!("read:{path}"));
+        assert!(
+            r.starts_with("READ_DENIED") && eperm(&r),
+            "read {path}: {r}"
+        );
+        seen.push(r);
+    }
+    // The system fonts are the one thing it may read (pdfium maps non-embedded fonts).
+    let font = text("read:/System/Library/Fonts/Helvetica.ttc".into());
+    assert!(font.starts_with("READ_ALLOWED"), "{font}");
+    for path in &written {
+        let r = text(format!("write:{}", path.display()));
+        assert!(
+            r.starts_with("WRITE_DENIED") && eperm(&r),
+            "write {}: {r}",
+            path.display()
+        );
+        seen.push(r);
+    }
+    for (p, want) in [
+        (format!("net:{addr}"), "NET_DENIED"),
+        ("net:1.1.1.1:443".to_string(), "NET_DENIED"),
+        (format!("unix:{}", sock.display()), "UNIX_DENIED"),
+    ] {
+        let r = text(p.clone());
+        assert!(r.starts_with(want) && eperm(&r), "{p}: {r}");
+        seen.push(r);
+    }
+    // fork/exec: the profile (EPERM) or RLIMIT_NPROC = 0 (EAGAIN) refuses it, whichever the
+    // kernel checks first.
+    for (p, want) in [("spawn", "SPAWN_DENIED"), ("fork", "FORK_DENIED")] {
+        let r = text(p.into());
+        assert!(r.starts_with(want), "{p}: {r}");
+        seen.push(r);
+    }
+    println!("seatbelt denials: {seen:#?}");
+    // Still a working parser after all of that.
+    assert!(rt().block_on(legit_ok(&pool)));
+    assert_eq!(
+        pool.stats().sandbox,
+        Some(sr_extract_client::ActiveSandbox::Seatbelt)
+    );
+    assert_no_leaks(&pool);
+    for path in &written {
+        assert!(!path.exists(), "{} was written", path.display());
+    }
+}
+
+/// Fail closed: a worker that runs without its sandbox, or with a weaker one, is refused by the
+/// supervisor's own kernel check (`sandbox_check` on its pid), although it claims to be sandboxed.
+/// Such a worker is killed before it gets any work, and no file is ever parsed by it.
+#[cfg(target_os = "macos")]
+#[test]
+fn weak_or_missing_sandbox_is_refused() {
+    for variant in ["nosandbox", "weak"] {
+        let dir = tmp_root().join("stage").join(format!("sup-{variant}"));
+        std::fs::create_dir_all(&dir).unwrap();
+        let exe = dir.join(format!("sr-extract-{variant}-test"));
+        let _ = std::fs::remove_file(&exe);
+        std::fs::copy(env!("CARGO_BIN_EXE_sr-extract"), &exe).unwrap();
+        let dll = pdfium_dll();
+        let mut cfg = config(&exe, &dll, SandboxMode::Auto, "unused");
+        cfg.workers = 1;
+        cfg.spawn_timeout = Duration::from_secs(10);
+        let pool = ExtractPool::start(cfg).unwrap();
+        let e = rt()
+            .block_on(pool.extract(ExtractSource::Bytes(b"hello".to_vec()), DocKind::Text))
+            .unwrap_err();
+        assert_eq!(e.cause, FailureCause::SpawnFailed, "{variant}: {e:?}");
+        assert_eq!(e.disposition, Disposition::Retry);
+        let detail = e.error.ctx.detail.clone().unwrap_or_default();
+        assert!(
+            detail.contains("sandbox is not in force"),
+            "{variant}: {detail}"
+        );
+        let s = pool.stats();
+        assert_eq!(s.jobs_ok, 0);
+        assert_eq!(s.spawns, 0, "{variant}: an unconfined worker was accepted");
+        assert!(s.spawn_failures >= 1);
+        assert!(pool.spawned_workers().is_empty());
+        pool.shutdown();
+        // Every refused worker was killed (they never reach the pool's list, so look them up by
+        // their executable).
+        let alive = std::process::Command::new("/usr/bin/pgrep")
+            .arg("-f")
+            .arg(&exe)
+            .output()
+            .unwrap();
+        assert!(
+            alive.stdout.is_empty(),
+            "{variant}: refused workers still running: {}",
+            String::from_utf8_lossy(&alive.stdout)
+        );
+        println!("{variant}: refused: {detail}");
+    }
 }
 
 #[test]

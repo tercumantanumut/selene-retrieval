@@ -96,6 +96,7 @@ fn five_bridge_race_x10_gives_exactly_one_daemon() {
 
 /// VS Code-style `taskkill /T /F` on the bridge tree: the daemon survives (its parent, the
 /// launcher, is already gone) and serves the next client.
+#[cfg(windows)]
 #[test]
 fn taskkill_tree_on_client_daemon_survives() {
     let _s = serial();
@@ -137,6 +138,38 @@ fn taskkill_tree_on_client_daemon_survives() {
         ambient_allows_breakaway(),
         r["launched_by"]
     ));
+}
+
+/// Unix twin of the tree kill: SIGKILL to the bridge's whole process group (what an MCP client
+/// does on quit). The daemon runs in its own session (`setsid` by the launcher), survives and
+/// serves the next client.
+#[cfg(unix)]
+#[test]
+fn group_kill_on_client_daemon_survives() {
+    let _s = serial();
+    let env = TestEnv::new("groupkill");
+    let mut b = Bridge::spawn(&env, "vscode", &[]);
+    let r = b.initialize(T).unwrap();
+    let dpid = r["daemon_pid"].as_u64().unwrap() as u32;
+    assert_eq!(r["launched_by"], expected_free_method(), "{r}");
+    let st = Command::new("/bin/kill")
+        .args(["-s", "KILL", "--", &format!("-{}", b.pid())])
+        .status()
+        .unwrap();
+    assert!(st.success());
+    assert!(
+        b.wait_exit(Duration::from_secs(5)).is_some(),
+        "bridge killed"
+    );
+    std::thread::sleep(Duration::from_millis(500));
+    assert!(alive(dpid), "daemon survived the group kill");
+    let mut b2 = Bridge::spawn(&env, "vscode", &[]);
+    let r2 = b2.initialize(T).unwrap();
+    assert_eq!(
+        r2["daemon_pid"].as_u64().unwrap() as u32,
+        dpid,
+        "same daemon serves the next client"
+    );
 }
 
 /// Contract: the bridge exits promptly on stdin EOF (VS Code escalates to a tree kill after 20 s).

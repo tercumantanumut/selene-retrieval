@@ -25,6 +25,7 @@ import {
 import { modelName, thousands } from "@/lib/format";
 import { askConsent, focusSearchStore, requestLineStore, setRequestLine, startAddFolder, useStore } from "@/lib/store";
 import { ClipboardCopy, FolderOpen, FolderPlus, Search, SearchX, Sparkles, Square } from "lucide-react";
+import { FILE_MANAGER } from "@/lib/platform";
 
 /** Results per "page" (page 26 "Show more results" asks for more, up to the engine's 150). */
 const PAGE = 50;
@@ -105,7 +106,7 @@ function ResultCard({ file, words, index }: { file: ResultFile; words: string[];
             <ClipboardCopy /> Copy path
           </Button>
           <Button size="sm" variant="ghost" onClick={() => void showInExplorer()}>
-            <FolderOpen /> Show in File Explorer
+            <FolderOpen /> Show in {FILE_MANAGER}
           </Button>
           <Button
             size="sm"

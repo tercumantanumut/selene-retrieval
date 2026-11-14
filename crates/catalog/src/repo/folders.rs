@@ -25,6 +25,7 @@ use crate::repo::outbox;
 
 /// Catalog key of an absolute root: `/`-separated, case-folded, no trailing separator,
 /// no verbatim prefix. Used for `UNIQUE(collection_id, root_key)` and the overlap rule.
+#[cfg(windows)]
 pub fn root_key(root: &Path) -> String {
     let s = root.to_string_lossy();
     let s = s
@@ -32,6 +33,19 @@ pub fn root_key(root: &Path) -> String {
         .map_or_else(|| s.to_string(), str::to_string);
     let mut k = s.replace('\\', "/").to_lowercase();
     while k.len() > 1 && k.ends_with('/') && !k.ends_with(":/") {
+        k.pop();
+    }
+    k
+}
+
+/// Catalog key of an absolute root on Unix: the path as given (exact case, `\` is part of a
+/// name), no trailing `/`. Roots are canonical (`Sandbox::add_root`), and on case-insensitive
+/// APFS `canonicalize` returns the on-disk case, so one folder has one key; on a case-sensitive
+/// volume `Docs` and `docs` are two folders and do not overlap.
+#[cfg(not(windows))]
+pub fn root_key(root: &Path) -> String {
+    let mut k = root.to_string_lossy().into_owned();
+    while k.len() > 1 && k.ends_with('/') {
         k.pop();
     }
     k
@@ -568,6 +582,7 @@ mod tests {
     use super::*;
 
     #[test]
+    #[cfg(windows)]
     fn root_keys_fold_case_and_separators() {
         assert_eq!(
             root_key(Path::new(r"C:\Users\Me\Docs\")),
@@ -584,5 +599,21 @@ mod tests {
         assert!(overlaps("c:/a", "c:/a/b"));
         assert!(!overlaps("c:/ab", "c:/a"));
         assert!(overlaps("d:/x", "d:/"));
+    }
+
+    #[test]
+    #[cfg(not(windows))]
+    fn unix_root_keys_keep_case_and_backslashes() {
+        assert_eq!(root_key(Path::new("/Users/Me/Docs/")), "/Users/Me/Docs");
+        assert_eq!(root_key(Path::new("/")), "/");
+        assert_eq!(root_key(Path::new(r"/Vol/a\b")), r"/Vol/a\b");
+        assert_ne!(
+            root_key(Path::new("/Vol/Docs")),
+            root_key(Path::new("/Vol/docs"))
+        );
+        assert!(overlaps("/Users/me", "/Users/me/Docs"));
+        assert!(!overlaps("/Vol/Docs", "/Vol/docs/sub"));
+        assert!(!overlaps("/Vol/a", "/Vol/ab"));
+        assert!(overlaps("/Vol/x", "/"));
     }
 }

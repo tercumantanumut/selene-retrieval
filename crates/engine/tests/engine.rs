@@ -159,7 +159,12 @@ async fn index_folder_end_to_end_and_never_index_secrets() {
     let out = e.search(args("quixotic_frobnicator")).await.unwrap();
     let hit = out.hits.first().expect("hit");
     assert_eq!(hit.rel_path, "src/lib.rs");
-    assert!(hit.path.ends_with(r"corpus\src\lib.rs"), "{}", hit.path);
+    assert!(
+        std::path::Path::new(&hit.path)
+            .ends_with(std::path::Path::new("corpus").join("src").join("lib.rs")),
+        "{}",
+        hit.path
+    );
     assert!(hit.line_start >= 1 && hit.line_end >= hit.line_start);
     assert_eq!(hit.folder_name, "Corpus");
 

@@ -2,7 +2,7 @@
 
 Thank you for helping. This file explains how to build the project, run the checks and send a change.
 
-Selene Retrieval runs on **Windows 10 and 11, x64 only**. The build and the tests need Windows too.
+Selene Retrieval runs on **Windows 10 and 11, x64**. A **macOS (Apple silicon) preview** builds and runs too; see [Building on macOS](#building-on-macos). Windows-only checks (`check-crt`, `check-delayload`, the installers) need Windows.
 
 ## What we care about
 
@@ -92,6 +92,24 @@ Every file the `cargo xtask fetch-*` commands download is pinned and checked aga
 ### Optional: a local MSVC toolset
 
 `spikes/extract-sandbox/msvc-env.sh` sets up the environment for an MSVC 14.44 toolset that was downloaded by hand into that folder. You don't need it if you installed the Build Tools above. It also pins Windows SDK `10.0.22621.0` and sets `CARGO_TARGET_DIR` to `spikes/extract-sandbox/target`, so override `CARGO_TARGET_DIR` after sourcing it if you want the normal `target/` folder.
+
+## Building on macOS
+
+Apple silicon, macOS 13 or newer (Amendment 18 in [docs/00-review-and-decisions.md](docs/00-review-and-decisions.md)). You need:
+
+- Rust from [rustup](https://rustup.rs) (the pinned toolchain installs itself from `rust-toolchain.toml`), the Xcode Command Line Tools (`xcode-select --install`), Node.js 22 and `protoc` (`brew install protobuf`).
+- Every Windows code path stays as it is, behind `cfg(windows)`; Mac code goes behind `cfg(unix)` or `cfg(target_os = "macos")`, never in place of Windows code.
+
+Build the app bundle and the disk image:
+
+```sh
+(cd ui && npm ci && npm run build)
+cargo xtask package-mac            # target/package/mac/Selene Retrieval.app + SeleneRetrieval-<v>-arm64.dmg
+```
+
+`package-mac` fetches the pinned pdfium and the bundled model, builds with the `dist` profile, puts programs in `Contents/MacOS`, pdfium in `Contents/Frameworks` and the model in `Contents/Resources`, signs every binary ad hoc (or with `SR_MAC_SIGN_IDENTITY`), verifies the signature and checks with `otool -L` that only system libraries are linked. `--no-build` repackages existing binaries; `--no-dmg` stops after the app.
+
+Run the tests of the crates you changed (`cargo test -p <crate>`). The parser sandbox suites need the probe feature: `cargo test -p sr-extract --features test-probes --test supervisor --test hostile`.
 
 ## Before you open a pull request
 

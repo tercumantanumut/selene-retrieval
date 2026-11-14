@@ -1,6 +1,10 @@
 //! Shared test support: per-test data dirs, the stub daemon, bridge processes speaking MCP over
 //! stdio, Win32 process/job/token helpers, and cleanup of every daemon and scheduled task a test
 //! creates (data dirs under `%TEMP%\sr-m1c`, tasks `\SR-M1C-test-*`).
+//!
+//! Unix (macOS port): the same harness over the socket transport. There are no jobs or tasks:
+//! the launcher's only method is the detached start (`breakaway`), daemons are found by their
+//! marker files plus a live process whose image is `sr-test-daemon`, and killed with SIGKILL.
 #![allow(unsafe_code, dead_code, clippy::unwrap_used, clippy::expect_used)]
 
 use std::collections::BTreeSet;
@@ -13,15 +17,19 @@ use std::sync::{Mutex, MutexGuard, Once};
 use std::time::{Duration, Instant};
 
 use serde_json::{Value, json};
+#[cfg(windows)]
 use windows_sys::Win32::Foundation::{CloseHandle, HANDLE, INVALID_HANDLE_VALUE};
+#[cfg(windows)]
 use windows_sys::Win32::System::Diagnostics::ToolHelp::{
     CreateToolhelp32Snapshot, PROCESSENTRY32W, Process32FirstW, Process32NextW, TH32CS_SNAPPROCESS,
     TH32CS_SNAPTHREAD, THREADENTRY32, Thread32First, Thread32Next,
 };
+#[cfg(windows)]
 use windows_sys::Win32::System::JobObjects::{
     AssignProcessToJobObject, CreateJobObjectW, JOBOBJECT_EXTENDED_LIMIT_INFORMATION,
     JobObjectExtendedLimitInformation, SetInformationJobObject,
 };
+#[cfg(windows)]
 use windows_sys::Win32::System::Threading::{
     OpenProcess, OpenThread, PROCESS_ALL_ACCESS, PROCESS_TERMINATE, ResumeThread,
     THREAD_SUSPEND_RESUME, TerminateProcess,
@@ -39,7 +47,7 @@ static COUNTER: AtomicU32 = AtomicU32::new(0);
 /// Process-wide dev hooks (debug builds only; identical for every test, so set once).
 pub fn init() {
     INIT.call_once(|| {
-        // SAFETY: set once before any test spawns a child; Windows env access is locked by std.
+        // SAFETY: set once before any test spawns a child; env access is locked by std.
         unsafe {
             std::env::set_var("SR_DAEMON_EXE", STUB);
             std::env::set_var("SR_LAUNCH_EXE", LAUNCH);
@@ -61,6 +69,7 @@ static AMBIENT: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
 /// cargo's own kill-on-close Job Object, which does **not** allow breakaway, so under cargo the
 /// launcher must (and does) fall back to the scheduled task; run the test exe directly to exercise
 /// the verified-breakaway path and the nested-job (O1) detection.
+#[cfg(windows)]
 pub fn ambient_allows_breakaway() -> bool {
     *AMBIENT.get_or_init(|| {
         use sr_client::win::OwnedProcess;
@@ -80,6 +89,12 @@ pub fn ambient_allows_breakaway() -> bool {
             Err(_) => false,
         }
     })
+}
+
+/// Unix: no jobs; the detached start always works.
+#[cfg(unix)]
+pub fn ambient_allows_breakaway() -> bool {
+    true
 }
 
 /// Launch method the launcher must pick when the client's own job allows breakaway.
@@ -119,14 +134,22 @@ impl TestEnv {
         }
     }
 
+    #[cfg(windows)]
     pub fn task_name(&self) -> String {
         let sid = sr_client::win::user_sid_string().unwrap();
         sr_client::naming::task_name(&sid, &self.dir)
     }
 
     pub fn pipe_name(&self) -> String {
-        let sid = sr_client::win::user_sid_string().unwrap();
+        let sid = sr_client::sys::user_sid_string().unwrap();
         sr_client::naming::pipe_name(&sid, &self.dir)
+    }
+
+    /// Unix: full path of this env's socket.
+    #[cfg(unix)]
+    pub fn socket_path(&self) -> PathBuf {
+        let dir = sr_client::sys::socket_dir(true).unwrap();
+        sr_client::sys::socket_path(&dir, &self.pipe_name()).unwrap()
     }
 
     pub fn opts(&self, kind: sr_common::protocol::ConnKind) -> sr_client::AttachOptions {
@@ -137,6 +160,7 @@ impl TestEnv {
     }
 
     /// Starts the stub daemon directly (not via the launcher) with extra args; waits for its pipe.
+    #[cfg(windows)]
     pub fn start_daemon(&self, extra: &[&str]) -> u32 {
         use std::os::windows::process::CommandExt;
         // The daemon is detached on purpose and outlives this handle (cleanup kills it by pid).
@@ -153,6 +177,26 @@ impl TestEnv {
             .spawn()
             .unwrap();
         let pid = child.id();
+        self.wait_owner(pid, Duration::from_secs(10));
+        pid
+    }
+
+    /// Unix: started through `sh … &`, so the shell exits at once and launchd adopts (and later
+    /// reaps) the stub, as with the real launcher; the shell prints the stub's pid.
+    #[cfg(unix)]
+    pub fn start_daemon(&self, extra: &[&str]) -> u32 {
+        let out = Command::new("/bin/sh")
+            .arg("-c")
+            .arg(r#""$0" "$@" </dev/null >/dev/null 2>&1 & echo $!"#)
+            .arg(STUB)
+            .arg("--data-dir")
+            .arg(&self.dir)
+            .args(["--launched-by", "test"])
+            .args(extra)
+            .stderr(Stdio::null())
+            .output()
+            .unwrap();
+        let pid: u32 = String::from_utf8_lossy(&out.stdout).trim().parse().unwrap();
         self.wait_owner(pid, Duration::from_secs(10));
         pid
     }
@@ -180,11 +224,25 @@ impl TestEnv {
     }
 
     /// Stub daemons of this env that are still running.
+    #[cfg(windows)]
     pub fn live_daemons(&self) -> BTreeSet<u32> {
         let stubs = pids_named("sr-test-daemon.exe");
         self.markers("start")
             .into_iter()
             .filter(|p| stubs.contains(p))
+            .collect()
+    }
+
+    /// Unix: a started stub that is still alive and still runs `sr-test-daemon` (not a reused pid).
+    #[cfg(unix)]
+    pub fn live_daemons(&self) -> BTreeSet<u32> {
+        self.markers("start")
+            .into_iter()
+            .filter(|p| {
+                alive(*p)
+                    && sr_client::sys::process_image_path(*p)
+                        .is_some_and(|i| i.file_name().is_some_and(|n| n == "sr-test-daemon"))
+            })
             .collect()
     }
 
@@ -207,9 +265,12 @@ impl TestEnv {
 impl Drop for TestEnv {
     fn drop(&mut self) {
         self.kill_daemons();
-        let t = self.task_name();
-        if t.starts_with(&format!(r"\{TASK_PREFIX}-")) {
-            let _ = sr_client::launch::delete_task(&t);
+        #[cfg(windows)]
+        {
+            let t = self.task_name();
+            if t.starts_with(&format!(r"\{TASK_PREFIX}-")) {
+                let _ = sr_client::launch::delete_task(&t);
+            }
         }
         for _ in 0..20 {
             if std::fs::remove_dir_all(&self.dir).is_ok() || !self.dir.exists() {
@@ -220,6 +281,7 @@ impl Drop for TestEnv {
     }
 }
 
+#[cfg(windows)]
 pub fn task_exists(name: &str) -> bool {
     let sys = sr_client::win::system_dir().unwrap();
     Command::new(sys.join("schtasks.exe"))
@@ -249,6 +311,10 @@ impl Bridge {
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .stderr(Stdio::null());
+        // Unix: its own process group, as an MCP client starts it, so a test can kill the
+        // client's whole group without hitting the test itself.
+        #[cfg(unix)]
+        std::os::unix::process::CommandExt::process_group(&mut c, 0);
         for (k, v) in extra_env {
             c.env(k, v);
         }
@@ -349,6 +415,7 @@ impl Drop for Bridge {
 
 // ------------------------------------------------------------------------------------ processes
 
+#[cfg(windows)]
 #[derive(Debug, Clone)]
 pub struct Proc {
     pub pid: u32,
@@ -356,6 +423,7 @@ pub struct Proc {
     pub name: String,
 }
 
+#[cfg(windows)]
 pub fn processes() -> Vec<Proc> {
     let mut v = Vec::new();
     // SAFETY: snapshot handle checked and closed.
@@ -384,6 +452,7 @@ pub fn processes() -> Vec<Proc> {
     v
 }
 
+#[cfg(windows)]
 pub fn pids_named(name: &str) -> BTreeSet<u32> {
     processes()
         .into_iter()
@@ -392,12 +461,14 @@ pub fn pids_named(name: &str) -> BTreeSet<u32> {
         .collect()
 }
 
+#[cfg(windows)]
 pub fn parent_of(pid: u32) -> Option<Proc> {
     let ps = processes();
     let ppid = ps.iter().find(|p| p.pid == pid)?.ppid;
     ps.into_iter().find(|p| p.pid == ppid)
 }
 
+#[cfg(windows)]
 pub fn kill(pid: u32) {
     // SAFETY: handle checked and closed.
     unsafe {
@@ -409,10 +480,37 @@ pub fn kill(pid: u32) {
     }
 }
 
+#[cfg(windows)]
 pub fn alive(pid: u32) -> bool {
     sr_client::win::pid_alive(pid)
 }
 
+/// Unix: SIGKILL (the stubs are launchd's children, which reaps them).
+#[cfg(unix)]
+pub fn kill(pid: u32) {
+    let _ = Command::new("/bin/kill")
+        .args(["-s", "KILL", &pid.to_string()])
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .status();
+}
+
+/// Unix: the process exists and is not a zombie waiting to be reaped.
+#[cfg(unix)]
+pub fn alive(pid: u32) -> bool {
+    if !sr_client::sys::pid_alive(pid) {
+        return false;
+    }
+    Command::new("/bin/ps")
+        .args(["-o", "stat=", "-p", &pid.to_string()])
+        .output()
+        .is_ok_and(|o| {
+            let st = String::from_utf8_lossy(&o.stdout);
+            !st.trim().is_empty() && !st.trim_start().starts_with('Z')
+        })
+}
+
+#[cfg(windows)]
 pub fn resume_all_threads(pid: u32) {
     // SAFETY: snapshot/thread handles checked and closed.
     unsafe {
@@ -438,10 +536,13 @@ pub fn resume_all_threads(pid: u32) {
 }
 
 /// A Job Object; closing it (drop) kills members when `KILL_ON_JOB_CLOSE` is set.
+#[cfg(windows)]
 pub struct Job(pub HANDLE);
 // SAFETY: a job handle can be used from any thread.
+#[cfg(windows)]
 unsafe impl Send for Job {}
 
+#[cfg(windows)]
 impl Job {
     pub fn new(limit_flags: u32) -> Self {
         // SAFETY: plain job creation and limit setting.
@@ -473,6 +574,7 @@ impl Job {
     }
 }
 
+#[cfg(windows)]
 impl Drop for Job {
     fn drop(&mut self) {
         // SAFETY: owned handle.
