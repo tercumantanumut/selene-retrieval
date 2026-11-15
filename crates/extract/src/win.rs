@@ -1,5 +1,6 @@
 //! Win32 calls of the worker process. The only module of `sr-extract` allowed to use `unsafe`
-//! (reviewed FFI; each call documents its safety argument).
+//! on Windows (reviewed FFI; each call documents its safety argument). On other platforms the
+//! same functions answer from libc and [`crate::seatbelt`].
 #![allow(unsafe_code)]
 
 /// DLL search: System32 only (pdfium is loaded by absolute path), and no error dialogs.
@@ -33,9 +34,10 @@ pub fn stdin_is_console() -> bool {
             !h.is_null() && GetFileType(h) == FILE_TYPE_CHAR
         }
     }
-    #[cfg(not(windows))]
+    #[cfg(unix)]
     {
-        false
+        // SAFETY: isatty takes any descriptor value and has no other preconditions.
+        unsafe { libc::isatty(libc::STDIN_FILENO) == 1 }
     }
 }
 
@@ -95,8 +97,19 @@ pub fn token_info() -> (String, bool) {
             (il, ac != 0)
         }
     }
-    #[cfg(not(windows))]
+    // macOS: "seatbelt" when the kernel has this process sandboxed (the supervisor checks the
+    // denials itself and refuses anything else).
+    #[cfg(target_os = "macos")]
     {
-        ("unknown".into(), false)
+        let level = if crate::seatbelt::is_sandboxed() {
+            crate::seatbelt::INTEGRITY
+        } else {
+            "none"
+        };
+        (level.into(), false)
+    }
+    #[cfg(all(not(windows), not(target_os = "macos")))]
+    {
+        ("none".into(), false)
     }
 }

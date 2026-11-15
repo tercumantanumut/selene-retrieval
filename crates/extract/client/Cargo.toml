@@ -1,6 +1,6 @@
 [package]
 name = "sr-extract-client"
-description = "Supervisor for sandboxed sr-extract workers: pool, AppContainer/low-IL spawn, Job Object limits, timeouts"
+description = "Supervisor for sandboxed sr-extract workers: pool, AppContainer/low-IL (Windows) or Seatbelt (macOS) spawn, limits, timeouts"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -14,10 +14,16 @@ sr-common   = { workspace = true }
 serde_json  = { workspace = true }
 tokio       = { workspace = true }
 tracing     = { workspace = true }
+
+[target.'cfg(windows)'.dependencies]
 windows-sys = { workspace = true, features = [
   "Win32_Security_Isolation", "Win32_System_IO", "Win32_System_SystemServices",
   "Win32_System_Memory",
 ] }
+
+# macOS: process group spawn, rlimits, proc_pid_rusage watchdog, sandbox_check.
+[target.'cfg(unix)'.dependencies]
+libc        = { workspace = true }
 
 [dev-dependencies]
 tempfile = { workspace = true }

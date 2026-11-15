@@ -33,6 +33,7 @@ import {
 } from "@/lib/app";
 import { PATHS, usePolicy } from "@/lib/policy";
 import { askConsent } from "@/lib/store";
+import { isMac, OS_NAME, START_AT_LOGIN, UNINSTALL_HINT } from "@/lib/platform";
 
 const TIER_RANK = { basic: 0, better: 1, best: 2 } as const;
 const TIER_WORD = { basic: "Basic search", better: "Better search", best: "Best search" } as const;
@@ -134,7 +135,7 @@ function MultilingualOffer({ tier, change }: { tier: TierView | null; change: Mo
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-3">
       <CardText>
-        Your Windows language isn't English. Search in many languages ({multilingualSize(tier)} download)
+        Your {isMac ? "Mac's" : "Windows"} language isn't English. Search in many languages ({multilingualSize(tier)} download)
       </CardText>
       <Button size="sm" variant="outline" onClick={() => void chooseMultilingual(showError)}>
         Use it
@@ -481,7 +482,7 @@ function About({ version, tier }: { version: string; tier: TierView | null }) {
       <Button size="sm" variant="outline" onClick={() => setLicences(true)}>
         View licences
       </Button>
-      <p className="text-muted-foreground">To uninstall, use Windows Settings → Apps.</p>
+      <p className="text-muted-foreground">{UNINSTALL_HINT}</p>
       {licences && <LicencesDialog onClose={() => setLicences(false)} />}
     </div>
   );
@@ -576,7 +577,7 @@ export function SettingsPage() {
         {/* Rendered only once the real state is known, so it never flashes "off". */}
         {about && (
           <SwitchRow
-            label="Start when Windows starts"
+            label={START_AT_LOGIN}
             help="Keeps your folders up to date in the background."
             checked={about.start_with_windows}
             managed={policy.field(PATHS.startWithWindows)}
@@ -630,7 +631,7 @@ export function SettingsPage() {
         <details className="text-sm">
           <summary className="cursor-pointer select-none rounded-sm text-muted-foreground">Show what's included</summary>
           <ul className="mt-1 list-disc space-y-0.5 pl-5 text-muted-foreground">
-            <li>App version and Windows version</li>
+            <li>App version and {OS_NAME} version</li>
             <li>Background service state</li>
             <li>Folder counts</li>
             <li>Claude connection state</li>

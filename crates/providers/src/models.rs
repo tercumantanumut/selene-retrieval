@@ -190,10 +190,13 @@ impl ModelPaths {
         }
     }
 
-    /// The bundled Minimum model: `<app_dir>\models\bge-small-en-v1.5\model_optimized.onnx`.
+    /// The bundled Minimum model: `<app_dir>\models\bge-small-en-v1.5\model_optimized.onnx`
+    /// (macOS bundle: `Contents/Resources/models/…`, [`sr_common::install::resources_dir`]).
     pub fn bundled(app_dir: &Path) -> Self {
         Self::in_dir(
-            &app_dir.join("models").join(BUNDLED_MODEL_DIR),
+            &sr_common::install::resources_dir(app_dir)
+                .join("models")
+                .join(BUNDLED_MODEL_DIR),
             &sr_common::tier::MINIMUM.gpu_file,
         )
     }
@@ -366,6 +369,7 @@ mod tests {
         assert_eq!(tokenizer_pins_for(&HIGH), &ARCTIC_L_TOKENIZER);
     }
 
+    #[cfg(windows)]
     #[test]
     fn bundled_paths() {
         let p = ModelPaths::bundled(Path::new(r"C:\App"));
@@ -375,6 +379,24 @@ mod tests {
         );
         let s = ModelPaths::in_dir(Path::new(r"C:\m"), &files::ARCTIC_M15_FP16);
         assert_eq!(s.onnx, Path::new(r"C:\m\model_fp16.onnx"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn bundled_paths() {
+        #[cfg(target_os = "macos")]
+        let app_dir = "/Applications/Selene Retrieval.app/Contents/MacOS";
+        #[cfg(not(target_os = "macos"))]
+        let app_dir = "/Applications/Selene Retrieval.app/Contents/Resources";
+        let p = ModelPaths::bundled(Path::new(app_dir));
+        assert_eq!(
+            p.onnx,
+            Path::new(
+                "/Applications/Selene Retrieval.app/Contents/Resources/models/bge-small-en-v1.5/model_optimized.onnx"
+            )
+        );
+        let s = ModelPaths::in_dir(Path::new("/m"), &files::ARCTIC_M15_FP16);
+        assert_eq!(s.onnx, Path::new("/m/model_fp16.onnx"));
     }
 
     #[test]

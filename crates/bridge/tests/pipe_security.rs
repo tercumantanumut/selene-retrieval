@@ -1,5 +1,8 @@
 //! Pipe access control (Amendment 3.10): protected DACL with only the user's SID, Medium
 //! mandatory label with no-read-up/no-write-up, and remote clients rejected.
+// Windows only: Job Objects and named-pipe DACLs have no Unix twin (the socket's checks are in
+// `socket_security.rs`).
+#![cfg(windows)]
 #![allow(unsafe_code)]
 // Test code: panicking on unexpected errors is the point. Each #[tokio::test] owns its runtime,
 // so holding the cross-test serial lock across awaits cannot deadlock.

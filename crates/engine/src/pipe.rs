@@ -21,6 +21,17 @@
 //! This module is generic over [`PipeService`] and uses only tokio, serde, `sr-common` and
 //! `sr-client`, so it does not need the rest of the engine (the M1-C stub daemon compiles this
 //! very file to test it).
+//!
+//! Unix (macOS port): the "pipe" is a Unix socket in a private per-user folder
+//! (`sr_client::unix::SocketListener`: folder 0700, socket 0600, both checked; peers of another
+//! uid are closed unread). A live socket for the same name replaces `FIRST_PIPE_INSTANCE`.
+//!
+//! macOS caller trust (R50): a pid can `exec` another program and keep its sockets, so the
+//! Windows rule (kernel pid → image) is not enough. An app session starts untrusted and proves
+//! itself with `host.challenge` / `host.attest` ([`Attest`]): the audit token read when the nonce
+//! goes out and the one read when it comes back must be the same process (pid and pid version),
+//! and that process must be our app next to this daemon. Every privileged call re-reads the token
+//! and drops the trust if another process or another image is now on the socket.
 
 use std::future::Future;
 use std::io;
@@ -32,7 +43,9 @@ use std::time::Duration;
 use serde::Serialize;
 use serde_json::Value;
 use sr_client::naming;
-use sr_client::win::{self, PipeSecurity};
+use sr_client::sys::{self, ServerStream};
+#[cfg(windows)]
+use sr_client::win::PipeSecurity;
 use sr_common::error::{Error, ErrorCode};
 use sr_common::events::{Cursor, EventLog, Replay, Seq, Snapshot, now_ms};
 use sr_common::ids::StreamId;
@@ -44,6 +57,7 @@ use sr_common::protocol::{
     UnavailableReason, decide, min_accepted,
 };
 use tokio::io::{AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt, WriteHalf};
+#[cfg(windows)]
 use tokio::net::windows::named_pipe::NamedPipeServer;
 use tokio::sync::{Mutex, broadcast, watch};
 
@@ -122,23 +136,33 @@ impl<E: Clone + Send + 'static> EventHub<E> {
 pub struct SessionInfo {
     /// Per-daemon-run session number.
     pub id: u64,
-    /// From the kernel (`GetNamedPipeClientProcessId`), not from the handshake.
+    /// From the kernel (`GetNamedPipeClientProcessId`; Unix: the socket's peer credentials), not
+    /// from the handshake.
     pub client_pid: Option<u32>,
     pub handshake: Handshake,
     /// R31 (M4-E): a `kind=app` peer whose process image is our own `sr-app.exe` or
     /// `sr-daemon.exe` next to this daemon ([`trusted_peer`]). Privileged methods need it.
+    /// macOS (R50): false until `host.attest` proves it; re-checked before each privileged call.
     pub trusted_app: bool,
 }
 
 /// R31 (M4-E): whether the process `pid` is Selene Retrieval's own app (`sr-app.exe`) or the
 /// hidden admin CLI (`sr-daemon.exe`) installed next to this daemon. The pid comes from the
-/// kernel, the image path from `QueryFullProcessImageNameW`; both paths are canonicalised before
-/// the case-insensitive comparison. Debug builds honour `SR_TRUST_ANY_APP` (tests).
+/// kernel, the image path from `QueryFullProcessImageNameW` (macOS: `proc_pidpath`); both paths
+/// are canonicalised before the comparison (case-insensitive on Windows only). Debug builds
+/// honour `SR_TRUST_ANY_APP` (tests).
+///
+/// Unix: never from the pid (a process can connect and then `exec` our app, R50). On macOS the
+/// session proves itself later with `host.attest` ([`Attest`]); other Unix systems have no such
+/// proof and stay untrusted (fail closed).
 pub fn trusted_peer(pid: Option<u32>) -> bool {
     if naming::dev_env("SR_TRUST_ANY_APP").is_some() {
         return true;
     }
-    let Some(image) = pid.and_then(win::process_image_path) else {
+    if cfg!(not(windows)) {
+        return false;
+    }
+    let Some(image) = pid.and_then(sys::process_image_path) else {
         return false;
     };
     let Ok(me) = std::env::current_exe() else {
@@ -148,18 +172,33 @@ pub fn trusted_peer(pid: Option<u32>) -> bool {
 }
 
 /// The rule behind [`trusted_peer`]: same directory as the daemon, and the file is `sr-app.exe`
-/// or `sr-daemon.exe`.
+/// or `sr-daemon.exe` (no `.exe` on Unix).
 pub fn is_trusted_image(peer: &Path, daemon: &Path) -> bool {
-    let canon = |p: &Path| std::fs::canonicalize(p).unwrap_or_else(|_| p.to_path_buf());
-    let (peer, daemon) = (canon(peer), canon(daemon));
-    let (Some(pd), Some(dd)) = (peer.parent(), daemon.parent()) else {
-        return false;
-    };
-    let name = peer
-        .file_name()
-        .map(|n| n.to_string_lossy().to_ascii_lowercase());
-    naming::data_dir_key(pd) == naming::data_dir_key(dd)
-        && matches!(name.as_deref(), Some("sr-app.exe" | "sr-daemon.exe"))
+    is_install_image(peer, daemon, &[&exe("sr-app"), &exe("sr-daemon")])
+}
+
+/// `stem` plus this platform's executable suffix (`sr-app.exe` on Windows, `sr-app` elsewhere).
+fn exe(stem: &str) -> String {
+    naming::exe_file_name(stem)
+}
+
+/// Windows file names compare case-insensitively; Unix ones exactly.
+fn same_file_name(a: &str, b: &str) -> bool {
+    if cfg!(windows) {
+        a.eq_ignore_ascii_case(b)
+    } else {
+        a == b
+    }
+}
+
+/// Two canonical folders are the same: the case-insensitive data-dir key on Windows, an exact
+/// comparison on Unix (a case-sensitive volume may hold both `SR` and `sr`).
+fn same_dir(a: &Path, b: &Path) -> bool {
+    if cfg!(windows) {
+        naming::data_dir_key(a) == naming::data_dir_key(b)
+    } else {
+        a == b
+    }
 }
 
 /// S-05 (R31): may this app session stop or restart the service (`host.shutdown`,
@@ -174,41 +213,150 @@ pub fn host_call_allowed(method: &str, trusted_app: bool, peer_image: Option<&Pa
     method == rpc::SHUTDOWN
         && peer_image
             .and_then(Path::file_name)
-            .is_some_and(|n| n.to_string_lossy().eq_ignore_ascii_case("sr-setup.exe"))
+            .is_some_and(|n| same_file_name(&n.to_string_lossy(), &exe("sr-setup")))
 }
 
 /// S-05: a handshake `drain_restart` (version skew) stops the running daemon, so only our own
 /// binaries next to it may ask: `sr-app.exe`, `sr-bridge.exe` (a newer bridge after an update)
 /// or `sr-daemon.exe`. Anyone else gets the plain "service is outdated" reply instead.
-pub fn drain_restart_allowed(pid: Option<u32>) -> bool {
+/// `image` is the caller's image ([`peer_image`]).
+pub fn drain_restart_allowed(image: Option<&Path>) -> bool {
     if naming::dev_env("SR_TRUST_ANY_APP").is_some() {
         return true;
     }
-    let (Some(image), Ok(me)) = (
-        pid.and_then(win::process_image_path),
-        std::env::current_exe(),
-    ) else {
+    let (Some(image), Ok(me)) = (image, std::env::current_exe()) else {
         return false;
     };
     is_install_image(
-        &image,
+        image,
         &me,
-        &["sr-app.exe", "sr-bridge.exe", "sr-daemon.exe"],
+        &[&exe("sr-app"), &exe("sr-bridge"), &exe("sr-daemon")],
     )
 }
 
-/// `peer` lives in the daemon's directory and is one of `names` (case-insensitive). Pure.
+/// Image of the process on the other end, for the drain-restart and installer rules (both only
+/// stop the daemon, which any same-user process can do with a signal anyway). Windows: from the
+/// kernel's client pid. macOS: from the audit token, so it is the image of exactly the process
+/// now on the socket, never of a later program under a reused pid.
+fn peer_image(pipe: &ServerStream, pid: Option<u32>) -> Option<PathBuf> {
+    #[cfg(target_os = "macos")]
+    {
+        let _ = pid;
+        sys::PeerToken::of(pipe).ok().and_then(|t| t.image_path())
+    }
+    #[cfg(not(target_os = "macos"))]
+    {
+        let _ = pipe;
+        pid.and_then(sys::process_image_path)
+    }
+}
+
+/// Whether `image` is our app or admin CLI next to this daemon ([`is_trusted_image`]).
+#[cfg(target_os = "macos")]
+fn image_is_trusted(image: &Path) -> bool {
+    std::env::current_exe().is_ok_and(|me| is_trusted_image(image, &me))
+}
+
+/// macOS (R50): the proof an app session gives that it is our own app. `LOCAL_PEERTOKEN` names
+/// the process that last used the client's end of the socket, read at the time of the call (not
+/// at connect). So:
+/// 1. `host.challenge`: read the token, reply with a fresh random nonce.
+/// 2. `host.attest {nonce}`: read the token again. The nonce must match, both tokens must be the
+///    same process (pid and pid version, which change on `exec` and pid reuse), and its image
+///    ([`sr_client::unix::attested_image`]) must be our app next to this daemon.
+///
+/// A process that pre-writes both requests and then `exec`s our app can't know the nonce; one
+/// that answers and then `exec`s has a new pid version by the next read; a helper answering
+/// through a shared descriptor has another pid. Each privileged call then re-reads the token
+/// ([`Attest::still_trusted`]).
+#[cfg(target_os = "macos")]
+struct Attest {
+    probe: Option<sys::PeerProbe>,
+    /// Token at the challenge and the nonce sent.
+    pending: Option<(sys::PeerToken, String)>,
+    /// The token that passed `host.attest`.
+    proven: Option<sys::PeerToken>,
+}
+
+#[cfg(target_os = "macos")]
+impl Attest {
+    fn new(pipe: &ServerStream) -> Self {
+        Self {
+            probe: sys::PeerProbe::new(pipe).ok(),
+            pending: None,
+            proven: None,
+        }
+    }
+
+    fn token(&self) -> Option<sys::PeerToken> {
+        self.probe.as_ref().and_then(|p| p.token().ok())
+    }
+
+    /// The caller's image now (installer rule of [`host_call_allowed`]).
+    fn image(&self) -> Option<PathBuf> {
+        self.token().and_then(|t| t.image_path())
+    }
+
+    /// `host.challenge`: the nonce to answer with.
+    fn challenge(&mut self) -> Result<String, Error> {
+        let fail = |e: std::io::Error| Error::new(ErrorCode::Internal).with_source(e);
+        let t = self
+            .probe
+            .as_ref()
+            .ok_or_else(|| Error::new(ErrorCode::Internal).with_detail("peer token unavailable"))?
+            .token()
+            .map_err(fail)?;
+        let nonce = sys::random_nonce().map_err(fail)?;
+        self.pending = Some((t, nonce.clone()));
+        Ok(nonce)
+    }
+
+    /// `host.attest`: whether the session is now trusted. A challenge is answered once.
+    fn answer(&mut self, params: &Value) -> bool {
+        let Some((challenged, nonce)) = self.pending.take() else {
+            return false;
+        };
+        if params.get("nonce").and_then(Value::as_str) != Some(nonce.as_str()) {
+            return false;
+        }
+        let Some(now) = self.token() else {
+            return false;
+        };
+        let ok = sr_client::unix::attested_image(&challenged, &now)
+            .is_some_and(|img| image_is_trusted(&img));
+        if ok {
+            self.proven = Some(now);
+        }
+        ok
+    }
+
+    /// Before a privileged call: the proven process (same pid version) is still the one on the
+    /// socket and still runs our app. True when the session was trusted without a proof (the
+    /// debug-only `SR_TRUST_ANY_APP`).
+    fn still_trusted(&self) -> bool {
+        let Some(proven) = self.proven else {
+            return true;
+        };
+        self.token()
+            .and_then(|now| sr_client::unix::attested_image(&proven, &now))
+            .is_some_and(|img| image_is_trusted(&img))
+    }
+
+    fn revoke(&mut self) {
+        self.proven = None;
+    }
+}
+
+/// `peer` lives in the daemon's directory and is one of `names` (case-insensitive on Windows,
+/// exact on Unix). Pure.
 pub fn is_install_image(peer: &Path, daemon: &Path, names: &[&str]) -> bool {
     let canon = |p: &Path| std::fs::canonicalize(p).unwrap_or_else(|_| p.to_path_buf());
     let (peer, daemon) = (canon(peer), canon(daemon));
     let (Some(pd), Some(dd)) = (peer.parent(), daemon.parent()) else {
         return false;
     };
-    let name = peer
-        .file_name()
-        .map(|n| n.to_string_lossy().to_ascii_lowercase());
-    naming::data_dir_key(pd) == naming::data_dir_key(dd)
-        && name.is_some_and(|n| names.contains(&n.as_str()))
+    let name = peer.file_name().map(|n| n.to_string_lossy().into_owned());
+    same_dir(pd, dd) && name.is_some_and(|n| names.iter().any(|w| same_file_name(&n, w)))
 }
 
 /// What the engine plugs into the pipe server.
@@ -224,7 +372,7 @@ pub trait PipeService: Send + Sync + 'static {
     /// Serve one MCP session over the pipe (rmcp `serve(stream)`); return when it ends.
     fn serve_mcp(
         &self,
-        stream: NamedPipeServer,
+        stream: ServerStream,
         session: SessionInfo,
     ) -> impl Future<Output = ()> + Send;
 
@@ -247,7 +395,7 @@ pub trait PipeService: Send + Sync + 'static {
 // ------------------------------------------------------------------------------------------------
 // Host lock
 
-/// `LockFileEx(<data_dir>\host.lock)`, held for the daemon's life.
+/// `LockFileEx(<data_dir>\host.lock)` (Unix: `flock`), held for the daemon's life.
 #[derive(Debug)]
 pub struct HostLock {
     _file: std::fs::File,
@@ -258,7 +406,7 @@ impl HostLock {
     /// `Ok(None)` when another daemon holds it (the caller exits 0 quietly).
     pub fn acquire(data_dir: &Path) -> io::Result<Option<Self>> {
         let path = data_dir.join(naming::HOST_LOCK);
-        Ok(win::lock_file(&path, false)?.map(|f| Self { _file: f, path }))
+        Ok(sys::lock_file(&path, false)?.map(|f| Self { _file: f, path }))
     }
 }
 
@@ -319,7 +467,8 @@ impl ServerHandle {
     pub fn pipe_name(&self) -> &str {
         &self.st.pipe_name
     }
-    /// Effective SDDL of the first instance (diagnostics).
+    /// Effective SDDL of the first instance (diagnostics; Unix: owner and mode of the socket and
+    /// its folder).
     pub fn effective_sddl(&self) -> &str {
         &self.st.effective_sddl
     }
@@ -353,13 +502,37 @@ impl ServerHandle {
 
 /// Opens the first pipe instance (fails if another process owns the name) and starts serving.
 /// Call this **last** in the daemon start sequence: an open pipe means "ready".
+#[cfg(windows)]
 pub fn serve<S: PipeService>(cfg: PipeServerConfig, svc: Arc<S>) -> io::Result<ServerHandle> {
-    let sid = win::user_sid_string()?;
+    let sid = sys::user_sid_string()?;
     let pipe_name = naming::pipe_name(&sid, &cfg.data_dir);
     let sec = Arc::new(PipeSecurity::for_sid(&sid)?);
     let first = sec.create_server(&pipe_name, true)?;
-    let effective_sddl = win::handle_sddl(std::os::windows::io::AsRawHandle::as_raw_handle(&first))
+    let effective_sddl = sys::handle_sddl(std::os::windows::io::AsRawHandle::as_raw_handle(&first))
         .unwrap_or_else(|e| format!("<GetSecurityInfo error {e}>"));
+    let (st, drain_rx) = new_state(cfg, pipe_name, effective_sddl);
+    tokio::spawn(accept_loop(st.clone(), sec, first, svc, drain_rx));
+    Ok(ServerHandle { st })
+}
+
+/// Unix: binds the private socket (under the host lock the caller holds; a live socket for the
+/// same name fails with `AddrInUse`) and starts serving. Call this **last**, as on Windows.
+#[cfg(unix)]
+pub fn serve<S: PipeService>(cfg: PipeServerConfig, svc: Arc<S>) -> io::Result<ServerHandle> {
+    let uid = sys::user_sid_string()?;
+    let pipe_name = naming::pipe_name(&uid, &cfg.data_dir);
+    let listener = sys::SocketListener::bind(&pipe_name)?;
+    let effective_sddl = listener.describe();
+    let (st, drain_rx) = new_state(cfg, pipe_name, effective_sddl);
+    tokio::spawn(accept_loop(st.clone(), listener, svc, drain_rx));
+    Ok(ServerHandle { st })
+}
+
+fn new_state(
+    cfg: PipeServerConfig,
+    pipe_name: String,
+    effective_sddl: String,
+) -> (Arc<State>, watch::Receiver<bool>) {
     let (drain_tx, drain_rx) = watch::channel(false);
     let (stopped_tx, _) = watch::channel(false);
     let st = Arc::new(State {
@@ -374,10 +547,10 @@ pub fn serve<S: PipeService>(cfg: PipeServerConfig, svc: Arc<S>) -> io::Result<S
         drain_tx,
         stopped_tx,
     });
-    tokio::spawn(accept_loop(st.clone(), sec, first, svc, drain_rx));
-    Ok(ServerHandle { st })
+    (st, drain_rx)
 }
 
+#[cfg(windows)]
 async fn accept_loop<S: PipeService>(
     st: Arc<State>,
     sec: Arc<PipeSecurity>,
@@ -390,7 +563,8 @@ async fn accept_loop<S: PipeService>(
         tokio::select! {
             r = server.connect() => {
                 if r.is_ok() {
-                    tokio::spawn(session(st.clone(), svc.clone(), server));
+                    let client_pid = sys::pipe_client_pid(&server);
+                    tokio::spawn(session(st.clone(), svc.clone(), server, client_pid));
                 }
             }
             _ = drain_rx.wait_for(|v| *v) => break,
@@ -408,6 +582,40 @@ async fn accept_loop<S: PipeService>(
         }
     }
     // Listener dropped: no new connections. Drain the service, then report stopped.
+    st.begin_drain();
+    svc.drain().await;
+    let _ = st.stopped_tx.send(true);
+}
+
+/// Unix: one listener serves every session; `accept` only returns peers of this uid.
+#[cfg(unix)]
+async fn accept_loop<S: PipeService>(
+    st: Arc<State>,
+    listener: sys::SocketListener,
+    svc: Arc<S>,
+    mut drain_rx: watch::Receiver<bool>,
+) {
+    let mut delay = Duration::from_millis(10);
+    loop {
+        // The watch guard of `wait_for` must not live across an await: decide first, act after.
+        let r = tokio::select! {
+            r = listener.accept() => r,
+            _ = drain_rx.wait_for(|v| *v) => break,
+        };
+        match r {
+            Ok((stream, client_pid)) => {
+                delay = Duration::from_millis(10);
+                tokio::spawn(session(st.clone(), svc.clone(), stream, client_pid));
+            }
+            // E.g. out of descriptors: back off instead of spinning.
+            Err(_) => {
+                tokio::time::sleep(delay).await;
+                delay = (delay * 2).min(Duration::from_secs(1));
+            }
+        }
+    }
+    // Socket file removed: no new connections. Drain the service, then report stopped.
+    drop(listener);
     st.begin_drain();
     svc.drain().await;
     let _ = st.stopped_tx.send(true);
@@ -455,8 +663,12 @@ fn unavailable(st: &State, reason: UnavailableReason, client_id: &str) -> Handsh
     }
 }
 
-async fn session<S: PipeService>(st: Arc<State>, svc: Arc<S>, mut pipe: NamedPipeServer) {
-    let client_pid = win::pipe_client_pid(&pipe);
+async fn session<S: PipeService>(
+    st: Arc<State>,
+    svc: Arc<S>,
+    mut pipe: ServerStream,
+    client_pid: Option<u32>,
+) {
     let line = match tokio::time::timeout(
         Duration::from_millis(HANDSHAKE_TIMEOUT_MS),
         read_line(&mut pipe),
@@ -510,7 +722,9 @@ async fn session<S: PipeService>(st: Arc<State>, svc: Arc<S>, mut pipe: NamedPip
             return;
         }
         // S-05: only our own binaries may stop the running daemon for a version skew.
-        SkewDecision::DrainRestart if !drain_restart_allowed(client_pid) => {
+        SkewDecision::DrainRestart
+            if !drain_restart_allowed(peer_image(&pipe, client_pid).as_deref()) =>
+        {
             tracing::warn!(target: "sr_engine::pipe", "drain-restart refused: caller is not one of Selene Retrieval's programs");
             let _ = reply(
                 &mut pipe,
@@ -569,7 +783,7 @@ impl Drop for AppGuard {
 // ------------------------------------------------------------------------------------------------
 // App-RPC session
 
-type Writer = Arc<Mutex<WriteHalf<NamedPipeServer>>>;
+type Writer = Arc<Mutex<WriteHalf<ServerStream>>>;
 
 async fn read_frame_limited<R: AsyncRead + Unpin>(
     r: &mut R,
@@ -605,14 +819,17 @@ fn to_value<T: Serialize>(v: &T) -> Value {
 async fn app_session<S: PipeService>(
     st: Arc<State>,
     svc: Arc<S>,
-    pipe: NamedPipeServer,
-    info: SessionInfo,
+    pipe: ServerStream,
+    #[cfg_attr(not(target_os = "macos"), allow(unused_mut))] mut info: SessionInfo,
 ) {
+    #[cfg(target_os = "macos")]
+    let mut attest = Attest::new(&pipe);
     let (mut r, w) = tokio::io::split(pipe);
     let w: Writer = Arc::new(Mutex::new(w));
     let mut sub: Option<tokio::task::JoinHandle<()>> = None;
     let in_flight = Arc::new(tokio::sync::Semaphore::new(MAX_IN_FLIGHT_PER_SESSION));
-    let max_frame = (!info.trusted_app).then_some(MAX_UNTRUSTED_FRAME);
+    #[cfg_attr(not(target_os = "macos"), allow(unused_mut))]
+    let mut max_frame = (!info.trusted_app).then_some(MAX_UNTRUSTED_FRAME);
     loop {
         let frame = match read_frame_limited(&mut r, max_frame).await {
             Ok(Some(f)) => f,
@@ -629,6 +846,20 @@ async fn app_session<S: PipeService>(
             }
         };
         let id = req.id;
+        // R50 (macOS): before each privileged call, the proven process must still be the one on
+        // the socket; otherwise the session loses its trust for good.
+        #[cfg(target_os = "macos")]
+        if info.trusted_app && sr_common::api::is_privileged(&req.method) && !attest.still_trusted()
+        {
+            tracing::warn!(target: "sr_engine::pipe", "app session lost its trust: another process is on the connection");
+            attest.revoke();
+            info.trusted_app = false;
+            max_frame = Some(MAX_UNTRUSTED_FRAME);
+        }
+        #[cfg(target_os = "macos")]
+        let peer_now = || attest.image();
+        #[cfg(not(target_os = "macos"))]
+        let peer_now = || info.client_pid.and_then(sys::process_image_path);
         match req.method.as_str() {
             rpc::PING => {
                 let p = PingResult {
@@ -644,11 +875,7 @@ async fn app_session<S: PipeService>(
             }
             // S-05 (R31): stopping the service is privileged (see [`host_call_allowed`]).
             m @ (rpc::SHUTDOWN | HOST_RESTART)
-                if !host_call_allowed(
-                    m,
-                    info.trusted_app,
-                    info.client_pid.and_then(win::process_image_path).as_deref(),
-                ) =>
+                if !host_call_allowed(m, info.trusted_app, peer_now().as_deref()) =>
             {
                 tracing::warn!(target: "sr_engine::pipe", method = m, "privileged call refused: caller is not Selene Retrieval's app");
                 let e = Error::new(ErrorCode::PermissionDenied)
@@ -673,6 +900,29 @@ async fn app_session<S: PipeService>(
                 )
                 .await;
                 st.begin_drain();
+            }
+            // R50 (macOS): the session proves it is our app ([`Attest`]).
+            #[cfg(target_os = "macos")]
+            sr_client::rpc::HOST_CHALLENGE => {
+                let resp = match attest.challenge() {
+                    Ok(nonce) => Response::ok(id, serde_json::json!({ "nonce": nonce })),
+                    Err(e) => Response::err(id, RpcError::from_error(&e)),
+                };
+                if send(&w, &resp).await.is_err() {
+                    break;
+                }
+            }
+            #[cfg(target_os = "macos")]
+            sr_client::rpc::HOST_ATTEST => {
+                let trusted = attest.answer(&req.params);
+                if trusted && !info.trusted_app {
+                    info.trusted_app = true;
+                    max_frame = None;
+                }
+                let resp = Response::ok(id, serde_json::json!({ "trusted": info.trusted_app }));
+                if send(&w, &resp).await.is_err() {
+                    break;
+                }
             }
             rpc::SUBSCRIBE => {
                 if sub.as_ref().is_some_and(|h| !h.is_finished()) {
@@ -804,7 +1054,7 @@ async fn send_events<E: Serialize>(w: &Writer, evs: Vec<Seq<E>>, last: &mut u64)
 /// The error a daemon should surface when it is started in a packaged (MSIX) context
 /// (it must refuse to own stores there; the client shows the U8 text).
 pub fn packaged_context_error() -> Option<Error> {
-    win::package_full_name().map(|p| {
+    sys::package_full_name().map(|p| {
         Error::new(ErrorCode::ServiceUnavailable).with_detail(format!(
             "started with package identity {p}; refusing to own stores"
         ))

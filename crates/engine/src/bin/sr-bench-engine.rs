@@ -395,7 +395,7 @@ async fn run(a: Args) -> Result<(), String> {
     let worker = a
         .worker
         .clone()
-        .unwrap_or_else(|| exe_dir().join("sr-extract.exe"));
+        .unwrap_or_else(|| exe_dir().join(format!("sr-extract{}", std::env::consts::EXE_SUFFIX)));
     let mut xc = sr_extract_client::ExtractConfig::new(worker, None);
     // Its own sandbox profile (deleted when the process ends), never the production one: a dev
     // tool must not create or leak `SeleneRetrieval.Extract` (M2 tester; M2-I finding).

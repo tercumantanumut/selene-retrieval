@@ -111,7 +111,9 @@ fn native(root: &Path, rel: &str) -> PathBuf {
     if rel.is_empty() {
         root.to_path_buf()
     } else {
-        root.join(rel.replace('/', "\\"))
+        #[cfg(windows)]
+        let rel = rel.replace('/', "\\");
+        root.join(rel)
     }
 }
 

@@ -1022,8 +1022,7 @@ impl EngineHandle {
                     })
                     .collect();
                 SearchHitOut {
-                    path: root
-                        .join(h.path.replace('/', "\\"))
+                    path: crate::files::join_rel(&root, &h.path)
                         .to_string_lossy()
                         .into_owned(),
                     rel_path: h.path,

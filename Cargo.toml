@@ -50,6 +50,9 @@ getrandom      = "0.3"
 axum       = { version = "0.8.9", default-features = false, features = ["http1", "tokio", "json"] }
 tower      = { version = "0.5.3", features = ["timeout", "limit", "util"] }
 tower-http = { version = "0.7.1", features = ["trace", "timeout", "limit", "request-id"] }
+# macOS port: getuid / proc_pidpath / confstr / getpwuid_r for the Unix socket transport (sr-client).
+# 0.2.191 is the locked version.
+libc = "0.2.191"
 windows-sys = { version = "0.61.2", features = [
   "Win32_Foundation", "Win32_Security", "Win32_Security_Authorization", "Win32_System_JobObjects",
   "Win32_System_Threading", "Win32_System_Pipes", "Win32_Storage_FileSystem",
@@ -117,6 +120,8 @@ backon   = "1.6.0"
 governor = "0.10.4"
 keyring-core                 = "1.0.1"
 windows-native-keyring-store = { version = "1.1.0", default-features = false }
+# macOS port: the keyring-core 1.x companion for the macOS keychain (1.0.2 needs keyring-core ^1).
+apple-native-keyring-store   = { version = "1.0.2", default-features = false }
 
 # fs / sync
 notify                = "8.2.0"

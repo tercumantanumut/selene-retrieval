@@ -5,6 +5,8 @@
 //! inheritable "ALL APPLICATION PACKAGES" RX ACE on the install directory, exactly what
 //! Program Files has). The `#[ignore]` experiments reproduce the M0 per-file grant and print the
 //! ACLs; run them with `--ignored --nocapture`.
+// Windows ACLs and AppContainer only.
+#![cfg(windows)]
 #![allow(clippy::unwrap_used, clippy::expect_used, unsafe_code)]
 
 mod common;

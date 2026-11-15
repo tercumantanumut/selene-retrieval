@@ -35,15 +35,29 @@ pub fn state_word(o: Overall) -> &'static str {
 
 pub fn tooltip(v: &AppView) -> String {
     let mut t = format!("Selene Retrieval: {}", v.summary);
-    // Windows truncates tray tooltips at 127 characters.
+    // Windows truncates tray tooltips at 127 characters (macOS shows the same text).
     if t.chars().count() > 120 {
         t = t.chars().take(119).collect::<String>() + "…";
     }
     t
 }
 
+/// macOS: a Dock icon (and the app menu) only while the window is shown, like the taskbar button
+/// on Windows, which comes and goes with the window by itself. Nothing to do elsewhere.
+pub fn set_dock_visible<R: Runtime>(app: &AppHandle<R>, visible: bool) {
+    #[cfg(target_os = "macos")]
+    let _ = app.set_activation_policy(if visible {
+        tauri::ActivationPolicy::Regular
+    } else {
+        tauri::ActivationPolicy::Accessory
+    });
+    #[cfg(not(target_os = "macos"))]
+    let _ = (app, visible);
+}
+
 pub fn show_main<R: Runtime>(app: &AppHandle<R>) {
     if let Some(w) = app.get_webview_window("main") {
+        set_dock_visible(app, true);
         let _ = w.unminimize();
         let _ = w.show();
         let _ = w.set_focus();

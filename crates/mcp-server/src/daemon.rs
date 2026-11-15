@@ -439,7 +439,12 @@ pub fn run_recovery(dir: PathBuf, info: sr_common::api::IndexMissingInfo) -> u8 
 }
 
 /// The desktop app next to the daemon (install layout).
+#[cfg(windows)]
 pub const APP_EXE: &str = "sr-app.exe";
+/// The desktop app next to the daemon (no `.exe` on Unix).
+// macOS phase 2: inside an app bundle the daemon and the app live in `Contents/MacOS`.
+#[cfg(not(windows))]
+pub const APP_EXE: &str = "sr-app";
 
 /// R-UX30 (Q5 / R-UX12): when an `add_folder` approval is requested and no app session is
 /// attached, start `sr-app.exe --approve <id>` (absolute path next to the daemon; once per
@@ -496,8 +501,27 @@ fn launch_app_for_approval(app_exe: &std::path::Path, id: sr_common::ids::Approv
         const CREATE_NEW_PROCESS_GROUP: u32 = 0x0000_0200;
         cmd.creation_flags(DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP);
     }
+    #[cfg(unix)]
+    {
+        use std::os::unix::process::CommandExt;
+        // Own process group, no stdio of ours.
+        // macOS phase 2: open the app bundle (`Contents/MacOS`) instead of a bare binary.
+        cmd.process_group(0)
+            .stdin(std::process::Stdio::null())
+            .stdout(std::process::Stdio::null())
+            .stderr(std::process::Stdio::null());
+    }
     match cmd.spawn() {
+        #[cfg(windows)]
         Ok(_) => {
+            tracing::info!(target: "sr_daemon", "approval requested; opened the app to show it")
+        }
+        // Unix: the daemon outlives the app, so wait for it in the background (no zombie).
+        #[cfg(unix)]
+        Ok(mut child) => {
+            std::thread::spawn(move || {
+                let _ = child.wait();
+            });
             tracing::info!(target: "sr_daemon", "approval requested; opened the app to show it")
         }
         Err(e) => {

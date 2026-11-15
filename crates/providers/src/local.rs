@@ -251,6 +251,7 @@ fn cpu_session(vm: &VerifiedModel, threads: usize) -> std::result::Result<TextEm
     build_session(vm, Vec::new(), threads)
 }
 
+#[cfg(windows)]
 fn dml_session(vm: &VerifiedModel, device_id: u32) -> std::result::Result<TextEmbedding, String> {
     let ep = ort::ep::DirectML::default()
         .with_device_id(device_id as i32)
@@ -259,6 +260,15 @@ fn dml_session(vm: &VerifiedModel, device_id: u32) -> std::result::Result<TextEm
     // DML EP requirements (memory pattern off, sequential) are applied by fastembed when it sees
     // a DirectML dispatch. Intra-op threads only matter for the few CPU-assigned nodes.
     build_session(vm, vec![ep], 2)
+}
+
+/// DirectML is Windows-only. Never reached: `dml::load_directml` already reports `Unsupported`
+/// here, so the plan runs on the CPU. macOS: no CoreML EP either (port phase 2 decision): the
+/// CPU is fast on Apple silicon, and CoreML would need its own cosine >= 0.999 proof per model
+/// variant, a compiled-model cache and a silent fallback first.
+#[cfg(not(windows))]
+fn dml_session(_vm: &VerifiedModel, _device_id: u32) -> std::result::Result<TextEmbedding, String> {
+    Err("DirectML is only available on Windows".into())
 }
 
 // ---------------------------------------------------------------------------------- outputs (O3)

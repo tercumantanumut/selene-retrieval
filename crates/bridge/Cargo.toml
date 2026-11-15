@@ -31,7 +31,7 @@ sr-common = { workspace = true }
 sr-client = { workspace = true }
 tokio = { workspace = true, features = ["io-std"] }
 
-[dev-dependencies]
+[target.'cfg(windows)'.dev-dependencies]
 windows-sys = { workspace = true, features = ["Win32_System_Diagnostics_ToolHelp", "Win32_System_SystemServices"] }
 
 [lints]

@@ -404,7 +404,12 @@ mod tests {
         let (_t, cat) = cat();
         let clock: SharedClock = crate::clock::system();
         let h = hw(vec![dgpu()]);
-        let d = select_tier(&h, &Thresholds::default());
+        // The DirectML fault bookkeeping, on the platform that has DirectML.
+        let d = sr_common::tier::select_tier_on(
+            &h,
+            &Thresholds::default(),
+            sr_common::tier::TierPlatform::WINDOWS_X64,
+        );
         assert_eq!(d.tier, Tier::High);
         let ctx = GpuContext::fixed(
             h.clone(),
@@ -488,7 +493,7 @@ mod tests {
 #[cfg(all(test, feature = "local"))]
 mod probe_cache_tests {
     use super::*;
-    use sr_common::tier::{GIB, Thresholds, select_tier};
+    use sr_common::tier::{GIB, Thresholds};
 
     fn igpu() -> GpuInfo {
         GpuInfo {
@@ -532,7 +537,12 @@ mod probe_cache_tests {
             free_disk: 100 * GIB,
             gpus: vec![igpu()],
         };
-        let d = select_tier(&hw, &Thresholds::default());
+        // The DirectML probe cache, on the platform that has DirectML.
+        let d = sr_common::tier::select_tier_on(
+            &hw,
+            &Thresholds::default(),
+            sr_common::tier::TierPlatform::WINDOWS_X64,
+        );
         assert_eq!(d.ep, EpPlan::ProbeDirectMl { dxgi_index: 0 });
         let ctx = GpuContext::fixed(
             hw.clone(),

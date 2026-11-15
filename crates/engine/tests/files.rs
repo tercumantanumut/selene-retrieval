@@ -200,7 +200,8 @@ async fn read_file_refuses_everything_outside_or_private() {
     let f = fixture().await;
     let e = &f.e;
     let outside_abs = f.outside.join("outside.txt");
-    let cases: Vec<(String, ErrorCode)> = vec![
+    #[cfg_attr(not(windows), allow(unused_mut))]
+    let mut cases: Vec<(String, ErrorCode)> = vec![
         (
             "../outside/outside.txt".into(),
             ErrorCode::PathOutsideSandbox,
@@ -217,6 +218,16 @@ async fn read_file_refuses_everything_outside_or_private() {
             format!(r"{}\..\outside\outside.txt", f.root.display()),
             ErrorCode::PathOutsideSandbox,
         ),
+        (".env".into(), ErrorCode::PathDenied),
+        (".ENV".into(), ErrorCode::PathDenied),
+        (".ssh/config".into(), ErrorCode::PathDenied),
+        ("id_rsa".into(), ErrorCode::PathDenied),
+        ("credentials-production.json".into(), ErrorCode::PathDenied),
+    ];
+    // Windows namespaces (UNC, `\\?\`, drive-relative, NTFS streams, device names, trailing
+    // dots/spaces). On Unix these are ordinary file names inside the folder.
+    #[cfg(windows)]
+    cases.extend([
         (
             r"\\localhost\c$\Windows\win.ini".into(),
             ErrorCode::PathOutsideSandbox,
@@ -236,12 +247,7 @@ async fn read_file_refuses_everything_outside_or_private() {
         ("src/COM1.rs".into(), ErrorCode::PathOutsideSandbox),
         ("notes.txt.".into(), ErrorCode::PathOutsideSandbox),
         ("notes.txt ".into(), ErrorCode::PathOutsideSandbox),
-        (".env".into(), ErrorCode::PathDenied),
-        (".ENV".into(), ErrorCode::PathDenied),
-        (".ssh/config".into(), ErrorCode::PathDenied),
-        ("id_rsa".into(), ErrorCode::PathDenied),
-        ("credentials-production.json".into(), ErrorCode::PathDenied),
-    ];
+    ]);
     for (p, want) in &cases {
         assert_eq!(code(e, p).await, Some(*want), "{p}");
     }
@@ -309,7 +315,10 @@ async fn grep_stays_inside_and_skips_private_files() {
         .find(|m| m.rel_path == "notes.txt")
         .unwrap();
     assert_eq!(m.line, 2);
-    assert!(m.path.ends_with(r"root\notes.txt"));
+    assert!(
+        m.path
+            .ends_with(&format!("root{}notes.txt", std::path::MAIN_SEPARATOR))
+    );
     // Scoped by path and glob, literal and case-insensitive.
     let r = e
         .grep(GrepRequest {

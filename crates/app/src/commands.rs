@@ -603,7 +603,10 @@ pub fn diagnostics_target(path: &str) -> Option<PathBuf> {
 fn save_failed() -> UiError {
     UiError::new(
         "Couldn't save the file",
-        "Windows didn't allow the change. Try again.",
+        &format!(
+            "{} didn't allow the change. Try again.",
+            crate::dto::OS_NAME
+        ),
         UiAction::Retry,
         "Retry",
         "DiagnosticsSave",
@@ -613,7 +616,7 @@ fn save_failed() -> UiError {
 fn open_failed() -> UiError {
     UiError::new(
         "Couldn't open it",
-        "Windows didn't allow it. Try again.",
+        &format!("{} didn't allow it. Try again.", crate::dto::OS_NAME),
         UiAction::Retry,
         "Retry",
         "Open",
@@ -946,7 +949,10 @@ pub mod cmd {
             tracing::warn!(err = %e, "autostart change failed");
             UiError::new(
                 "Couldn't change this setting",
-                "Windows didn't allow the change. Try again.",
+                &format!(
+                    "{} didn't allow the change. Try again.",
+                    crate::dto::OS_NAME
+                ),
                 UiAction::Retry,
                 "Retry",
                 "Autostart",
@@ -1254,7 +1260,7 @@ pub mod cmd {
         let docs = documents_dir(&app);
         let added = df::added_folders(&view);
         // Fail closed: if Windows can't say, treat the app as elevated (nothing is made).
-        let elevated = sr_client::win::process_elevated().unwrap_or(true);
+        let elevated = sr_client::sys::process_elevated().unwrap_or(true);
         let input = df::CreateInput {
             docs: docs.as_deref(),
             added: &added,
@@ -1679,23 +1685,33 @@ mod tests {
     use crate::daemon::fake::FakeRpc;
     use std::fs;
 
+    /// An absolute folder and a home folder on this platform.
+    #[cfg(windows)]
+    const DOCS: &str = r"C:\Docs";
+    #[cfg(windows)]
+    const HOME: &str = r"C:\Users\a";
+    #[cfg(not(windows))]
+    const DOCS: &str = "/Users/a/Docs";
+    #[cfg(not(windows))]
+    const HOME: &str = "/Users/a";
+
     #[tokio::test]
     async fn add_folder_forwards_and_maps_errors() {
         let rpc = FakeRpc::default();
         rpc.reply(Ok(json!({"folder_id": "01JABC", "name": "Docs"})));
         assert_eq!(
-            add_folder(&rpc, r" C:\Docs ").await,
+            add_folder(&rpc, &format!(" {DOCS} ")).await,
             Ok(json!({"folder_id": "01JABC", "name": "Docs"}))
         );
         assert_eq!(
             rpc.calls(),
-            vec![("folders.add".to_owned(), json!({"path": r"C:\Docs"}))]
+            vec![("folders.add".to_owned(), json!({"path": DOCS}))]
         );
 
         rpc.reply(Err(Error::new(ErrorCode::PathRefused)
-            .with_path(r"C:\Users\a")
+            .with_path(HOME)
             .with_detail("dangerous root")));
-        let e = add_folder(&rpc, r"C:\Users\a").await.unwrap_err();
+        let e = add_folder(&rpc, HOME).await.unwrap_err();
         assert_eq!(e.title, "This folder can't be added");
         assert!(matches!(e.action, UiAction::ChooseSubfolder { .. }));
         assert_eq!(e.action_label, "Choose a subfolder");

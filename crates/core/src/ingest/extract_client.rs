@@ -24,15 +24,26 @@ pub use sr_extract_client::{
 };
 
 /// File names in the install directory (next to `sr-daemon.exe`).
+#[cfg(windows)]
 pub const WORKER_EXE: &str = "sr-extract.exe";
+#[cfg(windows)]
 pub const PDFIUM_DLL: &str = "pdfium.dll";
 
+/// File names in the install directory (next to the daemon binary).
+#[cfg(not(windows))]
+pub const WORKER_EXE: &str = "sr-extract";
+#[cfg(target_os = "macos")]
+pub const PDFIUM_DLL: &str = "libpdfium.dylib";
+#[cfg(all(unix, not(target_os = "macos")))]
+pub const PDFIUM_DLL: &str = "libpdfium.so";
+
 /// Default supervisor configuration for an install directory holding `sr-extract.exe` and
-/// `pdfium.dll` side by side (the NSIS layout).
+/// `pdfium.dll` side by side (the NSIS layout). In a macOS app bundle the library sits in
+/// `Contents/Frameworks` ([`sr_common::install::libraries_dir`]).
 pub fn config_for_install_dir(install_dir: &Path) -> ExtractConfig {
     ExtractConfig::new(
         install_dir.join(WORKER_EXE),
-        Some(install_dir.join(PDFIUM_DLL)),
+        Some(sr_common::install::libraries_dir(install_dir).join(PDFIUM_DLL)),
     )
 }
 
@@ -40,6 +51,7 @@ pub fn config_for_install_dir(install_dir: &Path) -> ExtractConfig {
 mod tests {
     use super::*;
 
+    #[cfg(windows)]
     #[test]
     fn install_layout_paths() {
         let c = config_for_install_dir(Path::new(r"C:\Apps\SR"));
@@ -50,5 +62,28 @@ mod tests {
         );
         assert_eq!(c.sandbox, SandboxMode::Auto);
         assert_eq!(kind_for_path(Path::new("a.docx")), DocKind::Docx);
+    }
+
+    #[cfg(target_os = "macos")]
+    #[test]
+    fn install_layout_paths() {
+        let c = config_for_install_dir(Path::new("/Applications/SR.app/Contents/MacOS"));
+        assert_eq!(
+            c.worker_exe,
+            Path::new("/Applications/SR.app/Contents/MacOS/sr-extract")
+        );
+        assert_eq!(
+            c.pdfium_dll.as_deref(),
+            Some(Path::new(
+                "/Applications/SR.app/Contents/Frameworks/libpdfium.dylib"
+            ))
+        );
+        assert_eq!(c.sandbox, SandboxMode::Auto);
+        // Dev layout (target/debug): side by side.
+        let d = config_for_install_dir(Path::new("/src/target/debug"));
+        assert_eq!(
+            d.pdfium_dll.as_deref(),
+            Some(Path::new("/src/target/debug/libpdfium.dylib"))
+        );
     }
 }

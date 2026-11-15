@@ -291,7 +291,7 @@ pub fn reason_text(r: SkipReason, max_file_bytes: u64) -> String {
             "May be damaged, password-protected or in an unsupported format".into()
         }
         SkipReason::Timeout => "Took too long to read".into(),
-        SkipReason::Permission => "Windows didn't allow access".into(),
+        SkipReason::Permission => format!("{} didn't allow access", crate::dto::OS_NAME),
         SkipReason::Locked => "In use by another program; retried automatically".into(),
         SkipReason::DataFile => "Looks like a data file (very long lines), not a document".into(),
         SkipReason::Other => "Couldn't be read".into(),

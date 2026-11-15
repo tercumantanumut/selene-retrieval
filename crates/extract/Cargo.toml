@@ -34,7 +34,13 @@ quick-xml     = { workspace = true }
 encoding_rs   = { workspace = true }
 chardetng     = { workspace = true }
 memchr        = { workspace = true }
+
+[target.'cfg(windows)'.dependencies]
 windows-sys   = { workspace = true, features = ["Win32_System_Console", "Win32_System_Diagnostics_Debug"] }
+
+# macOS: Seatbelt (sandbox_init), isatty; test probes: fork.
+[target.'cfg(unix)'.dependencies]
+libc          = { workspace = true }
 
 [dev-dependencies]
 sr-extract-client = { workspace = true }
@@ -42,6 +48,8 @@ tokio     = { workspace = true }
 proptest  = { workspace = true }
 tempfile  = { workspace = true }
 flate2    = { workspace = true }
+
+[target.'cfg(windows)'.dev-dependencies]
 windows-sys = { workspace = true, features = ["Win32_Security_Authorization", "Win32_System_SystemServices"] }
 
 [lints]

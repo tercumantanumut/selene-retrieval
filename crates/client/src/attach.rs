@@ -11,6 +11,9 @@
 //!    daemon exit at once, so this is always safe).
 //! 5. Handshake. `Unavailable{restarting|draining}` (an old daemon draining for us) loops back to
 //!    step 1 until the new daemon answers.
+//!
+//! On Unix the "pipe" is the daemon's private socket (`sr_client::unix`): no socket file or a
+//! stale one counts as absent, and `sr-launch` starts the daemon detached in its own session.
 
 use std::io;
 use std::path::PathBuf;
@@ -21,10 +24,14 @@ use sr_common::protocol::{
     ConnKind, Handshake, HandshakeReply, MAX_HANDSHAKE_BYTES, PROTO_VERSION, UnavailableReason,
 };
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
-use tokio::net::windows::named_pipe::{ClientOptions, NamedPipeClient};
+#[cfg(windows)]
+use tokio::net::windows::named_pipe::ClientOptions;
+#[cfg(windows)]
 use windows_sys::Win32::System::Threading::{CREATE_NEW_PROCESS_GROUP, CREATE_NO_WINDOW};
 
 use crate::naming::{self, SPAWN_LOCK};
+use crate::sys::{self, Stream};
+#[cfg(windows)]
 use crate::win::{self, ERROR_FILE_NOT_FOUND, ERROR_PIPE_BUSY, OwnedProcess};
 
 /// How long a client waits for the daemon's pipe after launching it.
@@ -96,7 +103,7 @@ pub enum AttachPath {
 /// A connected, handshaken pipe.
 #[derive(Debug)]
 pub struct Connection {
-    pub stream: NamedPipeClient,
+    pub stream: Stream,
     pub pipe_name: String,
     pub data_dir: PathBuf,
     pub daemon_pid: u32,
@@ -116,21 +123,39 @@ fn io_unavailable(what: &str, e: io::Error) -> Error {
     unavailable(format!("{what}: {e}")).with_source(e)
 }
 
-fn try_open(name: &str) -> io::Result<NamedPipeClient> {
+#[cfg(windows)]
+async fn try_open(name: &str) -> io::Result<Stream> {
     ClientOptions::new().open(name)
 }
 
+/// Unix: the folder and socket checks of [`sys::connect`] run before connecting.
+#[cfg(unix)]
+async fn try_open(name: &str) -> io::Result<Stream> {
+    sys::connect(name).await
+}
+
 enum Probe {
-    Open(NamedPipeClient),
+    Open(Stream),
     Busy,
     Absent,
 }
 
-fn probe(name: &str) -> Result<Probe, Error> {
-    match try_open(name) {
+async fn probe(name: &str) -> Result<Probe, Error> {
+    match try_open(name).await {
         Ok(c) => Ok(Probe::Open(c)),
+        #[cfg(windows)]
         Err(e) if e.raw_os_error() == Some(ERROR_PIPE_BUSY) => Ok(Probe::Busy),
+        #[cfg(windows)]
         Err(e) if e.raw_os_error() == Some(ERROR_FILE_NOT_FOUND) => Ok(Probe::Absent),
+        #[cfg(unix)]
+        Err(e) if sys::is_busy(&e) => Ok(Probe::Busy),
+        #[cfg(unix)]
+        Err(e) if sys::is_absent(&e) => Ok(Probe::Absent),
+        // A socket folder or file that isn't ours and private: refuse, nothing sent.
+        #[cfg(unix)]
+        Err(e) if e.kind() == io::ErrorKind::PermissionDenied => {
+            Err(not_trusted(format!("service socket refused: {e}")))
+        }
         Err(e) => Err(io_unavailable("open pipe", e)),
     }
 }
@@ -149,10 +174,10 @@ impl Backoff {
 
 /// While the pipe is busy, waits for a free instance (up to `deadline`). Returns `None` as soon
 /// as the pipe disappears (an old daemon finished draining), so the caller can launch.
-async fn wait_busy(name: &str, deadline: Instant) -> Result<Option<NamedPipeClient>, Error> {
+async fn wait_busy(name: &str, deadline: Instant) -> Result<Option<Stream>, Error> {
     let mut b = Backoff::new();
     loop {
-        match probe(name)? {
+        match probe(name).await? {
             Probe::Open(c) => return Ok(Some(c)),
             Probe::Absent => return Ok(None),
             Probe::Busy => {}
@@ -167,6 +192,7 @@ async fn wait_busy(name: &str, deadline: Instant) -> Result<Option<NamedPipeClie
 }
 
 /// Runs `sr-launch` and waits for it (it is short-lived). Returns its exit code.
+#[cfg(windows)]
 async fn run_launcher(
     launcher: &std::path::Path,
     data_dir: &std::path::Path,
@@ -190,6 +216,43 @@ async fn run_launcher(
     }
 }
 
+/// Unix: runs `sr-launch` with stdio on `/dev/null` and no other inherited descriptors (the MCP
+/// client's pipes and anything it left open never reach the daemon) and waits for it. Returns its
+/// exit code.
+#[cfg(unix)]
+async fn run_launcher(
+    launcher: &std::path::Path,
+    data_dir: &std::path::Path,
+) -> Result<u32, Error> {
+    let mut std_cmd = std::process::Command::new(launcher);
+    std_cmd
+        .arg("--data-dir")
+        .arg(data_dir)
+        .stdin(std::process::Stdio::null())
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null());
+    if let Some(dir) = launcher.parent() {
+        std_cmd.current_dir(dir);
+    }
+    sys::close_inherited_fds(&mut std_cmd);
+    let mut cmd = tokio::process::Command::from(std_cmd);
+    cmd.kill_on_drop(true);
+    let mut child = cmd
+        .spawn()
+        .map_err(|e| io_unavailable("start sr-launch", e))?;
+    match tokio::time::timeout(LAUNCHER_TIMEOUT, child.wait()).await {
+        Ok(Ok(status)) => status
+            .code()
+            .and_then(|c| u32::try_from(c).ok())
+            .ok_or_else(|| unavailable(format!("sr-launch ended abnormally ({status})"))),
+        Ok(Err(e)) => Err(io_unavailable("wait for sr-launch", e)),
+        Err(_) => {
+            let _ = child.kill().await;
+            Err(unavailable("sr-launch did not finish"))
+        }
+    }
+}
+
 fn launcher_path(opts: &AttachOptions) -> Result<PathBuf, Error> {
     if let Some(p) = &opts.launcher {
         return Ok(p.clone());
@@ -197,7 +260,7 @@ fn launcher_path(opts: &AttachOptions) -> Result<PathBuf, Error> {
     if let Some(p) = naming::dev_env("SR_LAUNCH_EXE") {
         return Ok(PathBuf::from(p));
     }
-    naming::sibling_exe("sr-launch.exe")
+    naming::sibling_exe(&naming::exe_file_name("sr-launch"))
 }
 
 /// Steps 1–4: an open pipe instance (not yet handshaken).
@@ -205,9 +268,9 @@ async fn open_or_launch(
     opts: &AttachOptions,
     name: &str,
     data_dir: &std::path::Path,
-) -> Result<(NamedPipeClient, AttachPath), Error> {
+) -> Result<(Stream, AttachPath), Error> {
     // 1. Fast path.
-    match probe(name)? {
+    match probe(name).await? {
         Probe::Open(c) => return Ok((c, AttachPath::Direct)),
         Probe::Busy => {
             if let Some(c) = wait_busy(name, Instant::now() + opts.timeout).await? {
@@ -224,7 +287,7 @@ async fn open_or_launch(
     let lock_deadline = Instant::now() + opts.timeout + LAUNCHER_TIMEOUT;
     let mut b = Backoff::new();
     let lock = loop {
-        match probe(name)? {
+        match probe(name).await? {
             Probe::Open(c) => return Ok((c, AttachPath::AfterSpawnLock)),
             Probe::Busy => {
                 if let Some(c) = wait_busy(name, Instant::now() + opts.timeout).await? {
@@ -233,7 +296,7 @@ async fn open_or_launch(
             }
             Probe::Absent => {}
         }
-        match win::lock_file(&lock_path, false) {
+        match sys::lock_file(&lock_path, false) {
             Ok(Some(f)) => break f,
             Ok(None) => {}
             Err(e) => return Err(io_unavailable("spawn.lock", e)),
@@ -246,7 +309,7 @@ async fn open_or_launch(
         b.wait().await;
     };
     // Re-check under the lock: the previous holder may have just finished.
-    match probe(name)? {
+    match probe(name).await? {
         Probe::Open(c) => return Ok((c, AttachPath::AfterSpawnLock)),
         Probe::Busy => {
             if let Some(c) = wait_busy(name, Instant::now() + opts.timeout).await? {
@@ -286,7 +349,7 @@ async fn open_or_launch(
             }
         }
         // 4. Poll for the pipe.
-        match probe(name)? {
+        match probe(name).await? {
             Probe::Open(c) => {
                 drop(lock);
                 return Ok((
@@ -325,10 +388,7 @@ async fn open_or_launch(
 }
 
 /// Sends the handshake and reads the one-line reply (byte by byte: nothing may be over-read).
-pub async fn handshake(
-    pipe: &mut NamedPipeClient,
-    hs: &Handshake,
-) -> Result<HandshakeReply, Error> {
+pub async fn handshake(pipe: &mut Stream, hs: &Handshake) -> Result<HandshakeReply, Error> {
     let io = async {
         pipe.write_all(&hs.to_line()).await?;
         pipe.flush().await?;
@@ -368,14 +428,14 @@ enum ServerCheck {
     Refuse(String),
 }
 
-fn classify_server(id: win::ServerIdentity) -> ServerCheck {
+fn classify_server(id: sys::ServerIdentity) -> ServerCheck {
     match id {
-        win::ServerIdentity::Ours => ServerCheck::Proceed,
-        win::ServerIdentity::Unverifiable(why) => ServerCheck::Retry(why),
-        win::ServerIdentity::ForeignOwner(sid) => {
+        sys::ServerIdentity::Ours => ServerCheck::Proceed,
+        sys::ServerIdentity::Unverifiable(why) => ServerCheck::Retry(why),
+        sys::ServerIdentity::ForeignOwner(sid) => {
             ServerCheck::Refuse(format!("pipe owned by another account ({sid})"))
         }
-        win::ServerIdentity::ForeignProcess(sid) => {
+        sys::ServerIdentity::ForeignProcess(sid) => {
             ServerCheck::Refuse(format!("pipe served by another account ({sid})"))
         }
     }
@@ -388,12 +448,13 @@ fn not_trusted(detail: String) -> Error {
 /// Connect to the daemon, launching it if needed, and handshake.
 ///
 /// S-01: before the handshake (the first byte we send), the pipe's owner and the server
-/// process's user must be the current user ([`win::pipe_server_identity`]); otherwise the
-/// attach fails with `ConnectionNotTrusted` and nothing crosses the pipe.
+/// process's user must be the current user (`sys::pipe_server_identity`; on Unix the socket
+/// folder and file checks plus the peer's uid); otherwise the attach fails with
+/// `ConnectionNotTrusted` and nothing crosses the pipe.
 pub async fn attach(opts: &AttachOptions) -> Result<Connection, Error> {
     let t0 = Instant::now();
     let data_dir = naming::resolve_data_dir(opts.data_dir.as_deref())?;
-    let sid = win::user_sid_string().map_err(|e| io_unavailable("user SID", e))?;
+    let sid = sys::user_sid_string().map_err(|e| io_unavailable("user SID", e))?;
     let name = naming::pipe_name(&sid, &data_dir);
     let hs = opts.handshake();
     // Drain-restart rounds get their own budget on top of the normal attach.
@@ -402,7 +463,7 @@ pub async fn attach(opts: &AttachOptions) -> Result<Connection, Error> {
     let mut b = Backoff::new();
     loop {
         let (mut pipe, path) = open_or_launch(opts, &name, &data_dir).await?;
-        match classify_server(win::pipe_server_identity(&pipe, &sid)) {
+        match classify_server(sys::pipe_server_identity(&pipe, &sid)) {
             ServerCheck::Proceed => {}
             ServerCheck::Refuse(why) => return Err(not_trusted(why)),
             ServerCheck::Retry(why) => {
@@ -464,19 +525,19 @@ mod tests {
     #[test]
     fn server_check_refuses_foreign_and_retries_unverifiable() {
         assert_eq!(
-            classify_server(win::ServerIdentity::Ours),
+            classify_server(sys::ServerIdentity::Ours),
             ServerCheck::Proceed
         );
         assert!(matches!(
-            classify_server(win::ServerIdentity::ForeignOwner("S-1-5-21-9".into())),
+            classify_server(sys::ServerIdentity::ForeignOwner("S-1-5-21-9".into())),
             ServerCheck::Refuse(_)
         ));
         assert!(matches!(
-            classify_server(win::ServerIdentity::ForeignProcess("S-1-5-21-9".into())),
+            classify_server(sys::ServerIdentity::ForeignProcess("S-1-5-21-9".into())),
             ServerCheck::Refuse(_)
         ));
         assert!(matches!(
-            classify_server(win::ServerIdentity::Unverifiable("gone".into())),
+            classify_server(sys::ServerIdentity::Unverifiable("gone".into())),
             ServerCheck::Retry(_)
         ));
         let e = not_trusted("x".into());

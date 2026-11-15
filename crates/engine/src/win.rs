@@ -1,4 +1,5 @@
 //! Reviewed Win32 FFI for the engine (the only `unsafe` in sr-engine; add it to the reviewed list).
+//! The Unix `imp` (macOS port) holds the libc twins: `sysctlbyname` and `statfs`.
 //!
 //! Four read-only queries and one console attach, each a single documented call with a
 //! caller-owned, correctly sized buffer:
@@ -257,7 +258,136 @@ mod imp {
     }
 }
 
-#[cfg(not(windows))]
+/// Unix (macOS port): `sysctlbyname` for RAM and cores, `statfs` for the volume of a path, the
+/// file flags from `lstat` (std) for iCloud placeholders. Free disk space is
+/// `sr_providers::sys::free_disk` (`statvfs`). No registry: machine policy is the file only.
+#[cfg(unix)]
+#[allow(unsafe_code)]
+mod imp {
+    use std::path::{Path, PathBuf};
+
+    /// One numeric `sysctl` value of type `T` (`hw.memsize` is a u64, `hw.physicalcpu` an int).
+    #[cfg(target_os = "macos")]
+    fn sysctl<T: Copy + Default>(name: &std::ffi::CStr) -> Option<T> {
+        let mut v = T::default();
+        let mut len = size_of::<T>();
+        // SAFETY: `name` is NUL-terminated; `v` is a writable `T` of `len` bytes; no new value.
+        let rc = unsafe {
+            libc::sysctlbyname(
+                name.as_ptr(),
+                (&raw mut v).cast(),
+                &mut len,
+                std::ptr::null_mut(),
+                0,
+            )
+        };
+        (rc == 0 && len == size_of::<T>()).then_some(v)
+    }
+
+    #[cfg(target_os = "macos")]
+    pub fn total_ram() -> Option<u64> {
+        sysctl::<u64>(c"hw.memsize").filter(|n| *n > 0)
+    }
+
+    #[cfg(target_os = "macos")]
+    pub fn physical_cores() -> Option<u32> {
+        sysctl::<libc::c_int>(c"hw.physicalcpu")
+            .and_then(|n| u32::try_from(n).ok().filter(|n| *n > 0))
+    }
+
+    #[cfg(not(target_os = "macos"))]
+    pub fn total_ram() -> Option<u64> {
+        None
+    }
+
+    #[cfg(not(target_os = "macos"))]
+    pub fn physical_cores() -> Option<u32> {
+        None
+    }
+
+    pub fn free_disk(path: &Path) -> Option<u64> {
+        sr_providers::sys::free_disk(path)
+    }
+
+    /// File ids on Unix are (device, inode) from `sr_sync::fsid`; this NTFS form has no twin.
+    pub fn file_identity(_: &std::fs::File) -> Option<(u32, [u8; 16])> {
+        None
+    }
+
+    /// A Unix program started from a terminal already writes to it.
+    pub fn attach_parent_console() -> bool {
+        false
+    }
+
+    /// macOS: `/Library/Application Support`, writable only by administrators (the Unix twin
+    /// of `%ProgramData%` for `SeleneRetrieval/policy.toml`).
+    pub fn program_data() -> Option<PathBuf> {
+        if cfg!(target_os = "macos") {
+            Some(PathBuf::from("/Library/Application Support"))
+        } else {
+            None
+        }
+    }
+
+    /// macOS: the file flags (`st_flags`) from `lstat`, which never downloads an iCloud
+    /// placeholder.
+    #[cfg(target_os = "macos")]
+    pub fn file_attributes(path: &Path) -> Option<u32> {
+        use std::os::macos::fs::MetadataExt;
+        std::fs::symlink_metadata(path).ok().map(|m| m.st_flags())
+    }
+
+    #[cfg(not(target_os = "macos"))]
+    pub fn file_attributes(_: &Path) -> Option<u32> {
+        None
+    }
+
+    pub fn policy_value(_: bool, _: &str, _: &str) -> Option<super::RegValue> {
+        None
+    }
+
+    /// `statfs` of the nearest existing folder at or above `path`.
+    #[cfg(target_os = "macos")]
+    pub fn volume(path: &Path) -> Option<super::Volume> {
+        use std::os::unix::ffi::OsStrExt;
+        let mut p = path;
+        while std::fs::symlink_metadata(p).is_err() {
+            p = p.parent()?;
+        }
+        let c = std::ffi::CString::new(p.as_os_str().as_bytes()).ok()?;
+        // SAFETY: an all-zero statfs is a valid out value.
+        let mut st: libc::statfs = unsafe { std::mem::zeroed() };
+        // SAFETY: `c` is NUL-terminated and `st` is a writable statfs; both outlive the call.
+        if unsafe { libc::statfs(c.as_ptr(), &mut st) } != 0 {
+            return None;
+        }
+        let text = |b: &[libc::c_char]| {
+            let bytes: Vec<u8> = b
+                .iter()
+                .map(|c| c.to_ne_bytes()[0])
+                .take_while(|c| *c != 0)
+                .collect();
+            String::from_utf8_lossy(&bytes).into_owned()
+        };
+        // <sys/mount.h> MNT_REMOVABLE; the libc crate does not export it for Apple targets.
+        const MNT_REMOVABLE: libc::c_int = 0x0000_0200;
+        let flag = |f: libc::c_int| u32::try_from(f).is_ok_and(|f| st.f_flags & f != 0);
+        Some(super::Volume {
+            mount_point: PathBuf::from(text(&st.f_mntonname)),
+            fs_type: text(&st.f_fstypename),
+            local: flag(libc::MNT_LOCAL),
+            removable: flag(MNT_REMOVABLE),
+            ignores_owners: flag(libc::MNT_IGNORE_OWNERSHIP),
+        })
+    }
+
+    #[cfg(not(target_os = "macos"))]
+    pub fn volume(_: &Path) -> Option<super::Volume> {
+        None
+    }
+}
+
+#[cfg(not(any(windows, unix)))]
 mod imp {
     use std::path::Path;
     pub fn total_ram() -> Option<u64> {
@@ -295,13 +425,48 @@ pub fn file_attributes(path: &Path) -> Option<u32> {
 }
 
 /// Whether `path` is an online-only cloud placeholder (reading it would download it).
+#[cfg(windows)]
 pub fn is_online_only(path: &Path) -> bool {
     file_attributes(path).is_some_and(|a| a & sr_sync::fsid::ONLINE_ONLY_ATTRS != 0)
 }
 
+/// `SF_DATALESS` (`<sys/stat.h>`): an iCloud Drive / File Provider placeholder whose content is
+/// not on this Mac; reading it would download it.
+pub const SF_DATALESS: u32 = 0x4000_0000;
+
+/// Whether `path` is an online-only cloud placeholder (macOS: a dataless iCloud Drive or File
+/// Provider file, `SF_DATALESS`; reading it would download it).
+#[cfg(not(windows))]
+pub fn is_online_only(path: &Path) -> bool {
+    file_attributes(path).is_some_and(|a| a & SF_DATALESS != 0)
+}
+
 /// `%ProgramData%` from the known-folder API (M5-E: where `SeleneRetrieval\policy.toml` lives).
+/// macOS: `/Library/Application Support`.
 pub fn program_data() -> Option<std::path::PathBuf> {
     imp::program_data()
+}
+
+/// The volume a path lives on (Unix, `statfs`): index-move only accepts local, fixed volumes that
+/// keep file owners.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Volume {
+    /// Where it is mounted (`/`, `/Volumes/Data`); shown as the "drive".
+    pub mount_point: std::path::PathBuf,
+    /// `apfs`, `hfs`, `smbfs`, `nfs`, …
+    pub fs_type: String,
+    /// `MNT_LOCAL`: stored on this Mac.
+    pub local: bool,
+    /// `MNT_REMOVABLE`: removable media.
+    pub removable: bool,
+    /// `MNT_IGNORE_OWNERSHIP`: "Ignore ownership on this volume" (every account owns every file).
+    pub ignores_owners: bool,
+}
+
+/// The volume holding `path` (its nearest existing folder). `None` on Windows or on failure.
+#[cfg(unix)]
+pub fn volume(path: &Path) -> Option<Volume> {
+    imp::volume(path)
 }
 
 /// One value of `HKLM` (`machine`) or `HKCU` `subkey` (M5-E machine policy). `None` when the key

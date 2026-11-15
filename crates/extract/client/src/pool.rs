@@ -1,5 +1,6 @@
 //! The worker pool: bounded permits (backpressure), one OS thread per worker slot, the
-//! AppContainer → low-IL fallback, recycling and the outcome → `ExtractError` mapping.
+//! AppContainer → low-IL fallback (Windows; macOS has one mode, Seatbelt, and no fallback),
+//! recycling and the outcome → `ExtractError` mapping.
 
 use std::fs::File;
 use std::io::{Cursor, Read};
@@ -92,6 +93,8 @@ impl ExtractPool {
     /// Validates the configuration, prepares the sandbox (AppContainer profile, install-dir ACL)
     /// and starts the worker slots (each warms up one worker in the background).
     pub fn start(mut cfg: ExtractConfig) -> Result<ExtractPool, Error> {
+        // Fail closed: no pool (and so no worker) where the platform has no sandbox yet.
+        crate::sandbox::platform_supported()?;
         cfg.workers = cfg.workers.clamp(1, 64);
         cfg.max_file_bytes = cfg
             .max_file_bytes
@@ -297,6 +300,8 @@ fn active(t: TokenKind) -> ActiveSandbox {
     match t {
         TokenKind::AppContainer => ActiveSandbox::AppContainer,
         TokenKind::LowIntegrity => ActiveSandbox::LowIntegrity,
+        #[cfg(not(windows))]
+        TokenKind::Seatbelt => ActiveSandbox::Seatbelt,
     }
 }
 
@@ -308,6 +313,18 @@ fn shut_down() -> ExtractError {
     )
 }
 
+/// macOS (and the fail-closed stub elsewhere): one mode, whatever `cfg.sandbox` says. No
+/// fallback exists; a worker that can't be sandboxed never starts.
+#[cfg(not(windows))]
+fn prepare_sandbox(_cfg: &ExtractConfig) -> Result<ModeState, Error> {
+    Ok(ModeState {
+        token: TokenKind::Seatbelt,
+        app_container: None,
+        fallback_reason: None,
+    })
+}
+
+#[cfg(windows)]
 fn prepare_sandbox(cfg: &ExtractConfig) -> Result<ModeState, Error> {
     let low = |reason: Option<String>| ModeState {
         token: TokenKind::LowIntegrity,
@@ -681,7 +698,9 @@ fn run_job(
     let sandbox = active(w.token);
     let peak = w.peak_memory();
     let recycle = !outcome.worker_unusable()
-        && (peak > cfg.recycle_peak_bytes || w.jobs_done >= cfg.recycle_after_jobs);
+        && (peak > cfg.recycle_peak_bytes
+            || w.jobs_done >= cfg.recycle_after_jobs
+            || w.needs_recycle());
     if outcome.worker_unusable() || recycle {
         if recycle {
             c.recycles.fetch_add(1, Ordering::Relaxed);

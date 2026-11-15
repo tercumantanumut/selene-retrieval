@@ -30,7 +30,11 @@ pub const TOUCH_EVERY_MS: i64 = 60_000;
 /// MCP server key in client configs (matches the app's Connect writers).
 pub const SERVER_KEY: &str = "selene-retrieval";
 /// The bridge next to the daemon.
+#[cfg(windows)]
 pub const BRIDGE_EXE: &str = "sr-bridge.exe";
+/// The bridge next to the daemon (no `.exe` on Unix).
+#[cfg(not(windows))]
+pub const BRIDGE_EXE: &str = "sr-bridge";
 
 /// In-memory session bookkeeping.
 #[derive(Debug, Default)]
@@ -98,6 +102,25 @@ fn kind_name(kind: ClientKind) -> &'static str {
     }
 }
 
+/// Where each app keeps its MCP config (the snippet's file hint; the app's Connect writers use
+/// the same files).
+#[cfg(windows)]
+mod hints {
+    pub const CLAUDE: &str = "claude_desktop_config.json";
+    pub const CURSOR: &str = r"%USERPROFILE%\.cursor\mcp.json";
+    pub const VSCODE: &str = r".vscode\mcp.json or the user mcp.json";
+}
+
+/// macOS locations: Claude Desktop and VS Code under `~/Library/Application Support`, Cursor
+/// under the home folder.
+#[cfg(not(windows))]
+mod hints {
+    pub const CLAUDE: &str = "~/Library/Application Support/Claude/claude_desktop_config.json";
+    pub const CURSOR: &str = "~/.cursor/mcp.json";
+    pub const VSCODE: &str =
+        ".vscode/mcp.json or the user mcp.json (~/Library/Application Support/Code/User/mcp.json)";
+}
+
 /// JSON string escaping for snippet text (paths with backslashes).
 fn json_str(s: &str) -> String {
     serde_json::to_string(s).unwrap_or_else(|_| "\"\"".into())
@@ -114,7 +137,7 @@ pub fn snippet_text(
     let cmd = json_str(&bridge.display().to_string());
     let (file_hint, text) = match kind {
         ClientKind::VsCode => (
-            r".vscode\mcp.json or the user mcp.json".to_string(),
+            hints::VSCODE.to_string(),
             format!(
                 "{{\n  \"servers\": {{\n    \"{SERVER_KEY}\": {{\n      \"type\": \"stdio\",\n      \"command\": {cmd},\n      \"args\": [\"--client\", \"vscode\"]\n    }}\n  }}\n}}"
             ),
@@ -133,8 +156,8 @@ pub fn snippet_text(
         }
         other => {
             let hint = match other {
-                ClientKind::ClaudeDesktop => "claude_desktop_config.json",
-                ClientKind::Cursor => r"%USERPROFILE%\.cursor\mcp.json",
+                ClientKind::ClaudeDesktop => hints::CLAUDE,
+                ClientKind::Cursor => hints::CURSOR,
                 _ => "your app's MCP settings",
             };
             (
@@ -419,7 +442,10 @@ mod tests {
 
     #[test]
     fn snippets_per_kind() {
+        #[cfg(windows)]
         let bridge = Path::new(r"C:\Users\u\AppData\Local\Programs\Selene Retrieval\sr-bridge.exe");
+        #[cfg(not(windows))]
+        let bridge = Path::new("/Applications/Selene Retrieval.app/Contents/MacOS/sr-bridge");
         let c = snippet_text(ClientKind::ClaudeDesktop, bridge, None, None);
         let v: serde_json::Value = serde_json::from_str(&c.text).unwrap();
         assert_eq!(
@@ -454,5 +480,12 @@ mod tests {
         }
         let t = snippet_text(ClientKind::Http, bridge, Some(1), Some("abc"));
         assert!(t.text.contains("Bearer abc"));
+        assert!(bridge.ends_with(BRIDGE_EXE));
+        #[cfg(not(windows))]
+        {
+            assert!(cur.file_hint.starts_with("~/.cursor/"), "{}", cur.file_hint);
+            assert!(c.file_hint.contains("Application Support/Claude/"));
+            assert!(vs.file_hint.contains("Code/User/mcp.json"));
+        }
     }
 }

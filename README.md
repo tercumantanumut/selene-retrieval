@@ -58,6 +58,8 @@ Select-String -Path .\SHA256SUMS.txt -Pattern "SeleneRetrieval-0.1.0-x64-setup.e
 
 The two hashes must match. Letter case does not matter.
 
+**macOS (preview, Apple silicon).** A Mac build is in testing and not on the Releases page yet; build it from source (see [CONTRIBUTING.md](CONTRIBUTING.md#building-on-macos)). It has the same protections as the Windows app: the document reader runs in a macOS sandbox, keys are kept in your Mac's keychain, and AI apps reach it through a socket only your user can open. The build is not notarized, so the first time you open it macOS says it can't check the developer: open **System Settings → Privacy & Security** and press **Open Anyway**.
+
 ## Connect your AI app
 
 Open Selene Retrieval and go to **Connected apps**. Press **Connect** next to your app. Then quit the AI app completely and open it again.

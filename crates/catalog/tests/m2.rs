@@ -373,11 +373,16 @@ fn approvals_dedupe_decide_once_and_expire() {
     assert_eq!(a1.state, ApprovalState::Pending);
     assert_eq!(a1.client_kind, ClientKind::ClaudeDesktop);
     assert_eq!(a1.expires_at, NOW + ttl);
-    // Same client, same folder (other casing): the same request comes back.
+    // Same client, same folder (other spelling): the same request comes back. Windows keys
+    // fold case; Unix keys are exact, so only the trailing separator differs there.
+    #[cfg(windows)]
+    let same = r"c:\proj\";
+    #[cfg(not(windows))]
+    let same = r"C:\Proj/";
     let (again, created) = fx
         .cat
         .write_blocking(move |c| {
-            approvals::request_add_folder(c, &request("claude-1", r"c:\proj\"), NOW + 5, ttl)
+            approvals::request_add_folder(c, &request("claude-1", same), NOW + 5, ttl)
         })
         .unwrap();
     assert!(!created);

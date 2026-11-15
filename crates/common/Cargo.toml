@@ -25,6 +25,10 @@ ulid                  = { workspace = true }
 unicode-normalization = { workspace = true }
 dunce                 = { workspace = true }
 
+[target.'cfg(unix)'.dependencies]
+# Home and per-user temp folder for the sandbox's protected locations (never `$HOME`/`$TMPDIR`).
+libc = { workspace = true }
+
 [dev-dependencies]
 tempfile = { workspace = true }
 

@@ -1,4 +1,5 @@
-//! The hostile corpus through the real sandboxed worker, under both sandbox modes.
+//! The hostile corpus through the real sandboxed worker, under both sandbox modes (Windows) or
+//! the Seatbelt sandbox (macOS).
 //!
 //! Pass criteria per mode: every case lands in its allowed outcome set, a legit PDF extracts
 //! correctly after every case (the pool recovers), no protocol violations or spawn failures,
@@ -138,14 +139,27 @@ fn run(mode: SandboxMode, tag: &str) {
     assert!(leaked.is_empty(), "leaked workers {leaked:?}");
     assert_eq!(stats.protocol_violations, 0);
     assert_eq!(stats.spawn_failures, 0);
+    #[cfg(target_os = "macos")]
+    assert_eq!(
+        stats.sandbox,
+        Some(sr_extract_client::ActiveSandbox::Seatbelt)
+    );
 }
 
+#[cfg(windows)]
 #[test]
 fn hostile_corpus_app_container() {
     run(SandboxMode::AppContainer, "ac");
 }
 
+#[cfg(windows)]
 #[test]
 fn hostile_corpus_low_integrity() {
     run(SandboxMode::LowIntegrity, "low");
+}
+
+#[cfg(target_os = "macos")]
+#[test]
+fn hostile_corpus_seatbelt() {
+    run(SandboxMode::Auto, "seatbelt");
 }

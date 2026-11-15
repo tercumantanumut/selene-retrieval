@@ -41,7 +41,10 @@ async fn app_rpc_estimate_folder_controls_and_snapshot_fields() {
     assert!(est["eta_s"].as_u64().unwrap() >= 1, "{est}");
     assert_eq!(est["gpu"], false, "{est}");
     // A refused root gets the add path's code (the app shows "Choose a subfolder").
+    #[cfg(windows)]
     let win = std::env::var("SystemRoot").unwrap_or_else(|_| r"C:\Windows".into());
+    #[cfg(not(windows))]
+    let win = "/System".to_string();
     let err = e
         .rpc("folders.estimate", json!({ "path": win }))
         .await

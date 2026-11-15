@@ -3,16 +3,21 @@
 
 mod common;
 
+#[cfg(windows)]
 use std::path::Path;
+#[cfg(windows)]
 use std::process::Command;
 use std::sync::Arc;
 use std::time::Duration;
 
 use common::*;
-use sr_catalog::repo::{chunks, files, folders};
+#[cfg(windows)]
+use sr_catalog::repo::folders;
+use sr_catalog::repo::{chunks, files};
 use sr_catalog::{FileState, JobKind, RunTrigger};
 use sr_common::error::ErrorCode;
 use sr_common::events::FolderStatus;
+#[cfg(windows)]
 use sr_common::sandbox::{DangerousRoots, Violation};
 use sr_sync::filter::Excluded;
 use sr_sync::{AddFolder, EventOutcome, PathEvent, ScanOutcome, ScanStats};
@@ -303,6 +308,7 @@ async fn racy_rename_is_hashed_and_stays_a_path_refresh_when_unchanged() {
 }
 
 /// `icacls` deny of "list folder" for the current user (no admin needed on own files).
+#[cfg(windows)]
 fn deny_list(dir: &Path, on: bool) -> bool {
     let user = std::env::var("USERNAME").unwrap_or_default();
     let mut c = Command::new("icacls");
@@ -382,6 +388,7 @@ fn cancelled_scan_never_sweeps() {
     assert_eq!(fx.file_paths(id), vec!["a.md", "b.md"]);
 }
 
+#[cfg(windows)]
 fn mklink_junction(link: &Path, target: &Path) -> bool {
     Command::new("cmd")
         .args(["/C", "mklink", "/J"])

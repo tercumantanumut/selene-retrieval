@@ -9,6 +9,28 @@ use serde::{Deserialize, Serialize};
 use super::{ClientKind, Error, ErrorCode, Purpose, Section};
 use crate::ids::{ApprovalId, FolderId, TraceId};
 
+/// The operating system as the user knows it ("Windows didn't allow access …").
+#[cfg(windows)]
+const OS_NAME: &str = "Windows";
+#[cfg(not(windows))]
+const OS_NAME: &str = "Your Mac";
+
+/// Agent phrase and body end for [`ErrorCode::ConnectionNotTrusted`]: only a restart frees it.
+#[cfg(windows)]
+const RESTART_AGENT: &str = "Ask the user to restart Windows; don't retry.";
+#[cfg(not(windows))]
+const RESTART_AGENT: &str = "Ask the user to restart their Mac; don't retry.";
+#[cfg(windows)]
+const RESTART_BODY: &str = "Restart Windows to fix this.";
+#[cfg(not(windows))]
+const RESTART_BODY: &str = "Restart your Mac to fix this.";
+
+/// Agent phrase for [`ErrorCode::FileOnlineOnly`]: where the user keeps the file offline.
+#[cfg(windows)]
+const ONLINE_ONLY_AGENT: &str = "Ask the user to right-click the file in File Explorer and choose \"Always keep on this device\"; it can be read and searched once it is downloaded.";
+#[cfg(not(windows))]
+const ONLINE_ONLY_AGENT: &str = "Ask the user to Control-click the file in Finder and choose \"Always Keep on This Device\"; it can be read and searched once it is downloaded.";
+
 /// The one next action shown with every user-visible error (P1.5).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 #[serde(tag = "kind", content = "arg", rename_all = "snake_case")]
@@ -132,9 +154,9 @@ impl UserMessage {
             // R34: the generic "review the settings" phrase would not tell the agent what to say.
             ErrorCode::IndexMissing => "Ask the user to reconnect the drive that holds the search index, or to open Selene Retrieval and move the index back.".into(),
             // M5-E: the user can fix this in File Explorer (no app setting needed).
-            ErrorCode::FileOnlineOnly => "Ask the user to right-click the file in File Explorer and choose \"Always keep on this device\"; it can be read and searched once it is downloaded.".into(),
+            ErrorCode::FileOnlineOnly => ONLINE_ONLY_AGENT.into(),
             ErrorCode::ManagedByPolicy => "This is blocked by the user's organisation and can't be changed in Selene Retrieval; don't retry.".into(),
-            ErrorCode::ConnectionNotTrusted => "Ask the user to restart Windows; don't retry.".into(),
+            ErrorCode::ConnectionNotTrusted => RESTART_AGENT.into(),
             ErrorCode::PortInUse => "Ask the user to close the program that uses this port, then turn HTTP for local tools on again in Selene Retrieval.".into(),
             _ => self.action.agent_phrase(),
         };
@@ -245,11 +267,11 @@ impl From<&Error> for UserMessage {
             C::PermissionDenied => (
                 "No permission to read".into(),
                 match &c.name {
-                    Some(n) => format!("Windows didn't allow access to \"{n}\"."),
+                    Some(n) => format!("{OS_NAME} didn't allow access to \"{n}\"."),
                     None if c.path.is_some() => {
-                        format!("Windows didn't allow access to {quoted_file}.")
+                        format!("{OS_NAME} didn't allow access to {quoted_file}.")
                     }
-                    None => "Windows didn't allow access to this file.".into(),
+                    None => format!("{OS_NAME} didn't allow access to this file."),
                 },
                 A::Retry,
             ),
@@ -462,8 +484,9 @@ impl From<&Error> for UserMessage {
             // S-01 (M5-E): a pipe squatter. Nothing was sent; only a restart frees the name.
             C::ConnectionNotTrusted => (
                 "Connection not safe".into(),
-                "Another program is using Selene Retrieval's connection, so nothing was sent. Restart Windows to fix this."
-                    .into(),
+                format!(
+                    "Another program is using Selene Retrieval's connection, so nothing was sent. {RESTART_BODY}"
+                ),
                 A::None,
             ),
             // S-03 (M5-E): the remembered port is taken. HTTP stays off; never another port.

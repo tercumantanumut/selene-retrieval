@@ -1,5 +1,7 @@
 //! Job Object cases (Amendment 3.9, M0 tester O1): the client puts the bridge in a kill-on-close
 //! job; the daemon must outlive the job in every case.
+// Windows only: Job Objects have no Unix twin (`attach.rs` covers the group kill on Unix).
+#![cfg(windows)]
 // Test code: panicking on unexpected errors is the point. Each #[tokio::test] owns its runtime,
 // so holding the cross-test serial lock across awaits cannot deadlock.
 #![allow(clippy::unwrap_used, clippy::expect_used, clippy::await_holding_lock)]

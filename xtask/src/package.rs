@@ -175,7 +175,7 @@ fn profile_flags(profile: &str) -> Vec<String> {
         .collect()
 }
 
-fn target_dir() -> PathBuf {
+pub(crate) fn target_dir() -> PathBuf {
     let root = fetch::workspace_root();
     let t = std::env::var_os("CARGO_TARGET_DIR")
         .map(PathBuf::from)
@@ -196,7 +196,7 @@ fn exe(dir: &Path, name: &str) -> PathBuf {
     dir.join(format!("{name}.exe"))
 }
 
-fn cargo(profile: &str, extra: &[String]) -> Result<(), String> {
+pub(crate) fn cargo(profile: &str, extra: &[String]) -> Result<(), String> {
     let cargo = std::env::var("CARGO").unwrap_or_else(|_| "cargo".into());
     let mut cmd = Command::new(cargo);
     cmd.current_dir(fetch::workspace_root())
@@ -318,7 +318,7 @@ fn plan(out: &Path, vendor: &Path) -> Vec<Staged> {
 }
 
 /// The bundled model's five pinned files (same list as `fetch-models`).
-fn model_files() -> Vec<String> {
+pub(crate) fn model_files() -> Vec<String> {
     use sr_common::tier::{MINIMUM, Tier};
     let f = MINIMUM.gpu_file;
     let mut v = vec![f.path.rsplit('/').next().unwrap_or(f.path).to_string()];

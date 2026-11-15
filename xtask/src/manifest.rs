@@ -320,6 +320,8 @@ mod tests {
         );
     }
 
+    // Reads the test binary as a PE file: Windows only.
+    #[cfg(windows)]
     #[test]
     fn xtask_itself_has_no_manifest_yet_and_is_reported() {
         // xtask has no build.rs, so rustc embeds no manifest: the reader must say so, not pass.

@@ -562,3 +562,17 @@ Owner decision: remove the "Only list the files" mode. It let AI apps open and g
 | 17.5 | M6 importer | Not built. The rule of 17.2 applies to it: a Selene folder in `files_only` mode is not imported as a searched folder without the user's say-so. |
 
 **P2 check.** Can an average user do this without documentation? Yes: one Advanced choice fewer, and a folder that was set to only list its files explains itself in one plain sentence on its card, with both answers as buttons; nothing in it is read until the user picks one. No new risk to the standing check.
+
+### Amendment 18: macOS port (owner, 2026-11-14)
+
+Owner decision: build the app on macOS. Asked to choose between a phased port with the same security, a developer-only build without the parser sandbox, a compile-only port, or no change, the owner chose the phased full port, then: "go ahead throughout all phases end to end".
+
+| # | Topic | Decision |
+|---|---|---|
+| 18.1 | Platforms | Windows 10/11 x64 stays the primary platform; macOS on Apple silicon (aarch64-apple-darwin) is added. Windows behaviour does not change: every Windows code path stays and is gated `cfg(windows)`. |
+| 18.2 | Same security | Every Windows protection gets a macOS equivalent or fails closed: named pipe + user-only DACL → Unix socket 0600 in a 0700 per-user folder under the Darwin per-user temp dir, peer uid checked on both sides, extended ACLs removed; `icacls` data dir → owner-only 0700 without ACL entries; Credential Manager → login Keychain; AppContainer + Job Object for `sr-extract` → Seatbelt deny-default profile, resource limits and process-group kill. Until the parser sandbox exists the worker never starts on macOS. |
+| 18.3 | Fail-closed choices | The socket folder is refused when the per-user temp folder carries an ACL allow entry (another account could replace our folder); the service then does not start rather than run with a shared socket folder. |
+| 18.4 | Phases | 1: compiles on macOS. 2: runs end to end (POSIX path sandbox, macOS dangerous roots, hardware tier on Apple silicon, volume identity, FSEvents, audit-token peer trust). 3: parser sandbox. 4: `.app` / `.dmg` packaging. Status and risks (R49–R52, R-UX53–R-UX54) in `04-roadmap.md`. |
+| 18.5 | Distribution | A macOS build is distributed only after phase 3, and signed and notarized only once a Developer ID exists (R-UX54); until then it is ad-hoc signed for development. |
+
+**P2 check.** Can an average user do this without documentation? Windows users see no change. On macOS the target is the same: one `.dmg`, drag to Applications, the wizard. Until signing exists Gatekeeper blocks the first start (R-UX54); that is logged, not hidden.

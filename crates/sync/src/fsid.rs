@@ -14,7 +14,11 @@
 //!
 //! **Reviewed-unsafe module** (workspace lint `unsafe_code = "deny"` is lifted here only): two
 //! Win32 calls on an owned handle with correctly sized, zero-initialised out-structs, and
-//! `GetDriveTypeW` on a NUL-terminated UTF-16 buffer we own.
+//! `GetDriveTypeW` on a NUL-terminated UTF-16 buffer we own. On macOS: `getfsstat(MNT_NOWAIT)`
+//! into a zero-initialised `statfs` buffer we own and size (drive kind).
+//!
+//! macOS: identity = `(st_dev, st_ino)`; online-only = `SF_DATALESS` (iCloud Drive / File
+//! Provider placeholders), read from `lstat` flags, which never downloads the file.
 
 use std::io;
 use std::path::Path;
@@ -39,12 +43,22 @@ pub fn is_online_only(md: &std::fs::Metadata) -> bool {
         use std::os::windows::fs::MetadataExt;
         md.file_attributes() & ONLINE_ONLY_ATTRS != 0
     }
-    #[cfg(not(windows))]
+    #[cfg(target_os = "macos")]
+    {
+        use std::os::macos::fs::MetadataExt;
+        md.st_flags() & SF_DATALESS != 0
+    }
+    #[cfg(not(any(windows, target_os = "macos")))]
     {
         let _ = md;
         false
     }
 }
+
+/// `<sys/stat.h>` `SF_DATALESS`: an iCloud Drive / File Provider placeholder whose contents are
+/// not on this Mac; opening it for reading downloads it.
+#[cfg(target_os = "macos")]
+pub const SF_DATALESS: u32 = 0x4000_0000;
 
 #[cfg(windows)]
 #[allow(unsafe_code)]
@@ -132,8 +146,52 @@ mod imp {
         })
     }
 
+    #[cfg(not(target_os = "macos"))]
     pub fn drive_type(_root: &Path) -> Option<u32> {
         None
+    }
+
+    /// The mount that holds `root` (longest mount point that is a path prefix), from the kernel's
+    /// cached mount table (`getfsstat` with `MNT_NOWAIT`, which never asks a file server, so a
+    /// dead SMB share can't hang this): not `MNT_LOCAL` → remote, `MNT_REMOVABLE` → removable,
+    /// else fixed. `None` if the table can't be read.
+    #[cfg(target_os = "macos")]
+    #[allow(unsafe_code)]
+    pub fn drive_type(root: &Path) -> Option<u32> {
+        use super::{DRIVE_FIXED, DRIVE_REMOTE, DRIVE_REMOVABLE};
+        // <sys/mount.h>; the libc crate does not export MNT_REMOVABLE for Apple targets.
+        const MNT_REMOVABLE: u32 = 0x0000_0200;
+        // SAFETY: a null buffer with size 0 asks only for the number of mounts.
+        let n = unsafe { libc::getfsstat(std::ptr::null_mut(), 0, libc::MNT_NOWAIT) };
+        let n = usize::try_from(n).ok().filter(|n| *n > 0)?;
+        // Room for mounts added between the two calls.
+        let cap = n + 8;
+        // SAFETY: an all-zero statfs is a valid value; the vector owns `cap` of them.
+        let mut buf: Vec<libc::statfs> = vec![unsafe { std::mem::zeroed() }; cap];
+        let bytes = libc::c_int::try_from(cap * std::mem::size_of::<libc::statfs>()).ok()?;
+        // SAFETY: `buf` is writable for `bytes` bytes and outlives the call.
+        let got = unsafe { libc::getfsstat(buf.as_mut_ptr(), bytes, libc::MNT_NOWAIT) };
+        let got = usize::try_from(got).ok()?.min(cap);
+        let text = |b: &[libc::c_char]| {
+            let bytes: Vec<u8> = b
+                .iter()
+                .map(|c| c.to_ne_bytes()[0])
+                .take_while(|c| *c != 0)
+                .collect();
+            String::from_utf8_lossy(&bytes).into_owned()
+        };
+        let best = buf[..got]
+            .iter()
+            .filter(|m| root.starts_with(Path::new(&text(&m.f_mntonname))))
+            .max_by_key(|m| text(&m.f_mntonname).len())?;
+        let flags = best.f_flags;
+        Some(if flags & (libc::MNT_LOCAL as u32) == 0 {
+            DRIVE_REMOTE
+        } else if flags & MNT_REMOVABLE != 0 {
+            DRIVE_REMOVABLE
+        } else {
+            DRIVE_FIXED
+        })
     }
 }
 
@@ -230,5 +288,17 @@ mod tests {
             );
             assert_eq!(drive_kind(Path::new("relative")), DriveKind::Unknown);
         }
+    }
+
+    #[test]
+    #[cfg(target_os = "macos")]
+    fn mac_local_volume_and_regular_files_are_not_online_only() {
+        let d = tempfile::tempdir().unwrap();
+        let root = std::fs::canonicalize(d.path()).unwrap();
+        assert_eq!(drive_kind(&root), DriveKind::Local);
+        assert_eq!(drive_kind(Path::new("/")), DriveKind::Local);
+        let f = root.join("a.txt");
+        std::fs::write(&f, "a").unwrap();
+        assert!(!is_online_only(&std::fs::symlink_metadata(&f).unwrap()));
     }
 }

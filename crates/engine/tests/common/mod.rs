@@ -56,12 +56,12 @@ pub fn tmp() -> tempfile::TempDir {
     tempfile::Builder::new().prefix("w2e").tempdir().unwrap()
 }
 
-/// `target/<profile>/sr-extract.exe`, built on demand.
+/// `target/<profile>/sr-extract[.exe]`, built on demand.
 pub fn worker_exe() -> PathBuf {
     let exe = std::env::current_exe().unwrap();
     // target/<profile>/deps/<test>.exe → target/<profile>/
     let profile_dir = exe.parent().and_then(Path::parent).unwrap().to_path_buf();
-    let w = profile_dir.join("sr-extract.exe");
+    let w = profile_dir.join(format!("sr-extract{}", std::env::consts::EXE_SUFFIX));
     if !w.is_file() {
         let cargo = std::env::var("CARGO").unwrap_or_else(|_| "cargo".into());
         let mut cmd = std::process::Command::new(cargo);
@@ -98,7 +98,7 @@ impl Drop for Profile {
 pub fn worker_config(dir: &Path, profile: &Profile) -> ExtractConfig {
     let app = dir.join("app");
     std::fs::create_dir_all(&app).unwrap();
-    let exe = app.join("sr-extract.exe");
+    let exe = app.join(format!("sr-extract{}", std::env::consts::EXE_SUFFIX));
     std::fs::copy(worker_exe(), &exe).unwrap();
     let mut c = ExtractConfig::new(exe, None);
     c.app_container_name = profile.0.clone();

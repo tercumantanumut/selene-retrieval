@@ -7,6 +7,7 @@
 //     through sr-common (defensive; the shell maps these already). Text is copied verbatim from
 //     `crates/common/src/error/messages.rs`; anything else becomes "Something went wrong".
 import type { UiError } from "@/bindings";
+import { isMac } from "@/lib/platform";
 
 /** Mirrors `sr_common::error::ErrorCode::ALL`, in order (#1–#41). */
 export const ERROR_CODES = [
@@ -72,12 +73,15 @@ export function canRetry(e: Pick<UiError, "details">): boolean {
   return c === null || !NO_RETRY.has(c);
 }
 
+/** sr-common's `RESTART_BODY` (messages.rs), per platform. */
+const RESTART_BODY = isMac ? "Restart your Mac to fix this." : "Restart Windows to fix this.";
+
 /** sr-common's plain text for codes the UI may meet raw. Verbatim, never paraphrased. */
 const PLAIN: Partial<Record<ErrorCode, Pick<UiError, "title" | "body">>> = {
   // #40 (M5-E, S-01): a pipe squatter. Nothing was sent; only a restart frees the name.
   ConnectionNotTrusted: {
     title: "Connection not safe",
-    body: "Another program is using Selene Retrieval's connection, so nothing was sent. Restart Windows to fix this.",
+    body: `Another program is using Selene Retrieval's connection, so nothing was sent. ${RESTART_BODY}`,
   },
 };
 

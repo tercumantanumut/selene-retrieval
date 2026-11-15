@@ -3,7 +3,8 @@
 //! The supervisor treats the worker as hostile: every frame is capped before allocation, the
 //! response id, sizes and UTF-8 are validated, and any violation kills the worker. The
 //! [`Watchdog`] wall-clock timer is the real timeout (M0-C: the Job CPU limit overshoots 2-3× and
-//! is only a backstop); killing the job also unblocks any pipe read or write in progress.
+//! is only a backstop); killing the job also unblocks any pipe read or write in progress. On macOS
+//! the "job" is the worker's process group plus a footprint and CPU watchdog (sandbox/macos.rs).
 
 use std::io::{self, Read, Write};
 use std::path::PathBuf;
@@ -268,7 +269,7 @@ impl Worker {
             )));
         }
         let (job, child, stderr) = worker_guard.take();
-        Ok(Worker {
+        let w = Worker {
             job,
             child,
             ready,
@@ -276,7 +277,11 @@ impl Worker {
             jobs_done: 0,
             spawn_time: t0.elapsed(),
             stderr,
-        })
+        };
+        // macOS: the sandbox is checked from outside before the worker gets any work; on failure
+        // dropping `w` kills it (fail closed). A no-op on Windows.
+        sandbox::verify_worker(&w.child, &w.ready, &spec.exe)?;
+        Ok(w)
     }
 
     pub fn pid(&self) -> u32 {
@@ -293,6 +298,11 @@ impl Worker {
 
     pub fn peak_memory(&self) -> u64 {
         self.job.peak_process_memory()
+    }
+
+    /// Whether the worker should be replaced for a platform limit (macOS: its lifetime CPU).
+    pub fn needs_recycle(&self) -> bool {
+        sandbox::needs_recycle(&self.job)
     }
 
     /// Sends one job and waits for the result (at most `timeout`, enforced by `wd`).

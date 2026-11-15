@@ -237,7 +237,7 @@ impl EngineConfig {
 
     fn tokenizer_path(&self) -> PathBuf {
         self.tokenizer_json.clone().unwrap_or_else(|| {
-            self.app_dir
+            sr_common::install::resources_dir(&self.app_dir)
                 .join("models")
                 .join(sr_providers::models::BUNDLED_MODEL_DIR)
                 .join("tokenizer.json")

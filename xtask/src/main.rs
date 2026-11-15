@@ -26,6 +26,8 @@
 //! * `cargo xtask package [--opt-size] [--no-build]`: size-optimised build, staging, signing
 //!   hooks and the per-user NSIS installer. See [`package`]. `cargo xtask sign <file>...`: signs
 //!   when credentials are configured, otherwise reports UNSIGNED. See [`sign`].
+//! * `cargo xtask package-mac [--no-build] [--no-dmg]`: the macOS app bundle (ad-hoc signed) and
+//!   disk image. See [`package_mac`].
 //!
 //! * `cargo xtask sync-providers [--check]`: regenerates `crates/providers/data/selene-providers.json`
 //!   from Selene's provider registry (read-only) plus our policy table; `--check` fails on drift
@@ -39,6 +41,7 @@ mod fetch;
 mod manifest;
 mod models;
 mod package;
+mod package_mac;
 mod pe;
 mod sign;
 mod sync_providers;
@@ -140,6 +143,7 @@ fn main() -> ExitCode {
         Some("fetch-webview2") => fetch::fetch_webview2_cmd(&args[1..]),
         Some("fetch-wix") => fetch::fetch_wix(&args[1..]),
         Some("package") => package::main(&args[1..]),
+        Some("package-mac") => package_mac::main(&args[1..]),
         Some("sign") => sign::main(&args[1..]),
         Some("schema") => write_schema(args.get(1).map(String::as_str)),
         Some("eval") => eval::main(&args[1..]),
@@ -147,7 +151,7 @@ fn main() -> ExitCode {
         _ => Err(format!(
             "usage: xtask <check-bridge-deps | check-crt [opts] | check-delayload [opts] | check-manifest [opts] \
              | fetch-models [--all] [--dir <d>] | fetch-pdfium | fetch-runtime | fetch-nsis | fetch-wix | fetch-webview2 [--offline [--latest]] [--dir <d>] \
-             | package [--msi] [--webview2-offline] [--opt-size] [--no-build] [--stage-only] [--profile <p>] [--vendor <d>] | sign <file>... \
+             | package [--msi] [--webview2-offline] [--opt-size] [--no-build] [--stage-only] [--profile <p>] [--vendor <d>] | package-mac [--no-build] [--no-dmg] | sign <file>... \
              | schema [out.json] | sync-providers [--check] [--selene <dir>] [--out <file>] | eval ...>\n  check-* opts: [--profile <p>] [--no-build] \
              [--exe <path>]...\n{}",
             eval::USAGE

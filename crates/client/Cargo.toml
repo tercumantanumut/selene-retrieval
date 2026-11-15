@@ -13,7 +13,13 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 sr-common = { workspace = true }
 tokio = { workspace = true }
+
+[target.'cfg(windows)'.dependencies]
 windows-sys = { workspace = true, features = ["Win32_System_IO", "Win32_System_SystemInformation", "Win32_System_Com", "Win32_UI_Shell", "Win32_Networking_WinSock"] }
+
+# macOS port: the Unix socket transport (`sr_client::unix`).
+[target.'cfg(unix)'.dependencies]
+libc = { workspace = true }
 
 [lints]
 workspace = true

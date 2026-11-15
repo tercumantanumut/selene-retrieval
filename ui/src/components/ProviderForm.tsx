@@ -18,6 +18,7 @@ import { MANAGED_TEXT, PATHS, usePolicy } from "@/lib/policy";
 import { modelName } from "@/lib/format";
 import { keyFieldStore } from "@/lib/store";
 import { AlertTriangle, CheckCircle2 } from "lucide-react";
+import { KEY_STORE } from "@/lib/platform";
 
 export function useProviderList(): ProviderOption[] | undefined {
   return useQuery({ queryKey: PROVIDERS_LIST_KEY, queryFn: () => commands.getProviders() }).data;
@@ -208,7 +209,7 @@ export function ProviderForm({
             </Button>
           </div>
           <p id={`${ids}-help`} className="text-xs text-muted-foreground">
-            Your key is checked with {name ?? "your provider"} and kept in Windows Credential Manager, never in a file.
+            Your key is checked with {name ?? "your provider"} and kept in {KEY_STORE}, never in a file.
           </p>
           {provider?.key_url && <KeyLink url={provider.key_url} label="Where do I get a key?" />}
         </div>

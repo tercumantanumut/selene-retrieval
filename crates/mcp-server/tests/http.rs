@@ -86,7 +86,10 @@ async fn wait_running(e: &EngineHandle, running: bool) -> Option<u16> {
         }
         tokio::time::sleep(Duration::from_millis(50)).await;
     }
-    panic!("HTTP listener did not become running={running}");
+    panic!(
+        "HTTP listener did not become running={running}: {:?}",
+        e.http_status()
+    );
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]

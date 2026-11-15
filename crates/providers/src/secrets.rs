@@ -9,6 +9,8 @@
 //! * [`purge_all`] deletes every `SeleneRetrieval/*` credential: "Delete all my data" and the
 //!   uninstaller (see the final report for the installer hook).
 //! * [`ApiKey`] redacts itself in `Debug`/`Display`; [`key_hint`] gives the "ends in 1234" text.
+//! * macOS: the login keychain instead, generic passwords with service `SeleneRetrieval` and the
+//!   same accounts (`provider:<id>`, `proxy`).
 
 use std::collections::HashMap;
 use std::fmt;
@@ -147,10 +149,12 @@ impl SecretStore for MemorySecretStore {
     }
 }
 
-#[cfg(feature = "keyring")]
+#[cfg(all(feature = "keyring", windows))]
 pub use credman::{KeyringStore, purge_all};
+#[cfg(all(feature = "keyring", target_os = "macos"))]
+pub use keychain::{KeyringStore, purge_all};
 
-#[cfg(feature = "keyring")]
+#[cfg(all(feature = "keyring", windows))]
 mod credman {
     use std::collections::HashMap;
     use std::sync::Arc;
@@ -244,6 +248,115 @@ mod credman {
                 Err(KError::NoEntry) => {}
                 Err(err) => return Err(kerr("delete", &err)),
             }
+        }
+        Ok(n)
+    }
+}
+
+#[cfg(all(feature = "keyring", target_os = "macos"))]
+mod keychain {
+    use std::collections::HashMap;
+    use std::sync::Arc;
+
+    use apple_native_keyring_store::keychain::Store;
+    use keyring_core::api::CredentialStoreApi;
+    use keyring_core::{Entry, Error as KError};
+    use sr_common::error::{Error, ErrorCode};
+
+    use super::*;
+
+    /// Keychain service of every item we create (the Windows credential's service name).
+    const SERVICE: &str = "SeleneRetrieval";
+
+    /// macOS login keychain store: generic passwords, service [`SERVICE`], account `<account>`.
+    pub struct KeyringStore {
+        store: Arc<Store>,
+    }
+
+    impl fmt::Debug for KeyringStore {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            f.write_str("KeyringStore(macOS keychain)")
+        }
+    }
+
+    /// Error without any secret material: only the variant name goes to Details
+    /// (`BadEncoding` / `BadDataFormat` carry raw secret bytes and are never printed).
+    fn kerr(op: &str, e: &KError) -> Error {
+        let kind = match e {
+            KError::PlatformFailure(_) => "platform failure",
+            KError::NoStorageAccess(_) => "no storage access",
+            KError::NoEntry => "no entry",
+            KError::BadEncoding(_) => "bad encoding",
+            KError::BadDataFormat(..) => "bad data format",
+            KError::BadStoreFormat(_) => "bad store format",
+            KError::TooLong(..) => "too long",
+            KError::Invalid(..) => "invalid",
+            KError::Ambiguous(_) => "ambiguous",
+            KError::NoDefaultStore => "no default store",
+            KError::NotSupportedByStore(_) => "not supported",
+            _ => "other",
+        };
+        Error::new(ErrorCode::Internal).with_detail(format!("keychain {op}: {kind}"))
+    }
+
+    fn entry(store: &Store, account: &str) -> Result<Entry> {
+        store
+            .build(SERVICE, account, None)
+            .map_err(|e| kerr("build", &e))
+    }
+
+    /// Deletes one entry; `true` if it existed.
+    fn delete(e: &Entry) -> Result<bool> {
+        match e.delete_credential() {
+            Ok(()) => Ok(true),
+            Err(KError::NoEntry) => Ok(false),
+            Err(err) => Err(kerr("delete", &err)),
+        }
+    }
+
+    impl KeyringStore {
+        pub fn new() -> Result<Self> {
+            let store = Store::new().map_err(|e| kerr("open", &e))?;
+            Ok(Self { store })
+        }
+    }
+
+    impl SecretStore for KeyringStore {
+        fn get(&self, account: &str) -> Result<Option<String>> {
+            match entry(&self.store, account)?.get_password() {
+                Ok(s) => Ok(Some(s)),
+                Err(KError::NoEntry) => Ok(None),
+                Err(e) => Err(kerr("read", &e)),
+            }
+        }
+        fn set(&self, account: &str, secret: &str) -> Result<()> {
+            entry(&self.store, account)?
+                .set_password(secret)
+                .map_err(|e| kerr("write", &e))
+        }
+        fn delete(&self, account: &str) -> Result<()> {
+            delete(&entry(&self.store, account)?).map(|_| ())
+        }
+    }
+
+    /// Deletes every `SeleneRetrieval` keychain item of the current user. Returns how many were
+    /// deleted. Idempotent. The keychain has no pattern search, so the known accounts (every
+    /// registry provider and the proxy) are deleted by name, then any other item with our exact
+    /// service name (e.g. a provider since removed from the registry).
+    pub fn purge_all() -> Result<usize> {
+        let store = Store::new().map_err(|e| kerr("open", &e))?;
+        let mut n = 0;
+        let known = crate::registry::manifest()
+            .providers()
+            .map(|p| provider_account(&p.id))
+            .chain(std::iter::once(PROXY_ACCOUNT.to_string()));
+        for account in known {
+            n += usize::from(delete(&entry(&store, &account)?)?);
+        }
+        let spec: HashMap<&str, &str> = HashMap::from([("service", SERVICE)]);
+        let rest = store.search(&spec).map_err(|e| kerr("search", &e))?;
+        for e in rest {
+            n += usize::from(delete(&e)?);
         }
         Ok(n)
     }
